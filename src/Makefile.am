@@ -35,7 +35,7 @@ LIBBITCOIN_CRYPTO_BASE=crypto/libbitcoin_crypto_base.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 
-CHIAPOS_LIBS = -lbls -lrelic_s -lsodium -lbhd_vdf
+CHIAPOS_LIBS = -lbls -lrelic_s -lsodium -ltime_vdf
 
 CHIAPOS_KERNEL_INCLUDES = \
   chiapos/kernel/chiapos_types.h \
