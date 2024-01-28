@@ -546,7 +546,7 @@
     </message>
     <message>
         <location line="-257"/>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -561,7 +561,7 @@
     </message>
     <message>
         <location line="+3"/>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1861,7 +1861,7 @@
     </message>
     <message>
         <location line="-531"/>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1876,7 +1876,7 @@
     </message>
     <message>
         <location line="-55"/>
-        <source>&apos;btchd://&apos; is not a valid URI. Use &apos;btchd:&apos; instead.</source>
+        <source>&apos;depinc://&apos; is not a valid URI. Use &apos;depinc:&apos; instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3337,7 +3337,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of &quot;100 satos
     </message>
     <message>
         <location line="+54"/>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

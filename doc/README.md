@@ -15,12 +15,12 @@ The following are some helpful notes on how to run DePINC Core on your native pl
 
 Unpack the files into a directory and run:
 
-- `bin/btchd-qt` (GUI) or
+- `bin/depinc-qt` (GUI) or
 - `bin/depincd` (headless)
 
 ### Windows
 
-Unpack the files into a directory, and then run btchd-qt.exe.
+Unpack the files into a directory, and then run depinc-qt.exe.
 
 ### macOS
 
@@ -68,7 +68,7 @@ The DePINC repo's [root README](/README.md) contains relevant information on the
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)
-- [btchd.conf Configuration File](bitcoin-conf.md)
+- [depinc.conf Configuration File](bitcoin-conf.md)
 - [Files](files.md)
 - [Fuzz-testing](fuzzing.md)
 - [Reduce Memory](reduce-memory.md)

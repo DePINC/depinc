@@ -390,8 +390,8 @@
         <translation>Panel s listy</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Požaduj platby (generuje QR kódy a btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Požaduj platby (generuje QR kódy a depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -402,8 +402,8 @@
         <translation>Ukaž seznam použitých přijímacích adres a jejich označení</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Načti btchd: URI nebo platební požadavek</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Načti depinc: URI nebo platební požadavek</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1357,16 +1357,16 @@
         <translation>Chyba platebního požadavku</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Nemůžu spustit btchd: obsluha click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Nemůžu spustit depinc: obsluha click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Zpracování URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' není platné URI. Místo toho použij 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' není platné URI. Místo toho použij 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2448,8 +2448,8 @@ Poznámka: Jelikož je poplatek počítaný za bajt, poplatek o hodnotě "100 sa
         <translation>Zadej označení této adresy; obojí se ti pak uloží do adresáře</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Zpráva, která byla připojena k btchd: URI a která se ti pro přehled uloží k transakci. Poznámka: Tahle zpráva se neposílá s platbou po bitcoinové síti.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Zpráva, která byla připojena k depinc: URI a která se ti pro přehled uloží k transakci. Poznámka: Tahle zpráva se neposílá s platbou po bitcoinové síti.</translation>
     </message>
     <message>
         <source>Pay To:</source>

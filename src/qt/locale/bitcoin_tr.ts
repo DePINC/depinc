@@ -394,7 +394,7 @@
         <translation>Sekme araç çubuğu</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Ödeme talep et (QR kodu ve bitcoin URI'si oluşturur)</translation>
     </message>
     <message>
@@ -406,8 +406,8 @@
         <translation>Kullanılan alış adreslerinin ve etiketlerinin listesini göster</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Bir btchd: bağlantısı ya da ödeme talebi aç</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Bir depinc: bağlantısı ya da ödeme talebi aç</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1317,7 +1317,7 @@
         <translation>Ödeme isteği hatası</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>DePINC başlatılamadı: tıkla-ve-öde yöneticisi</translation>
     </message>
     <message>
@@ -1325,8 +1325,8 @@
         <translation>URI yönetimi</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' geçerli bir protokol değil. Onun yerine 'btchd:' kullanınız.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' geçerli bir protokol değil. Onun yerine 'depinc:' kullanınız.</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2348,8 +2348,8 @@
         <translation>Kullanılmış adres listesine eklemek için bu adrese bir etiket girin</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Referans için btchd: URI'siyle iliştirilmiş işlemle birlikte depolanacak bir ileti. Not: Bu mesaj DePINC ağı üzerinden gönderilmeyecektir.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Referans için depinc: URI'siyle iliştirilmiş işlemle birlikte depolanacak bir ileti. Not: Bu mesaj DePINC ağı üzerinden gönderilmeyecektir.</translation>
     </message>
     <message>
         <source>Pay To:</source>

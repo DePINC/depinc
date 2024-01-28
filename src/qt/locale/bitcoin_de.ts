@@ -430,8 +430,8 @@
         <translation>Registerkartenleiste</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Zahlungen anfordern (erzeugt QR-Codes und "btchd:"-URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Zahlungen anfordern (erzeugt QR-Codes und "depinc:"-URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Liste verwendeter Empfangsadressen und Bezeichnungen anzeigen</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Eine "btchd:"-URI oder Zahlungsanforderung öffnen</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Eine "depinc:"-URI oder Zahlungsanforderung öffnen</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1477,7 +1477,7 @@
         <translation>Fehler bei der Zahlungsanforderung</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Kann DePINC nicht starten: Klicken-zum-Bezahlen-Handler</translation>
     </message>
     <message>
@@ -1485,8 +1485,8 @@
         <translation>URI-Verarbeitung</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' ist kein gültiger URL. Bitte 'btchd:' nutzen.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' ist kein gültiger URL. Bitte 'depinc:' nutzen.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2596,8 +2596,8 @@ Hinweis: Eine Gebühr von "100 Satoshis pro kB" bei einer Größe der Transaktio
         <translation>Adressbezeichnung eingeben, die dann zusammen mit der Adresse der Liste bereits verwendeter Adressen hinzugefügt wird.</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Eine an die "btchd:"-URI angefügte Nachricht, die zusammen mit der Transaktion gespeichert wird. Hinweis: Diese Nachricht wird nicht über das DePINC-Netzwerk gesendet.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Eine an die "depinc:"-URI angefügte Nachricht, die zusammen mit der Transaktion gespeichert wird. Hinweis: Diese Nachricht wird nicht über das DePINC-Netzwerk gesendet.</translation>
     </message>
     <message>
         <source>Pay To:</source>

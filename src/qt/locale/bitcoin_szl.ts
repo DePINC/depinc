@@ -390,8 +390,8 @@
         <translation>Lajsta szkart</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Żōndej płatu (gyneruje kod QR jak tyż URI btchd:)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Żōndej płatu (gyneruje kod QR jak tyż URI depinc:)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -402,8 +402,8 @@
         <translation>Pokŏż wykŏz adres i etyket użytych do ôdbiyraniŏ</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Ôdewrzij URI btchd: abo żōndanie płatu</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Ôdewrzij URI depinc: abo żōndanie płatu</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1169,8 +1169,8 @@
         <translation>Bedynōng URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' to niyma nŏleżne URI. Użyj 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' to niyma nŏleżne URI. Użyj 'depinc:'.</translation>
     </message>
     <message>
         <source>Payment request network doesn't match client network.</source>
@@ -1680,8 +1680,8 @@
         <translation>Wiadōmość:</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Wiadōmość, kerŏ ôstała prziwstōnŏ do URI btchd:, kerŏ bydzie przechowowanŏ z transakcyjōm w cylach informacyjnych. Napōmniynie: Ta wiadōmość niy bydzie rozszyrzowanŏ w necu DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Wiadōmość, kerŏ ôstała prziwstōnŏ do URI depinc:, kerŏ bydzie przechowowanŏ z transakcyjōm w cylach informacyjnych. Napōmniynie: Ta wiadōmość niy bydzie rozszyrzowanŏ w necu DePINC.</translation>
     </message>
     </context>
 <context>

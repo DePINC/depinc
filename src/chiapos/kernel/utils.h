@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_UTILS_H
-#define BTCHD_CHIAPOS_UTILS_H
+#ifndef DEPINC_CHIAPOS_UTILS_H
+#define DEPINC_CHIAPOS_UTILS_H
 
 #include <memory>
 

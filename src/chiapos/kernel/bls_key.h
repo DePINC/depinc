@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_BLS_KEY_H
-#define BTCHD_CHIAPOS_BLS_KEY_H
+#ifndef DEPINC_CHIAPOS_BLS_KEY_H
+#define DEPINC_CHIAPOS_BLS_KEY_H
 
 #include <array>
 #include <memory>

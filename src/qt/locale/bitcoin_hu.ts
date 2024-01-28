@@ -426,8 +426,8 @@
         <translation>Fül eszköztár</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Fizetési kérelem (QR-kódot és "btchd:" URI azonosítót hoz létre)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Fizetési kérelem (QR-kódot és "depinc:" URI azonosítót hoz létre)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -438,8 +438,8 @@
         <translation>A használt fogadó címek és címkék megtekintése</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>"btchd:" URI azonosító vagy fizetési kérelem megnyitása</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>"depinc:" URI azonosító vagy fizetési kérelem megnyitása</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1424,7 +1424,7 @@
         <translation>Hiba történt a fizetési kérelem során</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>A bitcoin nem tud elindulni: click-to-pay kezelő</translation>
     </message>
     <message>

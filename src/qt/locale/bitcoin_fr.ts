@@ -430,8 +430,8 @@
         <translation>Barre d’outils des onglets</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Demander des paiements (génère des codes QR et des URI btchd:)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Demander des paiements (génère des codes QR et des URI depinc:)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Afficher la liste d’adresses de réception et d’étiquettes utilisées</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Ouvrir une URI btchd: ou une demande de paiement</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Ouvrir une URI depinc: ou une demande de paiement</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,16 +1469,16 @@
         <translation>Erreur de demande de paiement</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Impossible de démarrer le gestionnaire de cliquer-pour-payer btchd:</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Impossible de démarrer le gestionnaire de cliquer-pour-payer depinc:</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Gestion des URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' n’est pas une URI valide. Utilisez plutôt 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' n’est pas une URI valide. Utilisez plutôt 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2588,8 +2588,8 @@ Note : Les frais étant calculés par octet, des frais de « 100 satoshis par
         <translation>Saisir une étiquette pour cette adresse afin de l’ajouter à la liste d’adresses utilisées</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Un message qui était joint à l’URI btchd: et qui sera stocké avec la transaction pour référence. Note : Ce message ne sera pas envoyé par le réseau DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Un message qui était joint à l’URI depinc: et qui sera stocké avec la transaction pour référence. Note : Ce message ne sera pas envoyé par le réseau DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

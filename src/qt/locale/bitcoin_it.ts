@@ -430,8 +430,8 @@
         <translation>Barra degli strumenti</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Richiedi pagamenti (genera codici QR e btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Richiedi pagamenti (genera codici QR e depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Mostra la lista degli indirizzi di ricezione utilizzati</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Apri un btchd: URI o una richiesta di pagamento</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Apri un depinc: URI o una richiesta di pagamento</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1470,16 +1470,16 @@ Per specificare più URL separarli con una barra verticale "|".</translation>
         <translation>Errore di richiesta di pagamento</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Impossibile avviare btchd: gestore click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Impossibile avviare depinc: gestore click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Gestione URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' non è un URI valido. Usa invece 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' non è un URI valido. Usa invece 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2589,7 +2589,7 @@ Nota: poiché la commissione è calcolata su base per byte, una commissione di "
         <translation>Inserisci un'etichetta per questo indirizzo per aggiungerlo alla lista degli indirizzi utilizzati</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>Messaggio incluso nel bitcoin URI e che sarà memorizzato con la transazione per tuo riferimento. Nota: Questo messaggio non sarà inviato attraverso la rete DePINC.</translation>
     </message>
     <message>

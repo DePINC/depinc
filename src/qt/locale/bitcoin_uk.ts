@@ -426,8 +426,8 @@
         <translation>Панель вкладок</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Створити запит платежу (генерує QR-код та btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Створити запит платежу (генерує QR-код та depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -438,8 +438,8 @@
         <translation>Показати список адрес і міток, що були використані для отримання</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Відкрити btchd: URI чи запит платежу</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Відкрити depinc: URI чи запит платежу</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1437,7 +1437,7 @@
         <translation>Помилка запиту платежу</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Не вдається запустити біткойн: обробник клацни-плати</translation>
     </message>
     <message>
@@ -1445,8 +1445,8 @@
         <translation>Обробка URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' не вірний URI. Використовуйте 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' не вірний URI. Використовуйте 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2530,8 +2530,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Введіть мітку для цієї адреси для додавання її в список використаних адрес</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Повідомлення, що було додане до btchd:URI та буде збережено разом з транзакцією для довідки. Примітка: Це повідомлення не буде відправлено в мережу DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Повідомлення, що було додане до depinc:URI та буде збережено разом з транзакцією для довідки. Примітка: Це повідомлення не буде відправлено в мережу DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

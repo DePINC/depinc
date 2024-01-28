@@ -390,8 +390,8 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Humiling ng bayad (lumilikha ng QR codes at btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Humiling ng bayad (lumilikha ng QR codes at depinc: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -402,8 +402,8 @@
         <translation>Ipakita ang talaan ng mga gamit na address at label para sa pagtanggap</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Buksan ang btchd: URI o kahilingan ng bayad</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Buksan ang depinc: URI o kahilingan ng bayad</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1341,16 +1341,16 @@
         <translation>Kamalian sa paghiling ng bayad</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Hindi masimulan ang btchd: click-to-pay handler</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Hindi masimulan ang depinc: click-to-pay handler</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI handling</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>Ang 'btchd://' ay hindi wastong URI. Sa halip, gamitin ang 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>Ang 'depinc://' ay hindi wastong URI. Sa halip, gamitin ang 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2432,8 +2432,8 @@ Tandaan: Dahil ang bayad  ay kinakalkula sa bawat-byte na batayan, ang bayad ng 
         <translation>Mag-enter ng label para sa address na ito upang idagdag ito sa listahan ng mga gamit na address.</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Mensahe na nakalakip sa btchd: URI na kung saan maiimbak kasama ang transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Mensahe na nakalakip sa depinc: URI na kung saan maiimbak kasama ang transaksyon para sa iyong sanggunian. Tandaan: Ang mensaheng ito ay hindi ipapadala sa network ng DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

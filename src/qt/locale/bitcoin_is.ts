@@ -378,8 +378,8 @@
         <translation>Tólaborð flipa</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Óska eftir greiðslum (býr til QR kóða og btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Óska eftir greiðslum (býr til QR kóða og depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -390,8 +390,8 @@
         <translation>Sýna færslugildi sem notuð hafa verið til að taka við mynt og merkingar þeirra</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Opna btchd: URI eða greiðslubeiðni</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Opna depinc: URI eða greiðslubeiðni</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

@@ -95,8 +95,8 @@ void setupAddressWidget(QValidatedLineEdit *widget, QWidget *parent)
 
 bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
 {
-    // return if URI is not valid or is no btchd: URI
-    if(!uri.isValid() || uri.scheme() != QString("btchd"))
+    // return if URI is not valid or is no depinc: URI
+    if(!uri.isValid() || uri.scheme() != QString("depinc"))
         return false;
 
     SendCoinsRecipient rv;
@@ -160,7 +160,7 @@ QString formatBitcoinURI(const SendCoinsRecipient &info)
 {
     bool bech_32 = info.address.startsWith(QString::fromStdString(Params().Bech32HRP() + "1"));
 
-    QString ret = QString("btchd:%1").arg(bech_32 ? info.address.toUpper() : info.address);
+    QString ret = QString("depinc:%1").arg(bech_32 ? info.address.toUpper() : info.address);
     int paramCount = 0;
 
     if (info.amount)
@@ -378,7 +378,7 @@ bool openBitcoinConf()
 
     configFile.close();
 
-    /* Open btchd.conf with the associated application */
+    /* Open depinc.conf with the associated application */
     bool res = QDesktopServices::openUrl(QUrl::fromLocalFile(boostPathToQString(pathConfig)));
 #ifdef Q_OS_MAC
     // Workaround for macOS-specific behavior; see #15409.
@@ -617,8 +617,8 @@ fs::path static GetAutostartFilePath()
 {
     std::string chain = gArgs.GetChainName();
     if (chain == CBaseChainParams::MAIN)
-        return GetAutostartDir() / "btchd.desktop";
-    return GetAutostartDir() / strprintf("btchd-%s.lnk", chain);
+        return GetAutostartDir() / "depinc.desktop";
+    return GetAutostartDir() / strprintf("depinc-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()

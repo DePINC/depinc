@@ -431,8 +431,8 @@ Försök igen.</translation>
         <translation>Verktygsfält för flikar</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Begär betalningar (skapar QR-koder och btchd: -URIer)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Begär betalningar (skapar QR-koder och depinc: -URIer)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -443,8 +443,8 @@ Försök igen.</translation>
         <translation>Visa listan med använda mottagaradresser och etiketter</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Öppna en btchd: URI eller betalningsbegäran</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Öppna en depinc: URI eller betalningsbegäran</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1438,16 +1438,16 @@ Försök igen.</translation>
         <translation>Fel vid betalningsbegäran</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Kan inte starta btchd: klicka-och-betala hanteraren</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Kan inte starta depinc: klicka-och-betala hanteraren</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI-hantering</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' är inte en accepterad URI. Använd 'btchd:' istället.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' är inte en accepterad URI. Använd 'depinc:' istället.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2537,8 +2537,8 @@ Notera: Då avgiften beräknas per byte kommer en avgift på 50 satoshi tas ut f
         <translation>Ange en etikett för denna adress för att lägga till den i listan med använda adresser</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Ett meddelande som bifogades btchd: -URIn och som sparas med transaktionen som referens. Obs: Meddelandet sänds inte över DePINC-nätverket.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Ett meddelande som bifogades depinc: -URIn och som sparas med transaktionen som referens. Obs: Meddelandet sänds inte över DePINC-nätverket.</translation>
     </message>
     <message>
         <source>Pay To:</source>

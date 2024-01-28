@@ -398,8 +398,8 @@
         <translation>סרגל כלים לשוניות</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>בקשת תשלומים (יצירה של קודים מסוג QR וסכימות כתובות משאב של :btchd)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>בקשת תשלומים (יצירה של קודים מסוג QR וסכימות כתובות משאב של :depinc)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -410,7 +410,7 @@
         <translation>הצגת רשימת הכתובות והתוויות הנמצאות בשימוש</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>פתיחת ביטקוין: כתובת משאב או בקשת תשלום</translation>
     </message>
     <message>
@@ -1365,16 +1365,16 @@
         <translation>שגיאת בקשת תשלום</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>לא ניתן להפעיל את המקשר btchd: click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>לא ניתן להפעיל את המקשר depinc: click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>טיפול בכתובות</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'//:btchd' אינה כתובת URI תקינה. השתמשו במקום ב ':btchd'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'//:depinc' אינה כתובת URI תקינה. השתמשו במקום ב ':depinc'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2456,7 +2456,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>יש להזין תווית עבור כתובת זו כדי להוסיף אותה לרשימת הכתובות בשימוש</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>הודעה שצורפה לביטקוין: כתובת שתאוחסן בהעברה לצורך מעקב מצדך. לתשומת לבך: הודעה זו לא תישלח ברשת הביטקוין.</translation>
     </message>
     <message>

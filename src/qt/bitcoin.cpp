@@ -175,7 +175,7 @@ void BitcoinCore::shutdown()
 }
 
 static int qt_argc = 1;
-static const char* qt_argv = "btchd-qt";
+static const char* qt_argv = "depinc-qt";
 
 BitcoinApplication::BitcoinApplication(interfaces::Node& node):
     QApplication(qt_argc, const_cast<char **>(&qt_argv)),
@@ -364,7 +364,7 @@ void BitcoinApplication::initializeResult(bool success)
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
-        // btchd: URIs or payment requests:
+        // depinc: URIs or payment requests:
         if (paymentServer) {
             connect(paymentServer, &PaymentServer::receivedPaymentRequest, window, &BitcoinGUI::handlePaymentRequest);
             connect(window, &BitcoinGUI::receivedURI, paymentServer, &PaymentServer::handleURIOrFile);
@@ -506,7 +506,7 @@ int GuiMain(int argc, char* argv[])
     // Gracefully exit if the user cancels
     if (!Intro::showIfNeeded(*node, did_show_intro, prune)) return EXIT_SUCCESS;
 
-    /// 6. Determine availability of data directory and parse btchd.conf
+    /// 6. Determine availability of data directory and parse depinc.conf
     /// - Do not call GetDataDir(true) before this step finishes
     if (!CheckDataDirOption()) {
         node->initError(strprintf("Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "")));
@@ -566,7 +566,7 @@ int GuiMain(int argc, char* argv[])
         exit(EXIT_SUCCESS);
 
     // Start up the payment server early, too, so impatient users that click on
-    // btchd: links repeatedly have their payment requests routed to this process:
+    // depinc: links repeatedly have their payment requests routed to this process:
     if (WalletModel::isWalletEnabled()) {
         app.createPaymentServer();
     }

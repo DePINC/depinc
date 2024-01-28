@@ -621,7 +621,7 @@ void SetupServerArgs()
 
 std::string LicenseInfo()
 {
-    const std::string URL_SOURCE_CODE = "<https://github.com/bhdone/btchd>";
+    const std::string URL_SOURCE_CODE = "<https://github.com/depinc/depinc>";
     const std::string URL_WEBSITE = "<https://depinc.org>";
 
     return CopyrightHolders(_("Copyright (C) %s").translated) + "\n" +

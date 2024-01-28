@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_PLOTTER_ID_H
-#define BTCHD_CHIAPOS_PLOTTER_ID_H
+#ifndef DEPINC_CHIAPOS_PLOTTER_ID_H
+#define DEPINC_CHIAPOS_PLOTTER_ID_H
 
 #include <streams.h>
 

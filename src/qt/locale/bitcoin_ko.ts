@@ -414,8 +414,8 @@
         <translation>툴바 색인표</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>지불 요청하기 (QR코드와 btchd: URI를 생성합니다)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>지불 요청하기 (QR코드와 depinc: URI를 생성합니다)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -426,8 +426,8 @@
         <translation>한번 이상 사용된 받는 주소와 라벨의 목록을 보여줍니다</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>btchd: URI 또는 지불요청 열기</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>depinc: URI 또는 지불요청 열기</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1413,16 +1413,16 @@
         <translation>지불 요청 오류</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>btchd: 핸들러를 시작할 수 없음</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>depinc: 핸들러를 시작할 수 없음</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI 핸들링</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://"은 잘못된 URI입니다. 'btchd:'을 사용하십시오.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://"은 잘못된 URI입니다. 'depinc:'을 사용하십시오.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2572,8 +2572,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>이 주소에 라벨을 입력하면 사용된 주소 목록에 라벨이 표시됩니다</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>btchd: URI에 추가된 메시지는 참고를 위해 거래내역과 함께 저장될 것입니다. Note: 이 메시지는 비트코인 네트워크로 전송되지 않습니다.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>depinc: URI에 추가된 메시지는 참고를 위해 거래내역과 함께 저장될 것입니다. Note: 이 메시지는 비트코인 네트워크로 전송되지 않습니다.</translation>
     </message>
     <message>
         <source>Pay To:</source>

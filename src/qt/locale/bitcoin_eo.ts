@@ -350,8 +350,8 @@
         <translation>Langeto-breto</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Peti pagon (kreas QR-kodojn kaj URI-ojn kun prefikso btchd:)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Peti pagon (kreas QR-kodojn kaj URI-ojn kun prefikso depinc:)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -362,8 +362,8 @@
         <translation>Vidigi la liston de uzitaj ricevaj adresoj kaj etikedoj</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Malfermi btchd:-URI-on aŭ pagpeton</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Malfermi depinc:-URI-on aŭ pagpeton</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>

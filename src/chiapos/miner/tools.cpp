@@ -61,19 +61,19 @@ std::string GetDefaultDataDir(bool is_testnet, std::string const& filename) {
 #ifdef _WIN32
     std::string home_str = getenv("APPDATA");
     Path path(home_str);
-    path /= "btchd";
+    path /= "depinc";
 #endif
 
 #ifdef __APPLE__
     std::string home_str = getenv("HOME");
     Path path(home_str);
-    path = path / "Library" / "Application Support" / "btchd";
+    path = path / "Library" / "Application Support" / "depinc";
 #endif
 
 #ifdef __linux__
     std::string home_str = getenv("HOME");
     Path path(home_str);
-    path /= ".btchd";
+    path /= ".depinc";
 #endif
 
     if (is_testnet) {

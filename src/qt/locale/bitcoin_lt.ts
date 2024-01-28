@@ -394,8 +394,8 @@
         <translation>Kortelių įrankinė</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Reikalauti mokėjimų (sukuria QR kodus ir btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Reikalauti mokėjimų (sukuria QR kodus ir depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -406,8 +406,8 @@
         <translation>Rodyti sąrašą panaudotų gavimo adresų ir žymių</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Atidaryti btchd: URI ar apmokėjimo reikalavimą</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Atidaryti depinc: URI ar apmokėjimo reikalavimą</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1357,16 +1357,16 @@
         <translation>Mokėjimo užklausos klaida</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Negalima paleisti btchd: paspauskite sumokėti tvarkytojui</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Negalima paleisti depinc: paspauskite sumokėti tvarkytojui</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI tvarkymas</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>„btchd: //“ nėra galiojantis URI. Vietoj to naudokite „btchd:“.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>„depinc: //“ nėra galiojantis URI. Vietoj to naudokite „depinc:“.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2444,8 +2444,8 @@ Pastaba: Kadangi mokestis apskaičiuojamas pagal baitą, mokestis už „100 sat
         <translation>Įveskite šio adreso etiketę, kad ją pridėtumėte prie naudojamų adresų sąrašo</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Pranešimas, kuris buvo pridėtas prie btchd: URI, kuris bus saugomas kartu su sandoriu jūsų nuoroda. Pastaba: šis pranešimas nebus išsiųstas per „DePINC“ tinklą.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Pranešimas, kuris buvo pridėtas prie depinc: URI, kuris bus saugomas kartu su sandoriu jūsų nuoroda. Pastaba: šis pranešimas nebus išsiųstas per „DePINC“ tinklą.</translation>
     </message>
     <message>
         <source>Pay To:</source>

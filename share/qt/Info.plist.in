@@ -29,16 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>BTCHD-Qt</string>
+  <string>DEPINC-Qt</string>
   
   <key>CFBundleName</key>
-  <string>BTCHD-Qt</string>
+  <string>DEPINC-Qt</string>
 
   <key>LSHasLocalizedDisplayName</key>
   <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>org.btchd.BTCHD-Qt</string>
+  <string>org.depinc.DEPINC-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -46,10 +46,10 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>org.btchd.BTCHDPayment</string>
+      <string>org.depinc.DEPINCPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>btchd</string>
+        <string>depinc</string>
       </array>
     </dict>
   </array>
@@ -58,7 +58,7 @@
   <array>
     <dict>
       <key>UTTypeIdentifier</key>
-      <string>org.btchd.paymentrequest</string>
+      <string>org.depinc.paymentrequest</string>
       <key>UTTypeDescription</key>
       <string>DePINC payment request</string>
       <key>UTTypeConformsTo</key>
@@ -68,7 +68,7 @@
       <key>UTTypeTagSpecification</key>
       <dict>
         <key>public.mime-type</key>
-        <string>application/x-btchd-payment-request</string>
+        <string>application/x-depinc-payment-request</string>
         <key>public.filename-extension</key>
         <array>
           <string>bitcoinpaymentrequest</string>
@@ -84,7 +84,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>org.btchd.paymentrequest</string>
+        <string>org.depinc.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>

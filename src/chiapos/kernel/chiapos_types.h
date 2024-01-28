@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_COMMON_TYPES_H
-#define BTCHD_CHIAPOS_COMMON_TYPES_H
+#ifndef DEPINC_CHIAPOS_COMMON_TYPES_H
+#define DEPINC_CHIAPOS_COMMON_TYPES_H
 
 #include <boost/optional.hpp>
 #include <cstdint>

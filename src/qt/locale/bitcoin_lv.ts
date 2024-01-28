@@ -266,11 +266,11 @@
         <translation>Ciļņu rīkjosla</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Pieprasīt maksājumus (izveido QR kodu un btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Pieprasīt maksājumus (izveido QR kodu un depinc: URIs)</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>Atvērt bitcoin URI vai maksājuma pieprasījumu</translation>
     </message>
     <message>

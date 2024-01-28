@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_VDF_H
-#define BTCHD_CHIAPOS_VDF_H
+#ifndef DEPINC_CHIAPOS_VDF_H
+#define DEPINC_CHIAPOS_VDF_H
 
 #include <chiapos/block_fields.h>
 #include <uint256.h>

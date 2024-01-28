@@ -391,9 +391,9 @@ Haga clic para habilitar la actividad de red nuevamente.</translation>
         <translation>Pestañas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation> 
-Solicitar pagos (genera códigos QR y btchd: URI)
+Solicitar pagos (genera códigos QR y depinc: URI)
  </translation>
     </message>
     <message>

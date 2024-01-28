@@ -67,11 +67,11 @@
     </message>
     <message>
         <source>These are your DePINC addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>您可以给这些比特硬币地址付款。在付款之前，务必要检查金额和收款地址是否正确。</translation>
+        <translation>您可以给这些DePC地址付款。在付款之前，务必要检查金额和收款地址是否正确。</translation>
     </message>
     <message>
         <source>These are your DePINC addresses for receiving payments. Use the 'Create new receiving address' button in the receive tab to create new addresses.</source>
-        <translation>您可以用这些比特硬币地址收款。使用“接收”标签页中的"创建新收款地址"按钮创建新地址。</translation>
+        <translation>您可以用这些DePC地址收款。使用“接收”标签页中的"创建新收款地址"按钮创建新地址。</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR DePCs&lt;/b&gt;!</source>
-        <translation>警告: 如果把钱包加密后又忘记密码，你就会从此&lt;b&gt;失去其中所有的比特硬币了&lt;/b&gt;！</translation>
+        <translation>警告: 如果把钱包加密后又忘记密码，你就会从此&lt;b&gt;失去其中所有的DePC了&lt;/b&gt;！</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -197,7 +197,7 @@
     </message>
     <message>
         <source>Remember that encrypting your wallet cannot fully protect your DePCs from being stolen by malware infecting your computer.</source>
-        <translation>请注意，当您的计算机感染恶意软件时，加密钱包并不能完全规避您的比特硬币被偷窃的可能。</translation>
+        <translation>请注意，当您的计算机感染恶意软件时，加密钱包并不能完全规避您的DePC被偷窃的可能。</translation>
     </message>
     <message>
         <source>Wallet to be encrypted</source>
@@ -371,7 +371,7 @@
     </message>
     <message>
         <source>Send coins to a DePINC address</source>
-        <translation>向一个比特硬币地址发币</translation>
+        <translation>向一个DePC地址发币</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -415,11 +415,11 @@
     </message>
     <message>
         <source>Sign messages with your DePINC addresses to prove you own them</source>
-        <translation>用比特硬币地址关联的私钥为消息签名，以证明您拥有这个比特硬币地址</translation>
+        <translation>用DePC地址关联的私钥为消息签名，以证明您拥有这个DePC地址</translation>
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified DePINC addresses</source>
-        <translation>校验消息，确保该消息是由指定的比特硬币地址所有者签名的</translation>
+        <translation>校验消息，确保该消息是由指定的DePC地址所有者签名的</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -438,8 +438,8 @@
         <translation>标签页工具栏</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>请求支付 (生成二维码和 btchd: URI)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>请求支付 (生成二维码和 depinc: URI)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -450,8 +450,8 @@
         <translation>显示用过的收款地址和标签的列表</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>打开一个 btchd: URI 或支付请求</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>打开一个 depinc: URI 或支付请求</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -459,7 +459,7 @@
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to DePINC network</source>
-        <translation><numerusform>%n 条到比特硬币网络的活动连接</numerusform></translation>
+        <translation><numerusform>%n 条到DePC网络的活动连接</numerusform></translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
@@ -643,7 +643,7 @@
     </message>
     <message>
         <source>DePINC Core</source>
-        <translation>比特硬币</translation>
+        <translation>DePC</translation>
     </message>
     <message>
         <source>&amp;Generate plotting account</source>
@@ -907,7 +907,7 @@
     </message>
     <message>
         <source>The entered address "%1" is not a valid DePINC address.</source>
-        <translation>输入的地址 %1 并不是有效的比特硬币地址。</translation>
+        <translation>输入的地址 %1 并不是有效的DePC地址。</translation>
     </message>
     <message>
         <source>Address "%1" already exists as a receiving address with label "%2" and so cannot be added as a sending address.</source>
@@ -1008,7 +1008,7 @@
     </message>
     <message>
         <source>DePINC</source>
-        <translation>比特硬币</translation>
+        <translation>DePC</translation>
     </message>
     <message>
         <source>Discard blocks after verification, except most recent %1 GB (prune)</source>
@@ -1024,7 +1024,7 @@
     </message>
     <message>
         <source>%1 will download and store a copy of the DePINC block chain.</source>
-        <translation>%1 将会下载并存储比特硬币区块链。</translation>
+        <translation>%1 将会下载并存储DePC区块链。</translation>
     </message>
     <message>
         <source>The wallet will also be stored in this directory.</source>
@@ -1059,7 +1059,7 @@
     </message>
     <message>
         <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the DePINC network, as detailed below.</source>
-        <translation>近期交易可能尚未显示，因此当前余额可能不准确。以上信息将在与比特硬币网络完全同步后更正。详情如下</translation>
+        <translation>近期交易可能尚未显示，因此当前余额可能不准确。以上信息将在与DePC网络完全同步后更正。详情如下</translation>
     </message>
     <message>
         <source>Attempting to spend DePCs that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
@@ -1264,7 +1264,7 @@
     </message>
     <message>
         <source>Automatically open the DePINC client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自动在路由器中为比特硬币客户端打开端口。只有当您的路由器开启了 UPnP 选项时此功能才会有用。</translation>
+        <translation>自动在路由器中为DePC客户端打开端口。只有当您的路由器开启了 UPnP 选项时此功能才会有用。</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1280,7 +1280,7 @@
     </message>
     <message>
         <source>Connect to the DePINC network through a SOCKS5 proxy.</source>
-        <translation>通过 SOCKS5 代理连接比特硬币网络。</translation>
+        <translation>通过 SOCKS5 代理连接DePC网络。</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
@@ -1316,7 +1316,7 @@
     </message>
     <message>
         <source>Connect to the DePINC network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>通过 Tor 隐藏服务连接比特硬币网络时使用另一个 SOCKS5 代理。</translation>
+        <translation>通过 Tor 隐藏服务连接DePC网络时使用另一个 SOCKS5 代理。</translation>
     </message>
     <message>
         <source>&amp;Window</source>
@@ -1348,11 +1348,11 @@
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
-        <translation>比特硬币金额单位(&amp;U):</translation>
+        <translation>DePC金额单位(&amp;U):</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>选择显示及发送比特硬币时使用的最小单位。</translation>
+        <translation>选择显示及发送DePC时使用的最小单位。</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1435,7 +1435,7 @@
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the DePINC network after a connection is established, but this process has not completed yet.</source>
-        <translation>现在显示的消息可能是过期的。在连接上比特硬币网络节点后，您的钱包将自动与网络同步，但是这个过程还没有完成。</translation>
+        <translation>现在显示的消息可能是过期的。在连接上DePC网络节点后，您的钱包将自动与网络同步，但是这个过程还没有完成。</translation>
     </message>
     <message>
         <source>Watch-only:</source>
@@ -1533,16 +1533,16 @@
         <translation>支付请求出错</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>无法启动 btchd: 协议的“一键支付”处理程序</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>无法启动 depinc: 协议的“一键支付”处理程序</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI 处理</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>‘btchd://’不是合法的URI。请改用'btchd:'。</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>‘depinc://’不是合法的URI。请改用'depinc:'。</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -1570,7 +1570,7 @@
     </message>
     <message>
         <source>URI cannot be parsed! This can be caused by an invalid DePINC address or malformed URI parameters.</source>
-        <translation>无法解析 URI 地址！可能是因为比特硬币地址无效，或是 URI 参数格式错误。</translation>
+        <translation>无法解析 URI 地址！可能是因为DePC地址无效，或是 URI 参数格式错误。</translation>
     </message>
     <message>
         <source>Payment request file handling</source>
@@ -1672,7 +1672,7 @@
     </message>
     <message>
         <source>Enter a DePINC address (e.g. %1)</source>
-        <translation>请输入一个比特硬币地址 (例如 %1)</translation>
+        <translation>请输入一个DePC地址 (例如 %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2133,7 +2133,7 @@
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the DePINC network.</source>
-        <translation>可在支付请求上备注一条信息，在打开支付请求时可以看到。注意:该消息不是通过比特硬币网络传送。</translation>
+        <translation>可在支付请求上备注一条信息，在打开支付请求时可以看到。注意:该消息不是通过DePC网络传送。</translation>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address.</source>
@@ -2406,7 +2406,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>When there is less transaction volume than space in the blocks, miners as well as relaying nodes may enforce a minimum fee. Paying only this minimum fee is just fine, but be aware that this can result in a never confirming transaction once there is more demand for DePINC transactions than the network can process.</source>
-        <translation>当交易量小于可用区块空间时，矿工和中继节点可能会执行最低手续费率限制。按照这个最低费率来支付手续费也是可以的，但请注意，一旦交易需求超出比特硬币网络能处理的限度，你的交易可能永远也无法确认。</translation>
+        <translation>当交易量小于可用区块空间时，矿工和中继节点可能会执行最低手续费率限制。按照这个最低费率来支付手续费也是可以的，但请注意，一旦交易需求超出DePC网络能处理的限度，你的交易可能永远也无法确认。</translation>
     </message>
     <message>
         <source>A too low fee might result in a never confirming transaction (read the tooltip)</source>
@@ -2562,7 +2562,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Warning: Invalid DePINC address</source>
-        <translation>警告: 比特硬币地址无效</translation>
+        <translation>警告: DePC地址无效</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
@@ -2717,7 +2717,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>The fee will be deducted from the amount being sent. The recipient will receive less DePCs than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>交易费将从发送金额中扣除。接收人收到的比特硬币将会比您在金额框中输入的更少。如果选中了多个收件人，交易费平分。</translation>
+        <translation>交易费将从发送金额中扣除。接收人收到的DePC将会比您在金额框中输入的更少。如果选中了多个收件人，交易费平分。</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2744,8 +2744,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>请为此地址输入一个标签以将它加入已用地址列表</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>btchd: URI 附带的备注信息，将会和交易一起存储，备查。 注意：该消息不会通过比特硬币网络传输。</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>depinc: URI 附带的备注信息，将会和交易一起存储，备查。 注意：该消息不会通过DePC网络传输。</translation>
     </message>
     <message>
         <source>Pay To:</source>
@@ -2814,7 +2814,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>You can sign messages/agreements with your addresses to prove you can receive DePCs sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>您可以用你的地址对消息/协议进行签名，以证明您可以接收发送到该地址的比特硬币。注意不要对任何模棱两可或者随机的消息进行签名，以免遭受钓鱼式攻击。请确保消息内容准确的表达了您的真实意愿。</translation>
+        <translation>您可以用你的地址对消息/协议进行签名，以证明您可以接收发送到该地址的DePC。注意不要对任何模棱两可或者随机的消息进行签名，以免遭受钓鱼式攻击。请确保消息内容准确的表达了您的真实意愿。</translation>
     </message>
     <message>
         <source>The DePINC address to sign the message with</source>
@@ -2878,7 +2878,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Verify the message to ensure it was signed with the specified DePINC address</source>
-        <translation>验证消息，确保消息是由指定的比特硬币地址签名过的。</translation>
+        <translation>验证消息，确保消息是由指定的DePC地址签名过的。</translation>
     </message>
     <message>
         <source>Verify &amp;Message</source>
@@ -3092,7 +3092,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>新挖出的比特硬币在可以使用前必须经过 %1 个区块确认的成熟过程。当您挖出此区块后，它将被广播到网络中以加入区块链。如果它未成功进入区块链，其状态将变更为“不接受”并且不可使用。这可能偶尔会发生，在另一个节点比你早几秒钟成功挖出一个区块时就会这样。</translation>
+        <translation>新挖出的DePC在可以使用前必须经过 %1 个区块确认的成熟过程。当您挖出此区块后，它将被广播到网络中以加入区块链。如果它未成功进入区块链，其状态将变更为“不接受”并且不可使用。这可能偶尔会发生，在另一个节点比你早几秒钟成功挖出一个区块时就会这样。</translation>
     </message>
     <message>
         <source>Debug information</source>
@@ -4137,7 +4137,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
     </message>
     <message>
         <source>DePINC Core</source>
-        <translation>比特硬币</translation>
+        <translation>DePC</translation>
     </message>
 </context>
 <!-- qtbase_zh.ts -->

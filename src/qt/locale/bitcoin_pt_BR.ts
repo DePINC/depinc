@@ -430,8 +430,8 @@
         <translation>Barra de ferramentas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Solicitações de pagamentos (gera códigos QR e btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Solicitações de pagamentos (gera códigos QR e depinc: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Mostrar a lista de endereços de recebimento usados ​​e rótulos</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Abrir um btchd: URI ou cobrança</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Abrir um depinc: URI ou cobrança</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,16 +1469,16 @@
         <translation>Erro no pedido de pagamento</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Não foi possível iniciar btchd: manipulador click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Não foi possível iniciar depinc: manipulador click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Manipulação de URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' não é um URI válido. Use 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' não é um URI válido. Use 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2588,8 +2588,8 @@ Nota:  Como a taxa é calculada por byte, uma taxa de "100 satoshis por kB" por 
         <translation>Digite um rótulo para este endereço para adicioná-lo no catálogo</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>A mensagem que foi anexada ao btchd: URI na qual será gravada na transação para sua referência. Nota: Essa mensagem não será gravada publicamente na rede DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>A mensagem que foi anexada ao depinc: URI na qual será gravada na transação para sua referência. Nota: Essa mensagem não será gravada publicamente na rede DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

@@ -430,8 +430,8 @@
         <translation>Välilehtipalkki</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Pyydä maksuja (Luo QR koodit ja btchd: URIt)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Pyydä maksuja (Luo QR koodit ja depinc: URIt)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Näytä vastaanottamiseen käytettyjen osoitteiden ja nimien lista</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Avaa btchd: URI tai maksupyyntö</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Avaa depinc: URI tai maksupyyntö</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1449,7 +1449,7 @@
         <translation>Maksupyyntövirhe</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Bitcoinia ei voi käynnistää: klikkaa-maksaaksesi -käsittelijän virhe</translation>
     </message>
     <message>
@@ -1457,8 +1457,8 @@
         <translation>URI käsittely</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' ei ole kelvollinen URI. Käytä 'btchd:' sen sijaan.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' ei ole kelvollinen URI. Käytä 'depinc:' sen sijaan.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2544,8 +2544,8 @@ Huom: Koska siirtomaksu lasketaan tavujen mukaan, niin määrittelemällä 500 t
         <translation>Aseta nimi tälle osoitteelle lisätäksesi sen käytettyjen osoitteiden listalle.</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Viesti joka liitettiin btchd: URI:iin tallennetaan rahansiirtoon viitteeksi. Tätä viestiä ei lähetetä DePINC-verkkoon.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Viesti joka liitettiin depinc: URI:iin tallennetaan rahansiirtoon viitteeksi. Tätä viestiä ei lähetetä DePINC-verkkoon.</translation>
     </message>
     <message>
         <source>Pay To:</source>

@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_POST_H
-#define BTCHD_CHIAPOS_POST_H
+#ifndef DEPINC_CHIAPOS_POST_H
+#define DEPINC_CHIAPOS_POST_H
 
 #include <chain.h>
 #include <chiapos/kernel/calc_diff.h>

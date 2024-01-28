@@ -394,7 +394,7 @@
         <translation>Hjelpelinje for fliker</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Be om betalinger (genererer QR-koder og bitcoin-URIer)</translation>
     </message>
     <message>
@@ -406,8 +406,8 @@
         <translation>Vis lista over brukte mottakeradresser og merkelapper</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Åpne en btchd: URI eller betalingsforespørsel</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Åpne en depinc: URI eller betalingsforespørsel</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1337,8 +1337,8 @@
         <translation>Feil ved betalingsforespørsel</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Kan ikke starte btchd: Klikk-og-betal håndterer</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Kan ikke starte depinc: Klikk-og-betal håndterer</translation>
     </message>
     <message>
         <source>URI handling</source>
@@ -2368,7 +2368,7 @@
         <translation>Skriv inn en merkelapp for denne adressen for å legge den til listen av brukte adresser</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>En melding som var tilknyttet bitcoinen: URI vil bli lagret med transaksjonen for din oversikt. Denne meldingen vil ikke bli sendt over DePINC-nettverket.</translation>
     </message>
     <message>

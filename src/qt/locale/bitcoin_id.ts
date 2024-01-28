@@ -430,8 +430,8 @@
         <translation>Baris tab</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Permintaan pembayaran (membuat kode QR dan btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Permintaan pembayaran (membuat kode QR dan depinc: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Tampilkan daftar alamat dan label yang diterima</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Buka URI btchd: atau permintaan pembayaran</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Buka URI depinc: atau permintaan pembayaran</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,16 +1469,16 @@
         <translation>Terjadi kesalahan pada permintaan pembayaran</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Tidak bisa memulai btchd: handler click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Tidak bisa memulai depinc: handler click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Pengelolaan URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' bukanlah alamat URI yang valid. Silakan gunakan 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' bukanlah alamat URI yang valid. Silakan gunakan 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2578,8 +2578,8 @@ Catatan: Karena biaya dihitung berdasarkan per byte, biaya "100 satoshi per kB" 
         <translation>Masukkan label untuk alamat ini untuk dimasukan dalam daftar alamat yang pernah digunakan</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Pesan yang dilampirkan ke btchd: URI yang akan disimpan dengan transaksi untuk referensi Anda. Catatan: Pesan ini tidak akan dikirim melalui jaringan DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Pesan yang dilampirkan ke depinc: URI yang akan disimpan dengan transaksi untuk referensi Anda. Catatan: Pesan ini tidak akan dikirim melalui jaringan DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

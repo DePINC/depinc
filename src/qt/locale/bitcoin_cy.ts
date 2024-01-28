@@ -382,8 +382,8 @@
         <translation>Bar offer tabiau</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Gofyn taliadau (creu côd QR a btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Gofyn taliadau (creu côd QR a depinc: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -394,7 +394,7 @@
         <translation>Dangos rhestr o gyfeiriadau derbyn a labelau wedi eu defnyddio</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>Agor DePINC: URI neu ofyn taliad</translation>
     </message>
     <message>

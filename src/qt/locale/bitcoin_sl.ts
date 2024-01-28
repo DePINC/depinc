@@ -430,7 +430,7 @@
         <translation>Orodna vrstica zavihkov</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Zahtevajte plačilo (ustvarite zahtevek s kodo QR in URI tipa bitcoin)</translation>
     </message>
     <message>
@@ -442,7 +442,7 @@
         <translation>Preglejte in uredite seznam naslovov, na katere ste kdaj prejeli plačila</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>Izvedite plačilo iz zahtevka v datoteki ali iz URI tipa bitcoin</translation>
     </message>
     <message>
@@ -1469,16 +1469,16 @@
         <translation>Napaka pri zahtevi plačila</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Ni mogoče zagnati rokovalca plačilnih povezav tipa btchd:.</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Ni mogoče zagnati rokovalca plačilnih povezav tipa depinc:.</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Rokovanje z URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' ni veljaven URI. Uporabite raje 'btchd:' .</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' ni veljaven URI. Uporabite raje 'depinc:' .</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2587,8 +2587,8 @@ Opomba: Ker se provizija izračuna na bajt, bi provizija "100 satoshijev na kB" 
         <translation>Če vnesete oznako za zgornji naslov, se bo skupaj z naslovom shranila v imenk že uporabljenih naslovov</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Sporočilo, ki ste ga pripeli na URI tipa btchd:. Shranjeno bo skupaj s podatki o transakciji. Opomba: Sporočilo ne bo poslano preko omrežja DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Sporočilo, ki ste ga pripeli na URI tipa depinc:. Shranjeno bo skupaj s podatki o transakciji. Opomba: Sporočilo ne bo poslano preko omrežja DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

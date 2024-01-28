@@ -1,4 +1,4 @@
-# 如何使用chia plotter来进行挖矿？(BHDIP009)
+# 如何使用chia plotter来进行挖矿？
 
 ## 编译
 
@@ -58,12 +58,12 @@ usage:
 * `--config` 指定配置文件的路径，默认为当前目录下的`config.json`
 * `--min-vdf-count` 运行vdf次数，该参数只用于测试多次vdf后才出块的情况
 * `--disable-computer` 不要在本地计算vdf
-* `--cookie` 指定本地节点的`.cookie`文件所在的路径，默认为`$HOME/.btchd/.cookie`，Miner需要该文件与本地节点进行通信。
+* `--cookie` 指定本地节点的`.cookie`文件所在的路径，默认为`$HOME/.depinc/.cookie`，Miner需要该文件与本地节点进行通信。
 * `--command` 主命令。`generate-config`用于产生默认的config文件，`mining`启动挖矿，`account`用于账户相关操作
 
 ## 配置文件说明
 
-挖矿的基本信息需要保存到配置文件中，使用`./bhd_miner
+挖矿的基本信息需要保存到配置文件中，使用`./bh_miner
 generate-config`来产生一个空的配置文件，然后将基本信息保存到该文件中。
 
 ```
@@ -76,8 +76,8 @@ generate-config`来产生一个空的配置文件，然后将基本信息保存�
     "rpc" : // rpc相关
     {
         "host" : "", // RPC地址
-        "passwd" : "", // RPC用户名（可省略，省略则会自动从$HOME/.btchd/.cookie读取user和password）
-        "user" : "", // RPC密码（可省略，省略则会自动从$HOME/.btchd/.cookie读取user和password）
+        "passwd" : "", // RPC用户名（可省略，省略则会自动从$HOME/.depinc/.cookie读取user和password）
+        "user" : "", // RPC密码（可省略，省略则会自动从$HOME/.depinc/.cookie读取user和password）
     },
     "seed" : "", // Chia钱包的助记词，用于产生farmer public-key
 }

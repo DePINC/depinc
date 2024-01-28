@@ -430,7 +430,7 @@
         <translation>Pasek zakładek</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Żądaj płatności (generuje kod QR oraz bitcoinowe URI)</translation>
     </message>
     <message>
@@ -442,8 +442,8 @@
         <translation>Pokaż listę adresów i etykiet użytych do odbierania</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Otwórz URI btchd: lub żądanie zapłaty</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Otwórz URI depinc: lub żądanie zapłaty</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,16 +1469,16 @@
         <translation>Błąd żądania płatności</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Nie można uruchomić protokołu btchd: kliknij-by-zapłacić</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Nie można uruchomić protokołu depinc: kliknij-by-zapłacić</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>Obsługa URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' nie jest poprawnym URI. Użyj 'btchd:'.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' nie jest poprawnym URI. Użyj 'depinc:'.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2589,8 +2589,8 @@ Uwaga: Ponieważ opłata jest naliczana za każdy bajt, opłata "100 satoshi za 
         <translation>Wprowadź etykietę dla tego adresu by dodać go do listy użytych adresów</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Wiadomość, która została dołączona do URI btchd:, która będzie przechowywana wraz z transakcją w celach informacyjnych. Uwaga: Ta wiadomość nie będzie rozsyłana w sieci DePINC.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Wiadomość, która została dołączona do URI depinc:, która będzie przechowywana wraz z transakcją w celach informacyjnych. Uwaga: Ta wiadomość nie będzie rozsyłana w sieci DePINC.</translation>
     </message>
     <message>
         <source>Pay To:</source>

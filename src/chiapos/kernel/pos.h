@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_POS_H
-#define BTCHD_CHIAPOS_POS_H
+#ifndef DEPINC_CHIAPOS_POS_H
+#define DEPINC_CHIAPOS_POS_H
 
 #include <chiapos/kernel/chiapos_types.h>
 #include <uint256.h>

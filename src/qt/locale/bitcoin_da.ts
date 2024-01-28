@@ -430,8 +430,8 @@
         <translation>Faneværktøjslinje</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Anmod om betalinger (genererer QR-koder og “btchd:”-URI'er)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Anmod om betalinger (genererer QR-koder og “depinc:”-URI'er)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Vis listen over brugte modtagelsesadresser og -mærkater</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Åbn en “btchd:”-URI eller betalingsanmodning</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Åbn en “depinc:”-URI eller betalingsanmodning</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,16 +1469,16 @@
         <translation>Fejl i betalingsanmodning</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Kan ikke starte btchd: click-to-pay-håndtering</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Kan ikke starte depinc: click-to-pay-håndtering</translation>
     </message>
     <message>
         <source>URI handling</source>
         <translation>URI-håndtering</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' er ikke et gyldigt URI. Brug 'btchd:' istedet.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' er ikke et gyldigt URI. Brug 'depinc:' istedet.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2588,7 +2588,7 @@ Note: Siden gebyret er kalkuleret på en per-byte basis, et gebyr på "100 satos
         <translation>Indtast et mærkat for denne adresse for at føje den til listen over brugte adresser</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>En besked, som blev føjet til “bitcon:”-URI'en, som vil gemmes med transaktionen til din reference. Bemærk: Denne besked vil ikke blive sendt over DePINC-netværket.</translation>
     </message>
     <message>

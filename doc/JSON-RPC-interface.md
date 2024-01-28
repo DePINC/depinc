@@ -1,7 +1,7 @@
 # JSON-RPC Interface
 
 The headless daemon `depincd` has the JSON-RPC API enabled by default, the GUI
-`btchd-qt` has it disabled by default. This can be changed with the `-server`
+`depinc-qt` has it disabled by default. This can be changed with the `-server`
 option. In the GUI it is possible to execute RPC methods in the Debug Console
 Dialog.
 

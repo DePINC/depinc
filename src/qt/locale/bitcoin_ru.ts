@@ -430,7 +430,7 @@
         <translation>Панель вкладок</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Запросить платеж</translation>
     </message>
     <message>
@@ -442,7 +442,7 @@
         <translation>Показать список использованных адресов и меток получателей</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>Открыть биткойн: URI или запрос платежа</translation>
     </message>
     <message>
@@ -1465,7 +1465,7 @@
         <translation>Ошибка запроса платежа</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Не удаётся запустить биткойн: обработчик click-to-pay</translation>
     </message>
     <message>
@@ -1473,8 +1473,8 @@
         <translation>Обработка идентификатора</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' не верный URI. Используйте 'btchd:' вместо этого.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' не верный URI. Используйте 'depinc:' вместо этого.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2584,7 +2584,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Введите метку для этого адреса, чтобы добавить его в список используемых адресов</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>Сообщение прикрепленное к биткойн идентификатору будет сохранено вместе с транзакцией для вашего сведения. Заметьте: Сообщение не будет отправлено через сеть Биткойн.</translation>
     </message>
     <message>

@@ -430,8 +430,8 @@
         <translation>Tab-werkbalk</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Vraag betaling aan (genereert QR-codes en btchd: URI's)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Vraag betaling aan (genereert QR-codes en depinc: URI's)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Toon de lijst met gebruikte ontvangstadressen en labels</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Open een btchd: URI of betalingsverzoek</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Open een depinc: URI of betalingsverzoek</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1470,7 +1470,7 @@ Dit is ideaal voor alleen-lezen portommonees.</translation>
         <translation>Fout bij betalingsverzoek</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Kan bitcoin niet starten: click-to-pay handler</translation>
     </message>
     <message>
@@ -1478,8 +1478,8 @@ Dit is ideaal voor alleen-lezen portommonees.</translation>
         <translation>URI-behandeling</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' is niet een geldige URI. Gebruik 'btchd:' in plaats daarvan.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' is niet een geldige URI. Gebruik 'depinc:' in plaats daarvan.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2589,8 +2589,8 @@ Notitie: Omdat de vergoeding per byte wordt gerekend, zal een vergoeding van "10
         <translation>Vul een label voor dit adres in om het aan de lijst met gebruikte adressen toe te voegen</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>Een bericht dat werd toegevoegd aan de btchd: URI welke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Bitcoinnetwerk.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>Een bericht dat werd toegevoegd aan de depinc: URI welke wordt opgeslagen met de transactie ter referentie. Opmerking: Dit bericht zal niet worden verzonden over het Bitcoinnetwerk.</translation>
     </message>
     <message>
         <source>Pay To:</source>

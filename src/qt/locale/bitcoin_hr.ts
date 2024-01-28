@@ -430,8 +430,8 @@
         <translation>Traka kartica</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Zatražite uplatu (stvara QR kod i btchd: URI adresu)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Zatražite uplatu (stvara QR kod i depinc: URI adresu)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Prikažite popis korištenih adresa i oznaka za primanje novca</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Otvorite btchd: URI adresu ili zahtjev za uplatu</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Otvorite depinc: URI adresu ili zahtjev za uplatu</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1468,7 +1468,7 @@
         <translation>Greška kod zahtjeva za plaćanje</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Ne može se pokrenuti klijent: rukovatelj "kliknite da platite"</translation>
     </message>
     <message>
@@ -1476,8 +1476,8 @@
         <translation>URI upravljanje</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' nije ispravan URI. Koristite 'btchd:' umjesto toga.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' nije ispravan URI. Koristite 'depinc:' umjesto toga.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2587,7 +2587,7 @@ Napomena: Budući da se naknada računa po bajtu, naknada od "100 satošija po k
         <translation>Unesite oznaku za ovu adresu kako bi ju dodali u vaš adresar</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>Poruka koja je dodana uplati: URI koji će biti spremljen s transakcijom za referencu. Napomena: Ova poruka neće biti poslana preko DePINC mreže.</translation>
     </message>
     <message>

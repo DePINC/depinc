@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_KERNEL_CALC_DIFF_H
-#define BTCHD_CHIAPOS_KERNEL_CALC_DIFF_H
+#ifndef DEPINC_CHIAPOS_KERNEL_CALC_DIFF_H
+#define DEPINC_CHIAPOS_KERNEL_CALC_DIFF_H
 
 #include <arith_uint256.h>
 #include <chiapos/block_fields.h>

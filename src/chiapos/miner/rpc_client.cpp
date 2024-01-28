@@ -39,7 +39,7 @@ DepositTerm DepositTermFromString(std::string const& str) {
 RPCClient::RPCClient(bool no_proxy, std::string url, std::string const& cookie_path_str)
         : m_no_proxy(no_proxy), m_cookie_path_str(cookie_path_str), m_url(std::move(url)) {
     if (cookie_path_str.empty()) {
-        throw std::runtime_error("cookie is empty, cannot connect to btchd core");
+        throw std::runtime_error("cookie is empty, cannot connect to depinc core");
     }
     LoadCookie();
 }

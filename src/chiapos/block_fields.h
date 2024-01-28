@@ -1,5 +1,5 @@
-#ifndef BTCHD_CHIAPOS_BLOCK_FIELDS_H
-#define BTCHD_CHIAPOS_BLOCK_FIELDS_H
+#ifndef DEPINC_CHIAPOS_BLOCK_FIELDS_H
+#define DEPINC_CHIAPOS_BLOCK_FIELDS_H
 
 #include <chiapos/kernel/bls_key.h>
 #include <chiapos/kernel/chiapos_types.h>

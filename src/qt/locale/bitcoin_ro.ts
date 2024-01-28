@@ -390,7 +390,7 @@
         <translation>Bara de unelte</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>Cereţi plăţi (generează coduri QR şi bitcoin-uri: URls)</translation>
     </message>
     <message>
@@ -402,8 +402,8 @@
         <translation>Arată lista de adrese pentru primire şi etichetele</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Deschidere btchd: o adresa URI sau o cerere de plată</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Deschidere depinc: o adresa URI sau o cerere de plată</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1301,7 +1301,7 @@
         <translation>Eroare la cererea de plată</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>DePINC nu poate porni: click-to-pay handler</translation>
     </message>
     <message>
@@ -1309,8 +1309,8 @@
         <translation>Gestionare URI</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' nu este un URI valid. Folositi 'btchd:' in loc.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' nu este un URI valid. Folositi 'depinc:' in loc.</translation>
     </message>
     <message>
         <source>Payment request fetch URL is invalid: %1</source>
@@ -2364,8 +2364,8 @@ Nota: Cum taxa este calculata per byte, o taxa de "100 satoshi per kB" pentru o 
         <translation>Introduceţi eticheta pentru ca această adresa să fie introdusă în lista de adrese folosite</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>un mesaj a fost ataşat la btchd: URI care va fi stocat cu tranzacţia pentru referinţa dvs. Notă: Acest mesaj nu va fi trimis către reţeaua bitcoin.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>un mesaj a fost ataşat la depinc: URI care va fi stocat cu tranzacţia pentru referinţa dvs. Notă: Acest mesaj nu va fi trimis către reţeaua bitcoin.</translation>
     </message>
     <message>
         <source>Pay To:</source>

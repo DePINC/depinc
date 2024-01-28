@@ -6,15 +6,15 @@ Omni Core can be configured by providing one or more optional command-line argum
 $ omnicored -setting=value -setting=value
 ```
 
-All settings can alternatively also be configured via the `btchd.conf`.
+All settings can alternatively also be configured via the `depinc.conf`.
 
 Depending on the operating system, the default locations for the configuration file are:
 
-- Unix systems: `$HOME/.bitcoin/btchd.conf`
-- Mac OS X: `$HOME/Library/Application Support/Bitcoin/btchd.conf`
-- Microsoft Windows: `%APPDATA%/Bitcoin/btchd.conf`
+- Unix systems: `$HOME/.bitcoin/depinc.conf`
+- Mac OS X: `$HOME/Library/Application Support/Bitcoin/depinc.conf`
+- Microsoft Windows: `%APPDATA%/Bitcoin/depinc.conf`
 
-A typical `btchd.conf` may include:
+A typical `depinc.conf` may include:
 ```
 server=1
 rpcuser=omnicorerpc

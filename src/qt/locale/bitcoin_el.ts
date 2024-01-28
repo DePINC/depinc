@@ -386,8 +386,8 @@
         <translation>Εργαλειοθήκη καρτελών</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Αίτηση πληρωμών (δημιουργεί QR codes και διευθύνσεις btchd: )</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Αίτηση πληρωμών (δημιουργεί QR codes και διευθύνσεις depinc: )</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -398,8 +398,8 @@
         <translation>Προβολή της λίστας των χρησιμοποιημένων διευθύνσεων και ετικετών λήψεως</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Άνοιγμα btchd: URI αίτησης πληρωμής</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Άνοιγμα depinc: URI αίτησης πληρωμής</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1077,8 +1077,8 @@
         <translation>Σφάλμα αίτησης πληρωμής</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
-        <translation>Δεν είναι δυνατή η εκκίνηση του btchd: χειριστής click-to-pay</translation>
+        <source>Cannot start depinc: click-to-pay handler</source>
+        <translation>Δεν είναι δυνατή η εκκίνηση του depinc: χειριστής click-to-pay</translation>
     </message>
     <message>
         <source>URI handling</source>

@@ -63,7 +63,7 @@
     </message>
     <message>
         <source>These are your DePINC addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>這些是你要付款過去的比特硬幣位址。在付款之前，務必要檢查金額和收款位址是否正確。</translation>
+        <translation>這些是你要付款過去的DePC位址。在付款之前，務必要檢查金額和收款位址是否正確。</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -299,7 +299,7 @@
     </message>
     <message>
         <source>Send coins to a DePINC address</source>
-        <translation>付款至一個比特硬幣位址</translation>
+        <translation>付款至一個DePC位址</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
@@ -350,8 +350,8 @@
         <translation>說明 &amp;H</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>要求付款 (產生QR碼 btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>要求付款 (產生QR碼 depinc: URIs)</translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
@@ -450,7 +450,7 @@
     <name>QObject</name>
     <message>
         <source>Enter a DePINC address (e.g. %1)</source>
-        <translation>輸入一個比特硬幣位址 (例如 %1)</translation>
+        <translation>輸入一個DePC位址 (例如 %1)</translation>
     </message>
     <message>
         <source>%1 d</source>

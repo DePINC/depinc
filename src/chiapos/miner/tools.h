@@ -1,5 +1,5 @@
-#ifndef BTCHD_MINER_TOOLS_H
-#define BTCHD_MINER_TOOLS_H
+#ifndef DEPINC_MINER_TOOLS_H
+#define DEPINC_MINER_TOOLS_H
 
 #include "config.h"
 #include "rpc_client.h"

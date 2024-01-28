@@ -355,7 +355,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction &tran
             }
             else
 #endif
-            if (!rcp.message.isEmpty()) // Message from normal btchd:URI (btchd:123...?message=example)
+            if (!rcp.message.isEmpty()) // Message from normal depinc:URI (depinc:123...?message=example)
                 vOrderForm.emplace_back("Message", rcp.message.toStdString());
         }
 

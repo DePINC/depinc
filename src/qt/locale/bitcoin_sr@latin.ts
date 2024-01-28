@@ -378,8 +378,8 @@
         <translation>Alatke za tabove</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Zatražite plaćanje (generiše QR kodove i btchd: URI-e)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Zatražite plaćanje (generiše QR kodove i depinc: URI-e)</translation>
     </message>
     <message>
         <source>Error</source>

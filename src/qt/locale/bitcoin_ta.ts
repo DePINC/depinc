@@ -430,7 +430,7 @@
         <translation>தாவல்கள் கருவிப்பட்டி</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
         <translation>கொடுப்பனவுகளை கோருதல் (QR குறியீடுகள் மற்றும் bitcoin உருவாக்குகிறது: URI கள்)</translation>
     </message>
     <message>
@@ -442,7 +442,7 @@
         <translation>பயன்படுத்திய முகவரிகள் மற்றும் லேபிள்களின் பட்டியலைக் காட்டு</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>ஒரு DePINC திறக்க: URI அல்லது பணம் கோரிக்கை</translation>
     </message>
     <message>
@@ -1465,7 +1465,7 @@
         <translation>கட்டணம் கோரிக்கை பிழை</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>DePINC தொடங்க முடியாது: கிளிக் க்கு ஊதியம் கையாளுதல்</translation>
     </message>
     <message>
@@ -1473,8 +1473,8 @@
         <translation>URI கையாளுதல்</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd: //' சரியான URI அல்ல. அதற்கு பதிலாக 'பிட்கின்:' பயன்படுத்தவும்.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc: //' சரியான URI அல்ல. அதற்கு பதிலாக 'பிட்கின்:' பயன்படுத்தவும்.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2552,7 +2552,7 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>இந்த முகவரியை பயன்படுத்தப்பட்ட முகவரிகளின் பட்டியலில் சேர்க்க ஒரு லேபிளை உள்ளிடவும்.</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
         <translation>பிட்காயினுடன் இணைக்கப்பட்ட செய்தி: உங்கள் எதிர்கால குறிப்புக்காக பரிவர்த்தனையுடன் யூஆர்ஐ சேமிக்கப்படும். குறிப்பு: இந்த செய்தி பிட்காயின் வலையமைப்பிற்கு அனுப்பப்படாது.</translation>
     </message>
     <message>

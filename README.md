@@ -21,7 +21,7 @@ About DePINC
 
 For more information, as well as an immediately useable, binary version of
 the DePINC Core software, see https://depinc.org/#wallet, or read the
-[original whitepaper](https://github.com/bhdone/white-paper).
+[original whitepaper](https://github.com/depinc/white-paper).
 
 License
 -------
@@ -33,7 +33,7 @@ Development Process
 -------------------
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/bhdone/btchd/tags) are created
+completely stable. [Tags](https://github.com/depinc/depinc/tags) are created
 regularly to indicate new official, stable release versions of DePINC Core.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)

@@ -430,8 +430,8 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Request payments (generates QR codes and btchd: URIs)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Request payments (generates QR codes and depinc: URIs)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -442,8 +442,8 @@
         <translation>Show the list of used receiving addresses and labels</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
-        <translation>Open a btchd: URI or payment request</translation>
+        <source>Open a depinc: URI or payment request</source>
+        <translation>Open a depinc: URI or payment request</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -1469,7 +1469,7 @@
         <translation>Payment request error</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>Cannot start DePINC: click-to-pay handler</translation>
     </message>
     <message>
@@ -1477,8 +1477,8 @@
         <translation>URI handling</translation>
     </message>
     <message>
-        <source>'btchd://' is not a valid URI. Use 'btchd:' instead.</source>
-        <translation>'btchd://' is not a valid URI. Use 'btchd:' instead.</translation>
+        <source>'depinc://' is not a valid URI. Use 'depinc:' instead.</source>
+        <translation>'depinc://' is not a valid URI. Use 'depinc:' instead.</translation>
     </message>
     <message>
         <source>You are using a BIP70 URL which will be unsupported in the future.</source>
@@ -2588,8 +2588,8 @@ Note:  Since the fee is calculated on a per-byte basis, a fee of "100 satoshis p
         <translation>Enter a label for this address to add it to the list of used addresses</translation>
     </message>
     <message>
-        <source>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
-        <translation>A message that was attached to the btchd: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</translation>
+        <source>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</source>
+        <translation>A message that was attached to the depinc: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the DePINC network.</translation>
     </message>
     <message>
         <source>Pay To:</source>

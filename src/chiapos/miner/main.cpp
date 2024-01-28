@@ -137,7 +137,7 @@ struct Arguments {
     // Network related
     int difficulty_constant_factor_bits;  // dcf bits (chain parameter)
     std::string datadir;                  // The root path of the data directory
-    std::string cookie_path;              // The file stores the connecting information of current btchd server
+    std::string cookie_path;              // The file stores the connecting information of current depinc server
     std::string posproofs_path;           // The pos proofs for testing timeing
 } g_args;
 
@@ -627,7 +627,7 @@ int main(int argc, char** argv) {
                      std::to_string(chiapos::DIFFICULTY_CONSTANT_FACTOR_BITS)))  // --dcf-bits
             ("d,datadir", "The root path of the data directory",
              cxxopts::value<std::string>())  // --datadir, -d
-            ("cookie", "Full path to `.cookie` from btchd datadir",
+            ("cookie", "Full path to `.cookie` from depinc datadir",
              cxxopts::value<std::string>())                                                       // --cookie
             ("posproofs", "Path to the file contains PoS proofs", cxxopts::value<std::string>())  // --posproofs
             ("command", std::string("Command") + miner::GetCommandsList(),

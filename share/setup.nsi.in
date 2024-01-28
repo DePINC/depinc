@@ -107,12 +107,12 @@ Section -post SEC0001
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" DisplayVersion "@PACKAGE_VERSION@"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" Publisher "${COMPANY}"
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" URLInfoAbout "${URL}"
-    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" DisplayIcon $INSTDIR\btchd-qt.exe
+    WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" DisplayIcon $INSTDIR\depinc-qt.exe
     WriteRegStr HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" UninstallString $INSTDIR\uninstall.exe
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" NoModify 1
     WriteRegDWORD HKCU "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${LegacyName}" NoRepair 1
     WriteRegStr HKCR "@PACKAGE_TARNAME@" "URL Protocol" ""
-    WriteRegStr HKCR "@PACKAGE_TARNAME@" "" "URL:BTCHD"
+    WriteRegStr HKCR "@PACKAGE_TARNAME@" "" "URL:DEPINC"
     WriteRegStr HKCR "@PACKAGE_TARNAME@\DefaultIcon" "" $INSTDIR\@BITCOIN_GUI_NAME@@EXEEXT@
     WriteRegStr HKCR "@PACKAGE_TARNAME@\shell\open\command" "" '"$INSTDIR\@BITCOIN_GUI_NAME@@EXEEXT@" "%1"'
     # Clear "DePINC Chain"

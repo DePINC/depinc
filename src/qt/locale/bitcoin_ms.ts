@@ -389,8 +389,8 @@ Alihkan fail data ke dalam tab semasa</translation>
 </translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Request payments (generates QR codes and btchd: URIs)
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Request payments (generates QR codes and depinc: URIs)
 </translation>
     </message>
     <message>

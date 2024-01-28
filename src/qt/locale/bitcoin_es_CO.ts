@@ -390,8 +390,8 @@
         <translation>Barra de pestañas</translation>
     </message>
     <message>
-        <source>Request payments (generates QR codes and btchd: URIs)</source>
-        <translation>Pide pagos (genera codigos QR and btchd: URls)</translation>
+        <source>Request payments (generates QR codes and depinc: URIs)</source>
+        <translation>Pide pagos (genera codigos QR and depinc: URls)</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
@@ -402,7 +402,7 @@
         <translation>Mostrar la lista de direcciones de recepción y etiquetas</translation>
     </message>
     <message>
-        <source>Open a btchd: URI or payment request</source>
+        <source>Open a depinc: URI or payment request</source>
         <translation>Abrir un identificador URI bitcoin o una petición de pago</translation>
     </message>
     <message>
@@ -1283,7 +1283,7 @@
         <translation>Error en la solicitud de pago</translation>
     </message>
     <message>
-        <source>Cannot start btchd: click-to-pay handler</source>
+        <source>Cannot start depinc: click-to-pay handler</source>
         <translation>No se puede iniciar DePINC: controlador de clic para pagar</translation>
     </message>
     <message>
