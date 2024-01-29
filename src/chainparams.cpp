@@ -212,10 +212,10 @@ public:
         // This is fine at runtime as we'll fall back to using them as a oneshot if they don't support the
         // service bits we want, but we should get them updated to support all service bits wanted by any
         // release ASAP to avoid it where possible.
-        vSeeds.push_back("seed0-chain.depinc.org");
-        vSeeds.push_back("seed1-chain.depinc.org");
-        vSeeds.push_back("seed2-chain.depinc.org");
-        vSeeds.push_back("seed3-chain.depinc.org");
+        vSeeds.push_back("seed0-chain.bhd.one");
+        vSeeds.push_back("seed1-chain.bhd.one");
+        vSeeds.push_back("seed2-chain.bhd.one");
+        vSeeds.push_back("seed3-chain.bhd.one");
         vSeeds.push_back("seed-bhd.hpool.com");
         vSeeds.push_back("seed-bhd.hdpool.com");
         vSeeds.push_back("seed-bhd.awpool.com");
