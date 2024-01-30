@@ -2179,7 +2179,7 @@ static int64_t nTimeCallbacks = 0;
 static int64_t nTimeTotal = 0;
 static int64_t nBlocksTotal = 0;
 
-bool CheckWithdrawTx(CTransaction const& tx, int nLockHeight, CAmount nPointValue, int nPointHeight, int nHeight, CScript const& burnToScriptPubKey, CValidationState& state)
+bool CheckWithdrawTx(CTransaction const& tx, int nLockHeight, CAmount nPointValue, int nPointHeight, int nHeight, CScript const& burnToScriptPubKey, CValidationState& state, Consensus::Params const& params)
 {
     CAmount nWithdrawAmount = GetWithdrawAmount(nLockHeight, nPointHeight, nHeight, nPointValue);
     LogPrintf("%s: withdraw tx, tx.vout[0].nValue=%ld (%s DePC), withdraw=%ld (%s DePC), point=%ld (%s DePC), calculated on height: %ld, point height: %ld, should be locked %ld blocks\n", __func__, tx.vout[0].nValue, chiapos::FormatNumberStr(std::to_string(tx.vout[0].nValue / COIN)), nWithdrawAmount, chiapos::FormatNumberStr(std::to_string(nWithdrawAmount / COIN)), nPointValue, chiapos::FormatNumberStr(std::to_string(nPointValue / COIN)), nHeight, nPointHeight, nLockHeight);
@@ -2187,6 +2187,9 @@ bool CheckWithdrawTx(CTransaction const& tx, int nLockHeight, CAmount nPointValu
         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-wrong-withdraw-value", "the amount is invalid to be withdrawal");
     }
     CAmount nBurnAmount = nPointValue - nWithdrawAmount;
+    if (nHeight >= params.BHDIP010Height) {
+        nBurnAmount /= 2; // only half should be burned and half send to miner
+    }
     LogPrintf("%s: coins are burned total %s (%s DePC) from withdraw tx: %s\n", __func__, chiapos::FormatNumberStr(std::to_string(nBurnAmount)), chiapos::FormatNumberStr(std::to_string(nBurnAmount / COIN)), tx.GetHash().GetHex());
     if (nBurnAmount > 0) {
         if (tx.vout.size() != 2) {
@@ -2245,7 +2248,7 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
             if (DatacarrierTypeIsChiaPoint(prevPayloadType)) {
                 // Withdraw a POINT
                 int nTermIndex = prevPayloadType - DATACARRIER_TYPE_CHIA_POINT;
-                if (!CheckWithdrawTx(tx, params.BHDIP009PledgeTerms[nTermIndex].nLockHeight, prevCoin.out.nValue, prevCoin.nHeight, nHeight, burnToScriptPubKey, state)) {
+                if (!CheckWithdrawTx(tx, params.BHDIP009PledgeTerms[nTermIndex].nLockHeight, prevCoin.out.nValue, prevCoin.nHeight, nHeight, burnToScriptPubKey, state, params)) {
                     return false;
                 }
             } else if (prevPayloadType == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
@@ -2253,7 +2256,7 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
                 auto retargetPayload = PointRetargetPayload::As(prevCoin.extraData);
                 int nPointHeight = retargetPayload->GetPointHeight();
                 int nTermIndex = retargetPayload->GetPointType() - DATACARRIER_TYPE_CHIA_POINT;
-                if (!CheckWithdrawTx(tx, params.BHDIP009PledgeTerms[nTermIndex].nLockHeight, prevCoin.out.nValue, nPointHeight, nHeight, burnToScriptPubKey, state)) {
+                if (!CheckWithdrawTx(tx, params.BHDIP009PledgeTerms[nTermIndex].nLockHeight, prevCoin.out.nValue, nPointHeight, nHeight, burnToScriptPubKey, state, params)) {
                     return false;
                 }
             }

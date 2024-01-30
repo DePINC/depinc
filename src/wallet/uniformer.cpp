@@ -278,6 +278,8 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
     }
 
     int nSpendHeight = locked_chain->getHeight().get_value_or(0);
+    auto const& params = Params().GetConsensus();
+
     // Check unbind limit
     if (coin.IsBindPlotter()) {
         int nUnbindSpendHeight = nSpendHeight + 1;
@@ -286,7 +288,7 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
             errors.push_back(strprintf("Unbind plotter active on %d block height (%d blocks after, about %d minute)",
                     nActiveHeight,
                     nActiveHeight - nUnbindSpendHeight,
-                    (nActiveHeight - nUnbindSpendHeight) * Consensus::GetTargetSpacing(nUnbindSpendHeight, Params().GetConsensus()) / 60));
+                    (nActiveHeight - nUnbindSpendHeight) * Consensus::GetTargetSpacing(nUnbindSpendHeight, params) / 60));
             return Result::WALLET_ERROR;
         }
     }
@@ -300,7 +302,6 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
     txNew.nVersion = CTransaction::UNIFORM_VERSION;
     txNew.vin = { CTxIn(outpoint, CScript(), CTxIn::SEQUENCE_FINAL - 1) };
 
-    auto const& params = Params().GetConsensus();
     auto burnDest = GetBurnToDestination();
     CScript burnScriptPubKey = GetScriptForDestination(burnDest);
 
@@ -326,6 +327,9 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
     if (pterm) {
         nWithdrawAmount = GetWithdrawAmount(pterm->nLockHeight, nPointHeight, nSpendHeight, coin.out.nValue);
         nBurnAmount = coin.out.nValue - nWithdrawAmount;
+        if (nSpendHeight >= params.BHDIP010Height) {
+            nBurnAmount /= 2; // burn 1/2 to miner's fee
+        }
     } else {
         // otherwise, current type of tx is bind, we just need to unbind it.
         LogPrintf("%s: unbind\n", __func__);
