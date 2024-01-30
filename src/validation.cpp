@@ -2214,17 +2214,20 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
     if (nHeight < params.BHDIP009Height) {
         return true;
     }
-    Coin prevCoin;
-    for (auto const& in : tx.vin) {
-        if (!view.GetCoin(in.prevout, prevCoin)) {
-            return true;
-        }
-        if (prevCoin.IsChiaPointRelated()) {
-            // found one
-            // TODO matthew: We should check and ensure there is only 1 point/retarget input in this tx
-            break;
-        }
+    if (tx.vin.empty()) {
+        // skip the tx cause it has empty input
+        return true;
     }
+    Coin prevCoin;
+    if (!view.GetCoin(tx.vin[0].prevout, prevCoin)) {
+        // cannot find the previous coin, skip the checking procedure
+        return true;
+    }
+    if (!prevCoin.IsChiaPointRelated()) {
+        // the coin is not chia related
+        return true;
+    }
+
     if (tx.IsUniform()) {
         bool fReject { false };
         int nLastActiveHeight { 0 };
