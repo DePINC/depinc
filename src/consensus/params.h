@@ -135,6 +135,7 @@ struct Params {
     int BHDIP010TargetSpacingMulFactorEnableAtHeight;
     int BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight;
     int BHDIP010PledgeOverrideRetargetMinHeights;
+    int BHDIP010OverrideFundRoyaltyForLowMortgage;
 
     std::array<PledgeTerm, 4> BHDIP009PledgeTerms;
 

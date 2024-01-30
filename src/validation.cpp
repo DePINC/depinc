@@ -1266,8 +1266,10 @@ CAmount GetBlockAccumulateSubsidy(const CBlockIndex* pindexPrev, const Consensus
                 fundRatio = consensusParams.BHDIP001FundRoyaltyForFullMortgage;
             assert(fundRatio <= consensusParams.BHDIP001FundRoyaltyForLowMortgage);
             accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
-        } else {
+        } else if (pindex->nHeight < consensusParams.BHDIP010Height) {
             accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage)) / 1000;
+        } else {
+            accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage)) / 1000;
         }
     }
     return accumulate;
@@ -1387,9 +1389,13 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
                 assert(fundRatio <= consensusParams.BHDIP001FundRoyaltyForLowMortgage);
                 reward.fund = (nSubsidy * fundRatio) / 1000;
                 reward.accumulate -= (nSubsidy * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
-            } else {
+            } else if (nHeight < consensusParams.BHDIP010Height) {
                 reward.fund = 0;
                 reward.accumulate -= nSubsidy * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage) / 1000;
+            } else {
+                reward.fund = 0;
+                reward.accumulate -= nSubsidy * (1000 - consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage) / 1000;
+
             }
             LogPrint(BCLog::POC, "%s: low mortgage for account %s, accumulate=%s\n", __func__, strGeneratorAddr, chiapos::MakeNumberStr(reward.accumulate / COIN));
         }
@@ -1456,9 +1462,12 @@ BlockReward GetLowMortgageBlockReward(int nHeight, const Consensus::Params& cons
         assert(fundRatio < consensusParams.BHDIP001FundRoyaltyForLowMortgage);
         reward.fund = (nSubsidy * fundRatio) / 1000;
         reward.accumulate -= (nSubsidy * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
-    } else {
+    } else if (nHeight < consensusParams.BHDIP010Height) {
         reward.fund = 0;
         reward.accumulate -= nSubsidy * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage) / 1000;
+    } else {
+        reward.fund = 0;
+        reward.accumulate -= nSubsidy * (1000 - consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage) / 1000;
     }
 
     reward.miner = nSubsidy - reward.fund - reward.miner0;
@@ -1487,8 +1496,10 @@ int GetLowMortgageFundRoyaltyRatio(int nHeight, const Consensus::Params& consens
         if (fundRatio < consensusParams.BHDIP001FundRoyaltyForFullMortgage)
             fundRatio = consensusParams.BHDIP001FundRoyaltyForFullMortgage;
         return fundRatio;
-    } else {
+    } else if (nHeight < consensusParams.BHDIP010Height) {
         return consensusParams.BHDIP009FundRoyaltyForLowMortgage;
+    } else {
+        return consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage;
     }
 }
 
