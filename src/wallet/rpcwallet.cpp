@@ -392,8 +392,7 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
 static UniValue sendcointoaddress(JSONRPCRequest const& request)
 {
     if (request.params.size() != 3) {
-        std::cout << "params: [tx hash] [n] [address]\n";
-        return 0;
+        throw std::runtime_error("params: [tx hash] [n] [address]");
     }
 
     // parse arguments
