@@ -178,6 +178,10 @@ public:
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = 5; // 9 days for retargeting
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
+        consensus.BHDIP010RetargetFees[0] = { 0, 0 };
+        consensus.BHDIP010RetargetFees[1] = { 5, 10 };
+        consensus.BHDIP010RetargetFees[0] = { 10, 25 };
+        consensus.BHDIP010RetargetFees[0] = { 25, 60 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -747,6 +751,10 @@ public:
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height; // fix the duration as soon as the number of height reaches BHDIP010
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = ONE_HOUR_HEIGHTS * 24 * 9; // 9 days for retargeting
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
+        consensus.BHDIP010RetargetFees[0] = { 0, 0 };
+        consensus.BHDIP010RetargetFees[1] = { 5, 10 };
+        consensus.BHDIP010RetargetFees[0] = { 10, 25 };
+        consensus.BHDIP010RetargetFees[0] = { 25, 60 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

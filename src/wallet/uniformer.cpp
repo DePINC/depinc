@@ -21,6 +21,8 @@
 #include <net.h>
 #include <chiapos/kernel/utils.h>
 
+#include <consensus/pledge_term.h>
+
 //! Check whether transaction has descendant in wallet, or has been
 //! mined, or conflicts with a mined transaction. Return a uniformer::Result.
 static uniformer::Result PreconditionChecks(interfaces::Chain::Lock& locked_chain, CWallet const* wallet, CWalletTx const& wtx, std::vector<std::string>& errors) EXCLUSIVE_LOCKS_REQUIRED(wallet->cs_wallet) {
@@ -209,6 +211,7 @@ Result CreatePointTransaction(CWallet* wallet, CTxDestination const& senderDest,
 
 Result CreatePointRetargetTransaction(CWallet* wallet, COutPoint const& previousOutpoint, CTxDestination const& senderDest, CTxDestination const& receiverDest, DatacarrierType pointType, int nPointHeight, CCoinControl const& coin_control, std::vector<std::string>& errors, CAmount& txfee, CMutableTransaction& mtx) {
     auto locked_chain = wallet->chain().lock();
+    auto nTargetHeight = locked_chain->getHeight().get_value_or(0) + 1;
     LOCK(wallet->cs_wallet);
     auto const& coin = wallet->chain().accessCoin(previousOutpoint);
     errors.clear();
@@ -220,6 +223,17 @@ Result CreatePointRetargetTransaction(CWallet* wallet, COutPoint const& previous
     realCoinControl.m_pick_dest = senderDest;
     realCoinControl.destChange = senderDest;
     realCoinControl.Select(previousOutpoint);
+
+    auto const& params = ::Params().GetConsensus();
+
+    if (nPointHeight >= params.BHDIP010Height) {
+        // the tx fee must be calculated
+        int nTermIndex = static_cast<int>(pointType - DATACARRIER_TYPE_CHIA_POINT);
+        if (nTermIndex >= params.BHDIP010RetargetFees.size()) {
+            throw std::runtime_error("wront term index, internal error");
+        }
+        realCoinControl.m_min_txfee = CalculateTxFeeForPointRetarget({ nTermIndex, coin.out.nValue, nPointHeight }, nTargetHeight, params);
+    }
 
     // Create point transaction
     std::string strError;

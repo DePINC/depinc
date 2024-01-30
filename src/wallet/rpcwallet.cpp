@@ -5263,6 +5263,7 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
     CAccountID revokeID;
     DatacarrierType pointType;
     int nPointHeight;
+    CAmount nPointAmount = prevCoin.out.nValue;
     auto payload = ExtractTransactionDatacarrier(*prevWalletTx->tx, 0, {DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
     if (payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
         // RETARGET

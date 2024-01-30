@@ -2301,6 +2301,20 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
                         return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-wrong-point-from-target", "the point tx is invalid");
                     }
                 }
+                // BHDIP010 make sure that the tx fee is more than the value returns from CalculateTxFeeForPointRetarget
+                if (nHeight >= params.BHDIP010Height) {
+                    int nTermIndex = static_cast<int>(retargetPayload->pointType - DATACARRIER_TYPE_CHIA_POINT);
+                    CAmount nTxFee = CalculateTxFeeForPointRetarget({ nTermIndex, prevCoin.out.nValue, retargetPayload->nPointHeight }, nHeight, params);
+                    // calculate the txfee
+                    CAmount nActualTxFee = prevCoin.out.nValue;
+                    for (auto const& txout : tx.vout) {
+                        nActualTxFee -= txout.nValue;
+                    }
+                    if (nActualTxFee < nTxFee) {
+                        // tx-fee is not enough
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-invalid-retarget-fee", "you need to make sure that the retarget tx-fee is enough");
+                    }
+                }
             }
         }
     }
