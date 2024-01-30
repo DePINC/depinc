@@ -128,7 +128,9 @@ struct Params {
     int BHDIP009PledgeRetargetMinHeights;
     double BHDIP009DifficultyChangeMaxFactor;
     std::vector<std::pair<int, double>> BHDIP009DifficultyChangeMaxFactors;
+    std::array<PledgeTerm, 4> BHDIP009PledgeTerms;
 
+    /** BHD010 upgrade related consensus */
     int BHDIP010Height;
     int BHDIP010TotalAmountUpgradeMultiply;
     double BHDIP010TargetSpacingMulFactor;
@@ -136,8 +138,6 @@ struct Params {
     int BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight;
     int BHDIP010PledgeOverrideRetargetMinHeights;
     int BHDIP010OverrideFundRoyaltyForLowMortgage;
-
-    std::array<PledgeTerm, 4> BHDIP009PledgeTerms;
 
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
