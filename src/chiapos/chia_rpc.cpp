@@ -748,8 +748,18 @@ static UniValue querySupply(JSONRPCRequest const& request) {
 static UniValue queryPledgeInfo(JSONRPCRequest const& request) {
     auto const& params = Params().GetConsensus();
 
+    int nHeight = ::ChainActive().Height();
+
+    if (nHeight < params.BHDIP009Height) {
+        throw std::runtime_error("cannot query pledge info. cause the hard-fork is not applied");
+    }
+
     UniValue resValue(UniValue::VOBJ);
-    resValue.pushKV("retarget_min_heights", params.BHDIP009PledgeRetargetMinHeights);
+    if (nHeight >= params.BHDIP010Height) {
+        resValue.pushKV("retarget_min_heights", params.BHDIP010PledgeOverrideRetargetMinHeights);
+    } else {
+        resValue.pushKV("retarget_min_heights", params.BHDIP009PledgeRetargetMinHeights);
+    }
     resValue.pushKV("capacity_eval_window", params.nCapacityEvalWindow);
 
     UniValue termsValue(UniValue::VARR);

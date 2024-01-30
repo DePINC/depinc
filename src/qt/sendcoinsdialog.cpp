@@ -978,7 +978,7 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn 
             .arg(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), PROTOCOL_POINT_AMOUNT_MIN), msgArg);
         break;
     case WalletModel::RetargetTooEarlier:
-        msgParams.first = tr("Retarget a tx is too earlier, please wait until after %1 height since the tx.").arg(Params().GetConsensus().BHDIP009PledgeRetargetMinHeights);
+        msgParams.first = tr("Retarget a tx is too earlier, please wait until after %1 (BHDIP009) or %2 (BHDIP010) height since the hard-fork tx.").arg(Params().GetConsensus().BHDIP009PledgeRetargetMinHeights).arg(Params().GetConsensus().BHDIP010PledgeOverrideRetargetMinHeights);
         break;
     // included to prevent a compiler warning.
     case WalletModel::OK:

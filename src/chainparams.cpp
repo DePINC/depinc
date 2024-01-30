@@ -176,6 +176,7 @@ public:
 
         consensus.BHDIP010TargetSpacingMulFactor = 0.433333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
+        consensus.BHDIP010PledgeOverrideRetargetMinHeights = 5; // 9 days for retargeting
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -743,6 +744,7 @@ public:
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 200; // two days before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 0.433333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height; // fix the duration as soon as the number of height reaches BHDIP010
+        consensus.BHDIP010PledgeOverrideRetargetMinHeights = ONE_HOUR_HEIGHTS * 24 * 9; // 9 days for retargeting
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

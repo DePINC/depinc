@@ -134,6 +134,7 @@ struct Params {
     double BHDIP010TargetSpacingMulFactor;
     int BHDIP010TargetSpacingMulFactorEnableAtHeight;
     int BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight;
+    int BHDIP010PledgeOverrideRetargetMinHeights;
 
     std::array<PledgeTerm, 4> BHDIP009PledgeTerms;
 

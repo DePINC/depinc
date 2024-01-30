@@ -5251,7 +5251,13 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
     }
     auto params = Params().GetConsensus();
     int nSpendHeight = locked_chain->getHeight().get_value_or(0) + 1;
-    if (nSpendHeight - prevCoin.nHeight <= params.BHDIP009PledgeRetargetMinHeights) {
+    int nMinHeights;
+    if (nSpendHeight >= params.BHDIP010Height) {
+        nMinHeights = params.BHDIP010PledgeOverrideRetargetMinHeights;
+    } else {
+        nMinHeights = params.BHDIP009PledgeRetargetMinHeights;
+    }
+    if (nSpendHeight - prevCoin.nHeight <= nMinHeights) {
         throw std::runtime_error("Retarget the tx too early");
     }
     CAccountID revokeID;

@@ -290,9 +290,15 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(PayOperateMethod pa
             LOCK(cs_main);
             auto pindex = ::ChainActive().Tip();
             int nTargetHeight = pindex->nHeight + 1;
-            if (coin.nHeight + params.BHDIP009PledgeRetargetMinHeights > nTargetHeight) {
+            int nMinHeights;
+            if (nTargetHeight >= params.BHDIP010Height) {
+                nMinHeights = params.BHDIP010PledgeOverrideRetargetMinHeights;
+            } else {
+                nMinHeights = params.BHDIP009PledgeRetargetMinHeights;
+            }
+            if (coin.nHeight + nMinHeights > nTargetHeight) {
                 // cannot create the tx for retargeting
-                return SendCoinsReturn(RetargetTooEarlier, QString::fromStdString(tinyformat::format("Retarget a tx too earlier, you need to wait for %d blocks before retargeting it, please wait until height %d", params.BHDIP009PledgeRetargetMinHeights, coin.nHeight + params.BHDIP009PledgeRetargetMinHeights)));
+                return SendCoinsReturn(RetargetTooEarlier, QString::fromStdString(tinyformat::format("Retarget a tx too earlier, you need to wait for %d blocks before retargeting it, please wait until height %d", nMinHeights, coin.nHeight + nMinHeights)));
             }
             // prepare transaction
             DatacarrierType pointType = recipients[0].pointType;

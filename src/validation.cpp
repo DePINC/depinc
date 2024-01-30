@@ -2258,7 +2258,13 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
             } else if (payloadType == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
                 // check the distance
                 int nDistance = nHeight - prevCoin.nHeight;
-                if (nDistance <= params.BHDIP009PledgeRetargetMinHeights) {
+                int nMinHeights;
+                if (nHeight >= params.BHDIP010Height) {
+                    nMinHeights = params.BHDIP010PledgeOverrideRetargetMinHeights;
+                } else {
+                    nMinHeights = params.BHDIP009PledgeRetargetMinHeights;
+                }
+                if (nDistance <= nMinHeights) {
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-retarget-early", "the retarget is too early");
                 }
                 if (!prevCoin.IsChiaPointRelated()) {
