@@ -744,12 +744,12 @@ public:
 
         // BHDIP010
         constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
-        consensus.BHDIP010Height = consensus.BHDIP009Height + 300; // two days before BHDIP010
+        consensus.BHDIP010Height = consensus.BHDIP009Height + 100; // 100 blocks before BHDIP010
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 200; // two days before disabling coins before BHDIP009
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 100; // 100 blocks before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 0.433333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height; // fix the duration as soon as the number of height reaches BHDIP010
-        consensus.BHDIP010PledgeOverrideRetargetMinHeights = ONE_HOUR_HEIGHTS * 24 * 9; // 9 days for retargeting
+        consensus.BHDIP010PledgeOverrideRetargetMinHeights = 3; // 3 blocks for the number of min heights to do the retargeting
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
         consensus.BHDIP010RetargetFees[0] = { 0, 0 };
         consensus.BHDIP010RetargetFees[1] = { 5, 10 };
