@@ -230,9 +230,9 @@ Result CreatePointRetargetTransaction(CWallet* wallet, COutPoint const& previous
         // the tx fee must be calculated
         int nTermIndex = static_cast<int>(pointType - DATACARRIER_TYPE_CHIA_POINT);
         if (nTermIndex >= params.BHDIP010RetargetFees.size()) {
-            throw std::runtime_error("wront term index, internal error");
+            throw std::runtime_error("wrong term index, internal error");
         }
-        realCoinControl.m_min_txfee = CalculateTxFeeForPointRetarget({ nTermIndex, coin.out.nValue, nPointHeight }, nTargetHeight, params);
+        realCoinControl.m_min_txfee += CalculateTxFeeForPointRetarget({ nTermIndex, coin.out.nValue, nPointHeight }, nTargetHeight, params);
     }
 
     // Create point transaction
