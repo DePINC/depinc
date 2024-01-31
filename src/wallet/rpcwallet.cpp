@@ -5219,7 +5219,7 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
     if (request.fHelp || request.params.size() < 2 || request.params.size() > 7) {
         throw std::runtime_error(
             RPCHelpMan{
-                "withdrawpledge",
+                "retargetpledge",
                 "\nWithdraw an point for a given point txid." + HelpRequiringPassphrase(pwallet) + "\n",
                 {
                     {"txid", RPCArg::Type::STR, RPCArg::Optional::NO, "The previous transaction id."},
