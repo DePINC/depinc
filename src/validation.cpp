@@ -2306,13 +2306,20 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
                     int nTermIndex = static_cast<int>(retargetPayload->pointType - DATACARRIER_TYPE_CHIA_POINT);
                     CAmount nTxFee = CalculateTxFeeForPointRetarget({ nTermIndex, prevCoin.out.nValue, retargetPayload->nPointHeight }, nHeight, params);
                     // calculate the txfee
-                    CAmount nActualTxFee = prevCoin.out.nValue;
+                    CAmount nActualTxFee {0};
+                    for (auto const& txin : tx.vin) {
+                        Coin coin;
+                        if (!view.GetCoin(txin.prevout, coin)) {
+                            return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-invalid-retarget-coin", "cannot find the coin from retarget tx");
+                        }
+                        nActualTxFee += coin.out.nValue;
+                    }
                     for (auto const& txout : tx.vout) {
                         nActualTxFee -= txout.nValue;
                     }
                     if (nActualTxFee < nTxFee) {
                         // tx-fee is not enough
-                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-invalid-retarget-fee", "you need to make sure that the retarget tx-fee is enough");
+                        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-invalid-retarget-fee", tinyformat::format("you need to make sure that the retarget tx-fee is enough, actual=%s, required=%s", FormatMoney(nActualTxFee), FormatMoney(nTxFee)));
                     }
                 }
             }
