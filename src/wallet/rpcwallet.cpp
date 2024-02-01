@@ -5241,9 +5241,6 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
     COutPoint prevOutpoint(hashPrevTx, 0);
 
     Coin const& prevCoin = wallet->chain().accessCoin(prevOutpoint);
-    if (prevCoin.IsSpent()) {
-        throw std::runtime_error("The tx has already spent");
-    }
     uint256 hashBlock;
     CWalletTx const* prevWalletTx = wallet->GetWalletTx(hashPrevTx);
     if (prevWalletTx == nullptr) {
