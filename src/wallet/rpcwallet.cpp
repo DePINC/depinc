@@ -5255,7 +5255,7 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
         nMinHeights = params.BHDIP009PledgeRetargetMinHeights;
     }
     if (nSpendHeight - prevCoin.nHeight <= nMinHeights) {
-        throw std::runtime_error("Retarget the tx too early");
+        LogPrintf("retarget is too early, the tx should be rejected from the core, min-height=%d, curr-height=%d, coin-height=%d\n", nMinHeights, nSpendHeight, prevCoin.nHeight);
     }
     CAccountID revokeID;
     DatacarrierType pointType;
