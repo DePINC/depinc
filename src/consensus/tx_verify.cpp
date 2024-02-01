@@ -226,8 +226,11 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
         // Ensure that all coins are come from 1 address
         for (unsigned int i = 1; i < tx.vin.size(); ++i) {
             Coin const& coin = inputs.AccessCoin(tx.vin[i].prevout);
-            if (coin.out.scriptPubKey != scriptPubKey)
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputdest-invaliduniform");
+            if (coin.out.scriptPubKey != scriptPubKey) {
+                auto address0 = EncodeDestination(CTxDestination((ScriptHash)ExtractAccountID(scriptPubKey)));
+                auto addressi = EncodeDestination(CTxDestination((ScriptHash)ExtractAccountID(coin.out.scriptPubKey)));
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputdest-invaliduniform", tinyformat::format("coins aren't come from same address, 0=%s, %d=%s", address0, i, addressi));
+            }
         }
         // Ensure the `scriptPubkey` is the only script when it is a non-zero outpoint
         // We only verify the first outpoint and ensure the scripPubKey is match with the inputs
