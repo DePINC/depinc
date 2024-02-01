@@ -58,6 +58,8 @@ public:
     CoinPickPolicy m_coin_pick_policy;
     //! Custom pick destination.Unlimit select when not set 
     CTxDestination m_pick_dest;
+    //! Allow to ignore the max fee check
+    bool m_ignore_max_fee_check{false};
 
     CCoinControl()
     {

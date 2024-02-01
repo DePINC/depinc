@@ -2307,7 +2307,7 @@ void CWallet::ReacceptWalletTransactions(interfaces::Chain::Lock& locked_chain)
     }
 }
 
-bool CWalletTx::SubmitMemoryPoolAndRelay(std::string& err_string, bool relay, interfaces::Chain::Lock& locked_chain)
+bool CWalletTx::SubmitMemoryPoolAndRelay(std::string& err_string, bool relay, interfaces::Chain::Lock& locked_chain, bool ignore_max_fee_check)
 {
     // Can't relay if wallet is not broadcasting
     if (!pwallet->GetBroadcastTransactions()) return false;
@@ -2330,7 +2330,7 @@ bool CWalletTx::SubmitMemoryPoolAndRelay(std::string& err_string, bool relay, in
     // Irrespective of the failure reason, un-marking fInMempool
     // out-of-order is incorrect - it should be unmarked when
     // TransactionRemovedFromMempool fires.
-    bool ret = pwallet->chain().broadcastTransaction(tx, err_string, pwallet->m_default_max_tx_fee, relay);
+    bool ret = pwallet->chain().broadcastTransaction(tx, err_string, (ignore_max_fee_check ? 0 : pwallet->m_default_max_tx_fee), relay);
     fInMempool |= ret;
     return ret;
 }
@@ -3685,7 +3685,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
         }
     }
 
-    if (nFeeRet > m_default_max_tx_fee) {
+    if (!coin_control.m_ignore_max_fee_check && nFeeRet > m_default_max_tx_fee) {
         strFailReason = TransactionErrorString(TransactionError::MAX_FEE_EXCEEDED);
         return false;
     }
@@ -3750,8 +3750,13 @@ bool CWallet::CommitTransaction(CTransactionRef tx, mapValue_t mapValue, std::ve
 
         if (fBroadcastTransactions)
         {
+            auto const& params = Params().GetConsensus();
+            bool ignore_max_fee {false};
+            if (locked_chain->getHeight() >= params.BHDIP010Height && wtxNew.tx->IsUniform()) {
+                ignore_max_fee = true;
+            }
             std::string err_string;
-            if (!wtx.SubmitMemoryPoolAndRelay(err_string, true, *locked_chain)) {
+            if (!wtx.SubmitMemoryPoolAndRelay(err_string, true, *locked_chain, ignore_max_fee)) {
                 WalletLogPrintf("CommitTransaction(): Transaction cannot be broadcast immediately, %s\n", err_string);
                 // TODO: if we expect the failure to be long term or permanent, instead delete wtx from the wallet and return failure.
             }

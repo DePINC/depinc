@@ -238,6 +238,7 @@ Result CreatePointRetargetTransaction(CWallet* wallet, COutPoint const& previous
         }
         LogPrintf("calculated fee=%s for point retargeting\n", FormatMoney(nTxFee));
         realCoinControl.m_min_txfee += nTxFee;
+        realCoinControl.m_ignore_max_fee_check = true; // the fee might exceeds the maximum amount
     }
 
     // Create point transaction
