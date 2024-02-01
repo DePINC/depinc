@@ -232,7 +232,12 @@ Result CreatePointRetargetTransaction(CWallet* wallet, COutPoint const& previous
         if (nTermIndex >= params.BHDIP010RetargetFees.size()) {
             throw std::runtime_error("wrong term index, internal error");
         }
-        realCoinControl.m_min_txfee += CalculateTxFeeForPointRetarget({ nTermIndex, coin.out.nValue, nPointHeight }, nTargetHeight, params);
+        auto nTxFee = CalculateTxFeeForPointRetarget({ nTermIndex, coin.out.nValue, nPointHeight }, nTargetHeight, params);
+        if (nTxFee < 0) {
+            throw std::runtime_error(tinyformat::format("The amount of tx fee is a negative number, nTxFee=%s", FormatMoney(nTxFee)));
+        }
+        LogPrintf("calculated fee=%s for point retargeting\n", FormatMoney(nTxFee));
+        realCoinControl.m_min_txfee += nTxFee;
     }
 
     // Create point transaction
