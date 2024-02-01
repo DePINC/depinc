@@ -316,7 +316,36 @@ void GenerateChiaBlock(uint256 const& hashPrevBlock, int nHeightOfPrevBlock, CTx
 }
 
 static UniValue submitProof(JSONRPCRequest const& request) {
-    // TODO check the validity of request parameters
+    RPCHelpMan("submitproof", "Submit proof to the chain and release new block",
+        {
+            RPCArg("Hash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The hash value of the previous block"),
+            RPCArg("Height", RPCArg::Type::NUM, RPCArg::Optional::NO, "The number of height for the previous block"),
+            RPCArg("Challenge", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The challenge of the chain"),
+            RPCArg("ProofOfSpace", RPCArg::Type::OBJ, RPCArg::Optional::NO, "The proof of space", {
+                {
+                    RPCArg("Challenge", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The challenge from current chain"),
+                    RPCArg("K", RPCArg::Type::NUM, RPCArg::Optional::NO, "The k value presents the size of the plot file"),
+                    RPCArg("PkHash", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Pool public-key or the hash value"),
+                    RPCArg("LocalPk", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Local public-key from the plot file"),
+                    RPCArg("PlotType", RPCArg::Type::NUM, RPCArg::Optional::NO, "Plot type in integer"),
+                    RPCArg("Proof", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The proof of space"),
+                },
+            }),
+            RPCArg("FarmerSk", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The farmer secure key"),
+            RPCArg("VDFProof", RPCArg::Type::OBJ, RPCArg::Optional::NO, "The VDF proof", {
+                {
+                    RPCArg("Challenge", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The challenge from current chain"),
+                    RPCArg("Y", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The y with the proof"),
+                    RPCArg("Proof", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Proof of the VDF"),
+                    RPCArg("Iters", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Iterations for the VDF proof"),
+                    RPCArg("WitnessType", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Witness type"),
+                    RPCArg("Duration", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "Duration in seconds for calculating the vdf proof"),
+                },
+            }),
+            RPCArg("RewardAddress", RPCArg::Type::STR, RPCArg::Optional::NO, "The reward address"),
+        },
+        RPCResult("proof"),
+        RPCExamples("depinc-cli submitproof ...")).Check(request);
 
     uint256 hashPrevBlock = ParseHashV(request.params[0], "prev_block_hash");
     int nHeightOfPrevBlock = request.params[1].get_int();
@@ -991,6 +1020,11 @@ struct Amounts {
 };
 
 static UniValue queryChainPledgeInfo(JSONRPCRequest const& request) {
+    RPCHelpMan("querychiapledgeinfo", "Get the chain pledge information",
+        { },
+        RPCResult("info"),
+        RPCExamples("depinc-cli querychiapledgeinfo")).Check(request);
+
     auto params = ::Params().GetConsensus();
     LOCK(cs_main);
 
@@ -1126,6 +1160,13 @@ struct WrongTxOut {
 
 UniValue burntxout(JSONRPCRequest const& request)
 {
+    RPCHelpMan("burntxout", "Burn a special txout without making signature",
+        {
+            RPCArg("txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id of the tx owns the out"),
+            RPCArg("n", RPCArg::Type::NUM, RPCArg::Optional::NO,"The number of the txout from the transaction"),
+        },
+        RPCResult("txid"), RPCExamples("depinc-cli burntxout xxxxx 0")).Check(request);
+
     constexpr auto nMaxFee = static_cast<CAmount>(0.01 * COIN);
 
     LOCK(cs_main);

@@ -996,6 +996,11 @@ static UniValue getblock(const JSONRPCRequest& request)
 
 UniValue countblockowners(JSONRPCRequest const& request)
 {
+    RPCHelpMan("countblockowners", "Show the number of blocks sort by the owner",
+        { RPCArg("height", RPCArg::Type::STR, RPCArg::Optional::NO, "the number of the height") },
+        RPCResult("owners"),
+        RPCExamples("depinc-cli 100")).Check(request);
+
     if (request.params.size() != 1) {
         throw std::runtime_error("you need to provide the number of height");
     }
