@@ -223,13 +223,15 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
     if (tx.IsUniform() && nSpendHeight >= params.BHDIP006Height) {
         Coin const& coin = inputs.AccessCoin(tx.vin[0].prevout);
         CScript const& scriptPubKey = coin.out.scriptPubKey;
+        auto address0 = EncodeDestination(CTxDestination((ScriptHash)ExtractAccountID(scriptPubKey)));
+        CAmount amount0 = coin.out.nValue;
         // Ensure that all coins are come from 1 address
         for (unsigned int i = 1; i < tx.vin.size(); ++i) {
             Coin const& coin = inputs.AccessCoin(tx.vin[i].prevout);
             if (coin.out.scriptPubKey != scriptPubKey) {
-                auto address0 = EncodeDestination(CTxDestination((ScriptHash)ExtractAccountID(scriptPubKey)));
                 auto addressi = EncodeDestination(CTxDestination((ScriptHash)ExtractAccountID(coin.out.scriptPubKey)));
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputdest-invaliduniform", tinyformat::format("coins aren't come from same address, 0=%s, %d=%s", address0, i, addressi));
+                CAmount amounti = coin.out.nValue;
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-txns-inputdest-invaliduniform", tinyformat::format("coins aren't come from same address, 0=%s(value=%s), %d=%s(value=%s)", address0, FormatMoney(amount0), i, addressi, FormatMoney(amounti)));
             }
         }
         // Ensure the `scriptPubkey` is the only script when it is a non-zero outpoint
