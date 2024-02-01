@@ -2918,19 +2918,22 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
 
             // Get current parameters
             uint256 hashTxBlock = wtx.GetBlockHash();
-            int nTxHeight = locked_chain.getBlockHeight(hashTxBlock).get_value_or(-1);
-            if (nTxHeight == -1) {
-                throw std::runtime_error("cannot get tx height");
-            }
-            int nSpendHeight = locked_chain.getHeight().get_value_or(-1);
-            if (nSpendHeight == -1) {
-                throw std::runtime_error("cannot get chain height");
-            }
-            // Check the height and do not select the coin under hard-fork
-            auto params = Params().GetConsensus();
-            if (nSpendHeight >= params.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight && nTxHeight < params.BHDIP009Height) {
-                // the tx should not be added
-                continue;
+            if (!hashTxBlock.IsNull()) {
+                // the tx is confirmed, we need to check the spent-height
+                int nTxHeight = locked_chain.getBlockHeight(hashTxBlock).get_value_or(-1);
+                if (nTxHeight == -1) {
+                    throw std::runtime_error("cannot get tx height");
+                }
+                int nSpendHeight = locked_chain.getHeight().get_value_or(-1);
+                if (nSpendHeight == -1) {
+                    throw std::runtime_error("cannot get chain height");
+                }
+                // Check the height and do not select the coin under hard-fork
+                auto params = Params().GetConsensus();
+                if (nSpendHeight >= params.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight && nTxHeight < params.BHDIP009Height) {
+                    // the tx should not be added
+                    continue;
+                }
             }
 
             bool solvable = IsSolvable(*this, wtx.tx->vout[i].scriptPubKey);
