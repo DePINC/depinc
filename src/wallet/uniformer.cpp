@@ -357,7 +357,7 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
         nBurnAmount = 0;
     }
     assert(nWithdrawAmount <= coin.out.nValue);
-    LogPrintf("%s: pledge %s DePC, withdraw %s DePC, burn %s DePC, point %s DePC, calculated on height: %ld\n", __func__, chiapos::FormatNumberStr(std::to_string(coin.out.nValue / COIN)), chiapos::FormatNumberStr(std::to_string(nWithdrawAmount / COIN)), chiapos::FormatNumberStr(std::to_string(nBurnAmount / COIN)), chiapos::FormatNumberStr(std::to_string(coin.out.nValue)), nSpendHeight);
+    LogPrintf("%s: pledge %s DePC, withdraw %s DePC, burn %s DePC, calculated on height: %ld\n", __func__, FormatMoney(coin.out.nValue), FormatMoney(nWithdrawAmount ), FormatMoney(nBurnAmount), nSpendHeight);
     txNew.vout = { CTxOut(nWithdrawAmount, coin.out.scriptPubKey) };
     if (nBurnAmount > 0) {
         // We have money needs to be burned
