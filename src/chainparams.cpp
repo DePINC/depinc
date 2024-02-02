@@ -180,8 +180,8 @@ public:
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
         consensus.BHDIP010RetargetFees[0] = { 0, 0 };
         consensus.BHDIP010RetargetFees[1] = { 5, 10 };
-        consensus.BHDIP010RetargetFees[0] = { 10, 25 };
-        consensus.BHDIP010RetargetFees[0] = { 25, 60 };
+        consensus.BHDIP010RetargetFees[2] = { 10, 25 };
+        consensus.BHDIP010RetargetFees[3] = { 25, 60 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -753,8 +753,8 @@ public:
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
         consensus.BHDIP010RetargetFees[0] = { 0, 0 };
         consensus.BHDIP010RetargetFees[1] = { 5, 10 };
-        consensus.BHDIP010RetargetFees[0] = { 10, 25 };
-        consensus.BHDIP010RetargetFees[0] = { 25, 60 };
+        consensus.BHDIP010RetargetFees[2] = { 10, 25 };
+        consensus.BHDIP010RetargetFees[3] = { 25, 60 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
