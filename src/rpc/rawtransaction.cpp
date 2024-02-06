@@ -45,14 +45,14 @@
  */
 static const CFeeRate DEFAULT_MAX_RAW_TX_FEE_RATE{COIN / 10};
 
-void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
+void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, CoinAmountQuerier querier = {})
 {
     // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
     //
     // Blockchain contextual information (confirmations and blocktime) is not
     // available to code in bitcoin-common, so we query them here and push the
     // data into the returned UniValue.
-    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags());
+    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags(), 0, querier);
 
     if (!hashBlock.IsNull()) {
         LOCK(cs_main);
@@ -194,9 +194,11 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
         f_txindex_ready = g_txindex->BlockUntilSyncedToCurrentChain();
     }
 
+    auto const& params = ::Params().GetConsensus();
+
     CTransactionRef tx;
     uint256 hash_block;
-    if (!GetTransaction(hash, tx, Params().GetConsensus(), hash_block, blockindex)) {
+    if (!GetTransaction(hash, tx, params, hash_block, blockindex)) {
         std::string errmsg;
         if (blockindex) {
             if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
@@ -219,7 +221,23 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
 
     UniValue result(UniValue::VOBJ);
     if (blockindex) result.pushKV("in_active_chain", in_active_chain);
-    TxToJSON(*tx, hash_block, result);
+
+    {
+        LOCK(cs_main);
+        auto const& view = ::ChainstateActive().CoinsTip();
+        auto querier = [&view, &params](COutPoint const& outpoint) -> Optional<CAmount> {
+            CTransactionRef tx;
+            uint256 hashBlock;
+            if (GetTransaction(outpoint.hash, tx, params, hashBlock)) {
+                // found the tx
+                auto const& txout = tx->vout[outpoint.n];
+                return txout.nValue;
+            }
+            return {};
+        };
+        TxToJSON(*tx, hash_block, result, querier);
+    }
+
     // patch, show the bind-tx validation
     if (tx->IsUniform()) {
         CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(*tx, 0, {DATACARRIER_TYPE_BINDCHIAFARMER});
