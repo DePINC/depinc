@@ -223,9 +223,7 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     if (blockindex) result.pushKV("in_active_chain", in_active_chain);
 
     {
-        LOCK(cs_main);
-        auto const& view = ::ChainstateActive().CoinsTip();
-        auto querier = [&view, &params](COutPoint const& outpoint) -> Optional<CAmount> {
+        auto querier = [&params](COutPoint const& outpoint) -> Optional<CAmount> {
             CTransactionRef tx;
             uint256 hashBlock;
             if (GetTransaction(outpoint.hash, tx, params, hashBlock)) {
