@@ -172,11 +172,11 @@ public:
 
         consensus.BHDIP010Height = INFINITY_HEIGHT;
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 30 * 6; // 6 months
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 50; // disable BHDIP009 coins after 50 days of BHDIP010
 
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
-        consensus.BHDIP010PledgeOverrideRetargetMinHeights = 5; // 9 days for retargeting
+        consensus.BHDIP010PledgeOverrideRetargetMinHeights = HEIGHTS_DAY * 9; // 9 days for retargeting limits
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
         consensus.BHDIP010RetargetFees[0] = { 0, 0 };
         consensus.BHDIP010RetargetFees[1] = { 5, 10 };
