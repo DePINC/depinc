@@ -222,19 +222,17 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     UniValue result(UniValue::VOBJ);
     if (blockindex) result.pushKV("in_active_chain", in_active_chain);
 
-    {
-        auto querier = [&params](COutPoint const& outpoint) -> Optional<CAmount> {
-            CTransactionRef tx;
-            uint256 hashBlock;
-            if (GetTransaction(outpoint.hash, tx, params, hashBlock)) {
-                // found the tx
-                auto const& txout = tx->vout[outpoint.n];
-                return txout.nValue;
-            }
-            return {};
-        };
-        TxToJSON(*tx, hash_block, result, querier);
-    }
+    auto querier = [&params](COutPoint const& outpoint) -> Optional<CAmount> {
+        CTransactionRef tx;
+        uint256 hashBlock;
+        if (GetTransaction(outpoint.hash, tx, params, hashBlock)) {
+            // found the tx
+            auto const& txout = tx->vout[outpoint.n];
+            return txout.nValue;
+        }
+        return {};
+    };
+    TxToJSON(*tx, hash_block, result, querier);
 
     // patch, show the bind-tx validation
     if (tx->IsUniform()) {
