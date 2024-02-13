@@ -25,6 +25,7 @@
 #include <chiapos/kernel/calc_diff.h>
 
 const int32_t SECONDS_OF_A_DAY = 60 * 60 * 24;
+
 const int AVERAGE_VDF_SPEED = 200 * 1000; // 200k ips we assume
 const int AVERAGE_VDF_SPEED_TESTNET = 70 * 1000; // 70k ips we assume
 
@@ -138,11 +139,11 @@ public:
         assert(consensus.BHDIP008FundRoyaltyForLowMortgage < consensus.BHDIP001FundRoyaltyForLowMortgage);
         assert(consensus.BHDIP008FundRoyaltyForLowMortgage > consensus.BHDIP001FundRoyaltyForFullMortgage);
 
-        int nHeightsOfADay = SECONDS_OF_A_DAY / consensus.BHDIP008TargetSpacing;
+        const int HEIGHTS_DAY = SECONDS_OF_A_DAY / consensus.BHDIP008TargetSpacing;
         consensus.BHDIP009SkipTestChainChecks = false; // Do not check validation for blocks of burst consensus
         consensus.BHDIP009Height = 860130; // 2023/6/19 13:00 - 17:00
-        consensus.BHDIP009StartVerifyingVdfDurationHeight = consensus.BHDIP009Height + nHeightsOfADay * 7;
-        consensus.BHDIP009OldPledgesDisableOnHeight = consensus.BHDIP009Height + nHeightsOfADay * 14;
+        consensus.BHDIP009StartVerifyingVdfDurationHeight = consensus.BHDIP009Height + HEIGHTS_DAY * 7;
+        consensus.BHDIP009OldPledgesDisableOnHeight = consensus.BHDIP009Height + HEIGHTS_DAY * 14;
         // The reward address should be filled
         consensus.BHDIP009FundAddresses = { "34QSZXwx354rXUZ7W3mJnwfCiomJpHQApp" };
         consensus.BHDIP009FundRoyaltyForLowMortgage = 150;
@@ -156,21 +157,18 @@ public:
         consensus.BHDIP009BaseIters = AVERAGE_VDF_SPEED * 60;
         consensus.BHDIP009StartDifficulty = (arith_uint256(consensus.BHDIP009StartBlockIters) * chiapos::expected_plot_size<arith_uint256>(chiapos::MIN_K) / chiapos::Pow2(consensus.BHDIP009DifficultyConstantFactorBits)).GetLow64();
 
-        consensus.BHDIP009PledgeTerms[0] = {nHeightsOfADay * 5, 8};
-        consensus.BHDIP009PledgeTerms[1] = {nHeightsOfADay * 365, 20};
-        consensus.BHDIP009PledgeTerms[2] = {nHeightsOfADay * 365 * 2, 50};
-        consensus.BHDIP009PledgeTerms[3] = {nHeightsOfADay * 365 * 3, 100};
+        consensus.BHDIP009PledgeTerms[0] = {HEIGHTS_DAY * 5, 8};
+        consensus.BHDIP009PledgeTerms[1] = {HEIGHTS_DAY * 365, 20};
+        consensus.BHDIP009PledgeTerms[2] = {HEIGHTS_DAY * 365 * 2, 50};
+        consensus.BHDIP009PledgeTerms[3] = {HEIGHTS_DAY * 365 * 3, 100};
 
         consensus.BHDIP009TotalAmountUpgradeMultiply = 3; // 21,000,000 * 3 = 63,000,000
-        consensus.BHDIP009CalculateDistributedAmountEveryHeights = nHeightsOfADay * 30; // every 30 days the distributed amount will be changed
+        consensus.BHDIP009CalculateDistributedAmountEveryHeights = HEIGHTS_DAY * 30; // every 30 days the distributed amount will be changed
         consensus.BHDIP009PledgeRetargetMinHeights = (SECONDS_OF_A_DAY / consensus.BHDIP008TargetSpacing) * 7; // minimal number to retarget a pledge is 7 days
         consensus.BHDIP009DifficultyChangeMaxFactor = chiapos::DIFFICULTY_CHANGE_MAX_FACTOR;
 
         // BHDIP010
-        const int INFINITY_HEIGHT = 99999999;
-        constexpr int HEIGHTS_DAY = 60 / 3 * 24;
-
-        consensus.BHDIP010Height = INFINITY_HEIGHT;
+        consensus.BHDIP010Height = 933133; // 2024/2/20
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 50; // disable BHDIP009 coins after 50 days of BHDIP010
 
