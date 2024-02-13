@@ -5277,6 +5277,10 @@ static UniValue retargetpledge(JSONRPCRequest const& request) {
         throw std::runtime_error(tinyformat::format("wrong payload-type, RETARGET or POINT is required, but %s(%d) is received", DatacarrierTypeToString(payload->type), static_cast<int>(payload->type)));
     }
 
+    if (nPointHeight == 0) {
+        throw std::runtime_error("the tx to retarget hasn't been recorded on chain");
+    }
+
     CTxDestination revokedDest{ScriptHash{revokeID}};
 
     LogPrintf("%s: previous coin is %s on height %d, %s will be revoked.\n", __func__, DatacarrierTypeToString(pointType), nPointHeight, EncodeDestination(revokedDest));
