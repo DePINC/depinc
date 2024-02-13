@@ -2214,16 +2214,16 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
     if (nHeight < params.BHDIP009Height) {
         return true;
     }
-    if (tx.vin.empty()) {
-        // skip the tx cause it has empty input
-        return state.Invalid(ValidationInvalidReason::TX_MISSING_INPUTS, false, REJECT_INVALID, "missing inputs", "chia pledge checking is failed");
-    }
     Coin prevCoin;
-    if (!view.GetCoin(tx.vin[0].prevout, prevCoin)) {
-        // cannot find the previous coin, skip the checking procedure
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "prev coin is invalid", "cannot find previous coin");
+    for (auto const& in : tx.vin) {
+        if (!view.GetCoin(in.prevout, prevCoin)) {
+            return true;
+        }
+        if (prevCoin.IsChiaPointRelated()) {
+            // found one
+            break;
+        }
     }
-
     if (tx.IsUniform()) {
         bool fReject { false };
         int nLastActiveHeight { 0 };
@@ -2282,7 +2282,6 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-retarget-early", "the retarget is too early");
                 }
                 if (!prevCoin.IsChiaPointRelated()) {
-                    LogPrintf("%s: prevCoin={%s}{%s}\n", __func__, tx.vin[0].prevout.hash.GetHex(), DatacarrierTypeToString(prevCoin.GetExtraDataType()));
                     return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-invalid-retarget-prev", "previous coin is not chia point related");
                 }
                 auto prevPayloadType = prevCoin.GetExtraDataType();
