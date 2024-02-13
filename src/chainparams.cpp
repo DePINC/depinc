@@ -748,7 +748,7 @@ public:
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 30; // 100 blocks before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
-        consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height; // fix the duration as soon as the chain height reaches BHDIP010
+        consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP009Height; // fix the duration as soon as the chain height reaches BHDIP010
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = 3; // 3 blocks for the number of min heights to do the retargeting
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
         consensus.BHDIP010RetargetFees[0] = { 0, 0 };
