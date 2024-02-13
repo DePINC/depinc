@@ -2216,16 +2216,12 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
     }
     if (tx.vin.empty()) {
         // skip the tx cause it has empty input
-        return true;
+        return state.Invalid(ValidationInvalidReason::TX_MISSING_INPUTS, false, REJECT_INVALID, "missing inputs", "chia pledge checking is failed");
     }
     Coin prevCoin;
     if (!view.GetCoin(tx.vin[0].prevout, prevCoin)) {
         // cannot find the previous coin, skip the checking procedure
-        return true;
-    }
-    if (!prevCoin.IsChiaPointRelated()) {
-        // the coin is not chia related
-        return true;
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "prev coin is invalid", "cannot find previous coin");
     }
 
     if (tx.IsUniform()) {
@@ -2235,6 +2231,7 @@ bool CheckChiaPledgeTx(CTransaction const& tx, CCoinsViewCache const& view, CVal
         auto payload = ExtractTransactionDatacarrier(tx, nHeight, {DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET}, fReject, nLastActiveHeight, fIsBindTx);
         if (payload == nullptr) {
             if (fIsBindTx) {
+                // when the payload cannot be retrieved but the flag `fIsBindTx` is set, which means the tx is an invalid bind-tx
                 LogPrintf("%s: invalid bind-tx has been found, nLastActiveHeight=%d, fReject=%s, tx=%s\n", __func__, nLastActiveHeight, (fReject ? "true" : "false"), tx.GetHash().GetHex());
                 return false;
             }
