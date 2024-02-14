@@ -1,9 +1,9 @@
 package=vdf
-$(package)_version=v1.0.1
+$(package)_version=v1.0.2
 $(package)_download_path=https://github.com/depinc/vdf/archive/refs/tags/
 $(package)_download_file=$($(package)_version).tar.gz
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=8022ce6c7f0ca7ad0d1f95ea5f248dc54869275c42a401fb618af9bf1055791a
+$(package)_sha256_hash=32241c794324071673f1ed66e3332819ea31dadab00d958155590e5435c23e85
 
 define $(package)_fetch_cmds
 $(call fetch_file,$(package),$($(package)_download_path),$($(package)_download_file),$($(package)_file_name),$($(package)_sha256_hash))
