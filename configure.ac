@@ -65,7 +65,7 @@ case $host in
   ;;
 esac
 dnl Require C++14 compiler (no GNU extensions)
-AX_CXX_COMPILE_STDCXX([14], [noext], [mandatory], [nodefault])
+AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory], [nodefault])
 dnl Check if -latomic is required for <std::atomic>
 CHECK_ATOMIC
 
@@ -1175,7 +1175,7 @@ TEMP_LIBS="$LIBS"
 LIBS="$BOOST_LIBS $LIBS"
 TEMP_CPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$CPPFLAGS $BOOST_CPPFLAGS"
-AC_MSG_CHECKING([for mismatched boost c++14 scoped enums])
+AC_MSG_CHECKING([for mismatched boost c++17 scoped enums])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
   #include <boost/config.hpp>
   #include <boost/version.hpp>
