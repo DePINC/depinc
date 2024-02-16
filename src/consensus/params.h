@@ -132,6 +132,7 @@ struct Params {
 
     /** BHD010 upgrade related consensus */
     int BHDIP010Height;
+    uint64_t BHDIP010StartDifficulty;
     int BHDIP010TotalAmountUpgradeMultiply;
     double BHDIP010TargetSpacingMulFactor;
     int BHDIP010TargetSpacingMulFactorEnableAtHeight;

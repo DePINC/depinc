@@ -169,6 +169,8 @@ public:
 
         // BHDIP010
         consensus.BHDIP010Height = 933133; // 2024/2/20
+        consensus.BHDIP010StartDifficulty = consensus.BHDIP009StartDifficulty;
+
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 50; // disable BHDIP009 coins after 50 days of BHDIP010
 
@@ -743,6 +745,7 @@ public:
         // BHDIP010
         constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
         consensus.BHDIP010Height = consensus.BHDIP009Height + 30; // 100 blocks before BHDIP010
+        consensus.BHDIP010StartDifficulty = consensus.BHDIP009StartDifficulty;
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 30; // 100 blocks before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;

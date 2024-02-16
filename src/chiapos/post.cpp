@@ -293,6 +293,8 @@ uint64_t GetChiaBlockDifficulty(CBlockIndex const* pindex, Consensus::Params con
         return 0;
     } else if (nNextHeight == params.BHDIP009Height) {
         return params.BHDIP009StartDifficulty;
+    } else if (nNextHeight == params.BHDIP010Height) {
+        return params.BHDIP010StartDifficulty;
     } else {
         return pindex->chiaposFields.nDifficulty;
     }
@@ -302,6 +304,8 @@ uint64_t GetDifficultyForNextIterations(CBlockIndex const* pindex, Consensus::Pa
     int nTargetHeight = pindex->nHeight + 1;
     if (nTargetHeight == params.BHDIP009Height) {
         return params.BHDIP009StartDifficulty;
+    } else if (nTargetHeight == params.BHDIP010Height) {
+        return params.BHDIP010StartDifficulty;
     }
     arith_uint256 totalDifficulty{0};
     int nCount = params.BHDIP009DifficultyEvalWindow;
