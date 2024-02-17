@@ -10,9 +10,9 @@
 #if defined(_WIN32) || defined(__APPLE__)
 
 // FIXME here is the definition of bswap functions to avoid compiling/linking errors
-uint16_t bswap_16(uint16_t x) { return __bswap_16(x); }
-uint32_t bswap_32(uint32_t x) { return __bswap_32(x); }
-uint64_t bswap_64(uint64_t x) { return __bswap_64(x); }
+inline uint16_t bswap_16(uint16_t x) { return __bswap_16(x); }
+inline uint32_t bswap_32(uint32_t x) { return __bswap_32(x); }
+inline uint64_t bswap_64(uint64_t x) { return __bswap_64(x); }
 
 #endif
 
