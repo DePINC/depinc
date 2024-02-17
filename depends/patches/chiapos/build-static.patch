@@ -1,8 +1,8 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d880dc2..e8be874 100644
+index d880dc2..f34714d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -16,24 +16,6 @@ project(chiapos C CXX ASM)
+@@ -16,26 +16,8 @@ project(chiapos C CXX ASM)
  # CMake 3.14+
  include(FetchContent)
  
@@ -24,9 +24,13 @@ index d880dc2..e8be874 100644
 -)
 -FetchContent_MakeAvailable(cxxopts)
 -
- option(CP_LINK_BLADEBIT_HARVESTER "Links libbladebit_harvester at build time instead of dynamically loading it." OFF)
- option(CP_BUILD_BLADEBIT_HARVESTER "Pulls bladebit harvester target from git and builds it as a dependency.")
+-option(CP_LINK_BLADEBIT_HARVESTER "Links libbladebit_harvester at build time instead of dynamically loading it." OFF)
+-option(CP_BUILD_BLADEBIT_HARVESTER "Pulls bladebit harvester target from git and builds it as a dependency.")
++option(CP_LINK_BLADEBIT_HARVESTER "Links libbladebit_harvester at build time instead of dynamically loading it." ON)
++option(CP_BUILD_BLADEBIT_HARVESTER "Pulls bladebit harvester target from git and builds it as a dependency." OFF)
  
+ if (${CP_BUILD_BLADEBIT_HARVESTER} AND NOT ${CP_LINK_BLADEBIT_HARVESTER})
+   set(CP_LINK_BLADEBIT_HARVESTER ON)
 @@ -122,12 +104,6 @@ set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -fno-omit-frame-pointer -fsanitize=thre
  set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=thread")
  ENDIF()
@@ -40,7 +44,14 @@ index d880dc2..e8be874 100644
  FetchContent_Declare(
    blake3
    GIT_REPOSITORY https://github.com/BLAKE3-team/BLAKE3.git
-@@ -146,19 +122,13 @@ endif()
+@@ -142,23 +118,20 @@ if(NOT blake3_POPULATED)
+   set(BUILD_SHARED_LIBS FALSE CACHE BOOL "Build static libraries" FORCE)
+ 
+   add_subdirectory(${blake3_SOURCE_DIR}/c ${blake3_BINARY_DIR})
++  if (WIN32)
++      BLAKE3_DISABLE_SIMD()
++  endif()
+ endif()
  
  set(BLAKE3_SRC ${blake3_SOURCE_DIR}/c)
  set(BLAKE3_INCLUDE_DIR ${blake3_SOURCE_DIR}/c)
@@ -61,7 +72,7 @@ index d880dc2..e8be874 100644
  FetchContent_Declare(
    Catch2
    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-@@ -171,6 +141,8 @@ add_executable(RunTests
+@@ -171,6 +144,8 @@ add_executable(RunTests
      src/chacha8.c
  )
  
@@ -70,7 +81,7 @@ index d880dc2..e8be874 100644
  target_link_libraries(RunTests
      PRIVATE
      fse
-@@ -184,23 +156,17 @@ target_compile_options(RunTests PRIVATE --coverage)
+@@ -184,23 +159,17 @@ target_compile_options(RunTests PRIVATE --coverage)
  target_link_options(RunTests PRIVATE --coverage)
  endif()
  
@@ -95,7 +106,45 @@ index d880dc2..e8be874 100644
  target_link_libraries(RunTests PRIVATE fse Threads::Threads Catch2::Catch2WithMain
    $<$<CXX_COMPILER_ID:MSVC>:uint128>
    $<$<NOT:$<PLATFORM_ID:Darwin,OpenBSD,FreeBSD,Windows>>:stdc++fs>
-@@ -229,19 +195,15 @@ if (${CP_LINK_BLADEBIT_HARVESTER})
+@@ -208,6 +177,37 @@ target_link_libraries(RunTests PRIVATE fse Threads::Threads Catch2::Catch2WithMa
+ 
+ if (${CP_LINK_BLADEBIT_HARVESTER})
+ 
++  if (NOT ${CP_BUILD_BLADEBIT_HARVESTER})
++    message(STATUS "Downloading green_reaper release file...")
++    set(GREEN_REAPER_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/green_reaper-prefix)
++    set(GREEN_REAPER_ROOT ${GREEN_REAPER_PREFIX}/src/green_reaper)
++    if (WIN32)
++        message(STATUS "Green reaper (Windows)")
++        set(GREEN_REAPER_RELEASE_FILE https://github.com/Chia-Network/bladebit/releases/download/v3.1.0/green_reaper-v3.1.0-windows-x86-64.zip)
++        target_sources(RunTests PRIVATE
++            ${blake3_SOURCE_DIR}/c/blake3_avx2_x86-64_windows_gnu.S
++            ${blake3_SOURCE_DIR}/c/blake3_avx512_x86-64_windows_gnu.S
++            ${blake3_SOURCE_DIR}/c/blake3_sse2_x86-64_windows_gnu.S
++            ${blake3_SOURCE_DIR}/c/blake3_sse41_x86-64_windows_gnu.S
++        )
++    endif()
++    if("${CMAKE_SYSTEM}" MATCHES "Linux")
++        message(STATUS "Green reaper (Linux)")
++        set(GREEN_REAPER_RELEASE_FILE https://github.com/Chia-Network/bladebit/releases/download/v3.1.0/green_reaper-v3.1.0-linux-x86-64.tar.gz)
++    endif()
++    include(ExternalProject)
++    ExternalProject_Add(green_reaper
++        PREFIX ${GREEN_REAPER_PREFIX}
++        URL ${GREEN_REAPER_RELEASE_FILE}
++        CONFIGURE_COMMAND ""
++        BUILD_COMMAND ""
++        INSTALL_COMMAND ""
++    )
++    include_directories(${GREEN_REAPER_ROOT}/include)
++    add_dependencies(chiapos green_reaper)
++    add_dependencies(RunTests green_reaper)
++  Endif()
++
+   set(bb_defs
+     USE_GREEN_REAPER=1
+     BLADEBIT_HARVESTER_LINKED=1
+@@ -229,31 +229,21 @@ if (${CP_LINK_BLADEBIT_HARVESTER})
    )
  
    target_compile_definitions(chiapos PUBLIC ${bb_defs})
@@ -106,17 +155,24 @@ index d880dc2..e8be874 100644
 -  target_link_libraries(ProofOfSpace PUBLIC ${bb_libs})
    target_link_libraries(RunTests PUBLIC ${bb_libs})
  
-   target_link_directories(chiapos PUBLIC ${CMAKE_SOURCE_DIR}/libs/green_reaper/lib)
+-  target_link_directories(chiapos PUBLIC ${CMAKE_SOURCE_DIR}/libs/green_reaper/lib)
 -  target_link_directories(ProofOfSpace PUBLIC ${CMAKE_SOURCE_DIR}/libs/green_reaper/lib)
-   target_link_directories(RunTests PUBLIC ${CMAKE_SOURCE_DIR}/libs/green_reaper/lib)
+-  target_link_directories(RunTests PUBLIC ${CMAKE_SOURCE_DIR}/libs/green_reaper/lib)
++  target_link_directories(chiapos PUBLIC ${GREEN_REAPER_ROOT}/lib)
++  target_link_directories(RunTests PUBLIC ${GREEN_REAPER_ROOT}/lib)
  
    set_property(TARGET chiapos APPEND PROPERTY BUILD_RPATH "$ORIGIN")
 -  set_property(TARGET ProofOfSpace APPEND PROPERTY BUILD_RPATH "$ORIGIN")
    set_property(TARGET RunTests APPEND PROPERTY BUILD_RPATH "$ORIGIN")
- 
-   if (WIN32)
-@@ -254,6 +216,9 @@ if (${CP_LINK_BLADEBIT_HARVESTER})
-   endif()
+-
+-  if (WIN32)
+-    add_custom_command(TARGET chiapos POST_BUILD
+-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+-        "${CMAKE_SOURCE_DIR}/libs/green_reaper/lib/bladebit_harvester.dll"
+-        "$<TARGET_FILE_DIR:chiapos>/bladebit_harvester.dll"
+-    )
+-    message("The bladebit dll was copied to: $<TARGET_FILE_DIR:chiapos>/bladebit_harvester.dll")
+-  endif()
  endif()
  
 -
@@ -126,19 +182,6 @@ index d880dc2..e8be874 100644
 +install(TARGETS chiapos fse uint128)
 +install(DIRECTORY lib DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/chiapos)
 +install(DIRECTORY src DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/chiapos)
-diff --git a/src/prover_disk.hpp b/src/prover_disk.hpp
-index 6326e34..1e1ef29 100644
---- a/src/prover_disk.hpp
-+++ b/src/prover_disk.hpp
-@@ -853,7 +853,7 @@ private:
-                 }
-                 
-                 compressed_park_size = info.tableParkSize;;
--                compressed_stub_size_bits = info.stubSizeBits;
-+                compressed_stub_size_bits = info.subtSizeBits;
-                 compressed_ans_r_value = info.ansRValue;
-             }
-         #else
 diff --git a/src/util.hpp b/src/util.hpp
 index 0d6c379..d1b43ca 100644
 --- a/src/util.hpp
