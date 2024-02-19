@@ -168,7 +168,9 @@ public:
         consensus.BHDIP009DifficultyChangeMaxFactor = chiapos::DIFFICULTY_CHANGE_MAX_FACTOR;
 
         // BHDIP010
-        consensus.BHDIP010Height = 933133; // 2024/2/20
+        consensus.BHDIP010Height = 99999999; // 2024/2/20
+        consensus.BHDIP010StartDifficulty = consensus.BHDIP009StartDifficulty;
+
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 30; // disable BHDIP009 coins after 50 days of BHDIP010
 
