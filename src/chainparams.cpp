@@ -172,7 +172,7 @@ public:
         consensus.BHDIP010StartDifficulty = consensus.BHDIP009StartDifficulty;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 50; // disable BHDIP009 coins after 50 days of BHDIP010
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 30; // disable BHDIP009 coins after 50 days of BHDIP010
 
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
