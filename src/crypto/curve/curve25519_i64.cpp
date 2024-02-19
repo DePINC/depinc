@@ -278,7 +278,7 @@ static void sub25519(i25519 xy, const i25519 x, const i25519 y) {
  * The output is in reduced form, the input x need not be.  x and xy may point
  * to the same buffer. */
 static i25519ptr mul25519small(i25519 xy, const i25519 x, const int32_t y) {
-	register int64_t t;
+	int64_t t;
 	check_nonred("mul small x input", x);
 	check_range("mul small y input", y, -185861411, 185861411);
 	t = m64(x[8],y);
@@ -311,7 +311,7 @@ static i25519ptr mul25519small(i25519 xy, const i25519 x, const int32_t y) {
 /* Multiply two numbers.  The output is in reduced form, the inputs need not 
  * be. */
 static i25519ptr mul25519(i25519 xy, const i25519 x, const i25519 y) {
-	register int64_t t;
+	int64_t t;
 	check_nonred("mul input x", x);
 	check_nonred("mul input y", y);
 	t = m64(x[0],y[8]) + m64(x[2],y[6]) + m64(x[4],y[4]) + m64(x[6],y[2]) +
@@ -373,7 +373,7 @@ static i25519ptr mul25519(i25519 xy, const i25519 x, const i25519 y) {
 
 /* Square a number.  Optimization of  mul25519(x2, x, x)  */
 static i25519ptr sqr25519(i25519 x2, const i25519 x) {
-	register int64_t t;
+	int64_t t;
 	check_nonred("sqr input", x);
 	t = m64(x[4],x[4]) + 2 * (m64(x[0],x[8]) + m64(x[2],x[6])) + 38 *
 		m64(x[9],x[9]) + 4 * (m64(x[1],x[7]) + m64(x[3],x[5]));
