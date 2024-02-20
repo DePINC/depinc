@@ -727,8 +727,6 @@ public:
         consensus.BHDIP009StartBlockIters = static_cast<int64_t>(AVERAGE_VDF_SPEED_TESTNET) * consensus.BHDIP008TargetSpacing;
         consensus.BHDIP009DifficultyConstantFactorBits = chiapos::DIFFICULTY_CONSTANT_FACTOR_BITS;
         consensus.BHDIP009DifficultyEvalWindow = 100;
-        consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
-        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 400;
         consensus.BHDIP009PlotSizeMin = chiapos::MIN_K_TEST_NET;
         consensus.BHDIP009PlotSizeMax = chiapos::MAX_K;
         consensus.BHDIP009BaseIters = AVERAGE_VDF_SPEED_TESTNET * 3;
@@ -745,6 +743,11 @@ public:
         // BHDIP010
         constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
         consensus.BHDIP010Height = consensus.BHDIP009Height + 30; // 100 blocks before BHDIP010
+
+        // Patch for filter-bit
+        consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
+        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 400;
+
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 30; // 100 blocks before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
