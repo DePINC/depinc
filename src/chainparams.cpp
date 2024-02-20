@@ -727,8 +727,8 @@ public:
         consensus.BHDIP009StartBlockIters = static_cast<int64_t>(AVERAGE_VDF_SPEED_TESTNET) * consensus.BHDIP008TargetSpacing;
         consensus.BHDIP009DifficultyConstantFactorBits = chiapos::DIFFICULTY_CONSTANT_FACTOR_BITS;
         consensus.BHDIP009DifficultyEvalWindow = 100;
-        consensus.BHDIP009PlotIdBitsOfFilter = 0;
-        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP009Height + 0;
+        consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
+        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 400;
         consensus.BHDIP009PlotSizeMin = chiapos::MIN_K_TEST_NET;
         consensus.BHDIP009PlotSizeMax = chiapos::MAX_K;
         consensus.BHDIP009BaseIters = AVERAGE_VDF_SPEED_TESTNET * 3;
