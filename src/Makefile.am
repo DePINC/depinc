@@ -25,7 +25,6 @@ BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += $(UNIVALUE_CFLAGS)
 
 UTF8PROC_LIBS = -lutf8proc
-BLAKE3_LIBS = -lblake3
 
 LIBBITCOIN_SERVER=libbitcoin_server.a
 LIBBITCOIN_COMMON=libbitcoin_common.a
@@ -130,9 +129,6 @@ endif
 
 if BUILD_BITCOIN_CLI
   bin_PROGRAMS += depinc-cli
-endif
-if BUILD_BITCOIN_MINER
-  bin_PROGRAMS += depinc-miner
 endif
 if BUILD_BITCOIN_TX
   bin_PROGRAMS += depinc-tx
@@ -641,7 +637,7 @@ depincd_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-depincd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS) $(BLAKE3_LIBS)
+depincd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS)
 
 # bitcoin-cli binary #
 depinc_cli_SOURCES = bitcoin-cli.cpp compat/byteswap.cpp
@@ -680,7 +676,7 @@ depinc_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-depinc_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS) $(BLAKE3_LIBS)
+depinc_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS)
 #
 
 # bitcoin-wallet binary #
@@ -707,85 +703,8 @@ depinc_wallet_LDADD = \
   $(LIBSECP256K1) \
   $(LIBUNIVALUE)
 
-depinc_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS) $(BLAKE3_LIBS)
+depinc_wallet_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS)
 #
-
-# bitcoin-miner binary #
-CHIAPOS_MINER_H = \
-  chiapos/plotter_id.h \
-  chiapos/bhd_types.h \
-  chiapos/miner/config.h \
-  chiapos/miner/prover.h \
-  chiapos/miner/rpc_client.h \
-  chiapos/miner/chiapos_miner.h \
-  chiapos/miner/http_client.h \
-  chiapos/miner/tools.h \
-  chiapos/timelord_cli/timelord_client.h
-
-CHIAPOS_MINER_CPPS = \
-  chiapos/plotter_id.cpp \
-  chiapos/miner/config.cpp \
-  chiapos/miner/prover.cpp \
-  chiapos/miner/rpc_client.cpp \
-  chiapos/miner/chiapos_miner.cpp \
-  chiapos/miner/http_client.cpp \
-  chiapos/miner/main.cpp \
-  chiapos/miner/tools.cpp \
-  chiapos/timelord_cli/timelord_client.cpp
-
-depinc_miner_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DCURL_STATICLIB
-depinc_miner_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-depinc_miner_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-depinc_miner_SOURCES = \
-  chainparams.cpp \
-  chainparamsbase.cpp \
-  consensus/merkle.cpp \
-  subsidy_utils.cpp \
-  util/system.cpp \
-  util/translation.h \
-  merkleblock.cpp \
-  bloom.cpp \
-  random.cpp \
-  support/cleanse.cpp \
-  arith_uint256.cpp \
-  uint256.cpp \
-  util/strencodings.cpp \
-  util/time.cpp \
-  util/threadnames.cpp \
-  compat/byteswap.cpp \
-  crypto/sha256.cpp \
-  crypto/sha256_shani.cpp \
-  primitives/transaction.cpp \
-  primitives/block.cpp \
-  chiapos/block_fields.cpp \
-  versionbitsinfo.cpp \
-  fs.cpp \
-  hash.cpp \
-  logging.cpp \
-  script/script.cpp \
-  script/standard.cpp \
-  $(CHIAPOS_KERNEL_INCLUDES) \
-  $(CHIAPOS_KERNEL_CPPS) \
-  $(CHIAPOS_MINER_H) \
-  $(CHIAPOS_MINER_CPPS)
-
-CURL_LIBS = -lcurl
-
-depinc_miner_LDADD = \
-  $(BOOST_LIBS) \
-  $(CRYPTO_LIBS) \
-  $(EVENT_PTHREADS_LIBS) \
-  $(CHIAPOS_LIBS) \
-  $(GMP_LIBS) \
-  $(UTF8PROC_LIBS) \
-  $(CURL_LIBS) \
-  $(TOOLBOX_LIBS) \
-  $(UNIVALUE_LIBS) \
-  $(LIBBITCOIN_COMMON) \
-  $(LIBBITCOIN_UTIL) \
-  $(LIBBITCOIN_CRYPTO) \
-  $(LIBBITCOIN_CONSENSUS) \
-  $(BLAKE3_LIBS)
 
 # bitcoinconsensus library #
 if BUILD_BITCOIN_LIBS
