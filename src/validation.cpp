@@ -2188,7 +2188,7 @@ bool CheckWithdrawTx(CTransaction const& tx, int nLockHeight, CAmount nPointValu
     }
     CAmount nBurnAmount = nPointValue - nWithdrawAmount;
     if (nHeight >= params.BHDIP010Height) {
-        nBurnAmount /= 2; // only half should be burned and half send to miner
+        nBurnAmount = nBurnAmount * params.BHDIP010BurnPercent / 100; // only half should be burned and the other half will be sent to miner as txfee
     }
     LogPrintf("%s: coins are burned total %s (%s DePC) from withdraw tx: %s\n", __func__, chiapos::FormatNumberStr(std::to_string(nBurnAmount)), chiapos::FormatNumberStr(std::to_string(nBurnAmount / COIN)), tx.GetHash().GetHex());
     if (nBurnAmount > 0) {

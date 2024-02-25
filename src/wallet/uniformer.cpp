@@ -348,7 +348,7 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
         nWithdrawAmount = GetWithdrawAmount(pterm->nLockHeight, nPointHeight, nSpendHeight, coin.out.nValue);
         nBurnAmount = coin.out.nValue - nWithdrawAmount;
         if (nSpendHeight >= params.BHDIP010Height) {
-            nBurnAmount /= 2; // burn 1/2 to miner's fee
+            nBurnAmount = nBurnAmount * params.BHDIP010BurnPercent / 100;
         }
     } else {
         // otherwise, current type of tx is bind, we just need to unbind it.
