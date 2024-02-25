@@ -166,6 +166,7 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
     }
 
     bool fLimitTxOutToBurn { false };
+    COutPoint outpointCauseBurning = {};
     CAmount nValueIn = 0;
     CAccountID burnAccountID = GetBurnToAccountID();
     for (unsigned int i = 0; i < tx.vin.size(); ++i) {
@@ -177,6 +178,7 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
             // need to check the height of the txin, only the txin after the BHDIP009 fork-height is allowed
             if (previous_coin.nHeight < params.BHDIP009Height) {
                 fLimitTxOutToBurn = true;
+                outpointCauseBurning = prevout;
             }
         }
 
@@ -214,7 +216,7 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
         // the targets from the tx must be burn address
         for (auto const& txout : tx.vout) {
             if (ExtractAccountID(txout.scriptPubKey) != burnAccountID) {
-                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-target-must-be-burn-account-id", "the target must be burn account-id");
+                return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-target-must-be-burn-account-id", tinyformat::format("the target must be burn account-id, cause by outpoint(%s, %d) from vin", outpointCauseBurning.hash.GetHex(), outpointCauseBurning.n));
             }
         }
     }
