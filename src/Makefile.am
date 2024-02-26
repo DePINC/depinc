@@ -25,6 +25,7 @@ BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += $(UNIVALUE_CFLAGS)
 
 UTF8PROC_LIBS = -lutf8proc
+BLAKE3_LIBS = -lblake3
 
 LIBBITCOIN_SERVER=libbitcoin_server.a
 LIBBITCOIN_COMMON=libbitcoin_common.a
@@ -637,7 +638,7 @@ depincd_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-depincd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS)
+depincd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS) $(BLAKE3_LIBS)
 
 # bitcoin-cli binary #
 depinc_cli_SOURCES = bitcoin-cli.cpp compat/byteswap.cpp
@@ -676,7 +677,7 @@ depinc_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-depinc_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS)
+depinc_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS) $(CHIAPOS_LIBS) $(GMP_LIBS) $(UTF8PROC_LIBS) $(BLAKE3_LIBS)
 #
 
 # bitcoin-wallet binary #
