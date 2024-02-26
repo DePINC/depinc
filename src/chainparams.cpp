@@ -168,7 +168,7 @@ public:
         consensus.BHDIP009DifficultyChangeMaxFactor = chiapos::DIFFICULTY_CHANGE_MAX_FACTOR;
 
         // BHDIP010
-        consensus.BHDIP010Height = 99999999; // 2024/2/20
+        consensus.BHDIP010Height = 938000; // 2024/3/5
         consensus.BHDIP010StartDifficulty = consensus.BHDIP009StartDifficulty;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
