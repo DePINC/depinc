@@ -248,6 +248,89 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
+static UniValue gettxouts(const JSONRPCRequest& request)
+{
+    RPCHelpMan(
+        "gettxouts",
+        "Get related txouts from the provided address",
+        {
+            {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The retrieved txouts are related to this address"},
+        },
+        RPCResult("\"txouts\" in json format"),
+        RPCExamples("cli gettxouts [address]")
+    ).Check(request);
+
+    auto const& params = Params().GetConsensus();
+
+    std::string address = request.params[0].get_str();
+    CTxDestination dest = DecodeDestination(address);
+    CAccountID accountID = ExtractAccountID(dest);
+
+    LOCK(cs_main);
+    auto const& view = ::ChainstateActive().CoinsDB();
+    auto txouts = view.GetAccountCoins(accountID);
+
+    UniValue result(UniValue::VARR);
+    for (auto const& txout : txouts) {
+        UniValue val(UniValue::VOBJ);
+        Coin coin;
+        view.GetCoin(txout, coin);
+        val.pushKV("txid", txout.hash.GetHex());
+        val.pushKV("n", static_cast<int>(txout.n));
+        val.pushKV("address", address);
+        val.pushKV("value", coin.out.nValue);
+        val.pushKV("value(human)", FormatMoney(coin.out.nValue));
+        val.pushKV("height", coin.nHeight);
+        val.pushKV("behind", coin.nHeight < params.BHDIP009Height);
+        result.push_back(std::move(val));
+    }
+
+    return result;
+}
+
+static UniValue getalltxouts(const JSONRPCRequest& request)
+{
+    auto const& params = Params().GetConsensus();
+
+    RPCHelpMan(
+        "getalltxouts",
+        "Get all txouts before hard-fork BHDIP009",
+        {
+            {"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, tinyformat::format("This parameter can be omitted, the default value is %d", params.BHDIP009Height)},
+        },
+        RPCResult("\"txouts\" in json format"),
+        RPCExamples("cli gettxouts [address]")
+    ).Check(request);
+
+    int before_height = params.BHDIP009Height;
+    if (request.params.size() == 1) {
+        before_height = ParseInt32(request.params[0].get_str(), &before_height);
+    }
+
+    UniValue result(UniValue::VARR);
+
+    LOCK(cs_main);
+    auto const& view = ::ChainstateActive().CoinsDB();
+
+    auto outpoints = view.GetAllCoins();
+    for (auto const& outpoint : outpoints) {
+        Coin coin;
+        if (view.GetCoin(outpoint, coin) && coin.nHeight < before_height) {
+            UniValue val(UniValue::VOBJ);
+            val.pushKV("txid", outpoint.hash.GetHex());
+            val.pushKV("n", static_cast<int>(outpoint.n));
+            CTxDestination dest((ScriptHash)coin.out.scriptPubKey);
+            val.pushKV("address", EncodeDestination(dest));
+            val.pushKV("height", coin.nHeight);
+            val.pushKV("value", coin.out.nValue);
+            val.pushKV("value(human)", FormatMoney(coin.out.nValue));
+            result.push_back(std::move(val));
+        }
+    }
+
+    return result;
+}
+
 static UniValue gettxoutproof(const JSONRPCRequest& request)
 {
             RPCHelpMan{"gettxoutproof",
@@ -1809,6 +1892,8 @@ static const CRPCCommand commands[] =
 { //  category              name                            actor (function)            argNames
   //  --------------------- ------------------------        -----------------------     ----------
     { "rawtransactions",    "getrawtransaction",            &getrawtransaction,         {"txid","verbose","blockhash"} },
+    { "rawtransactions",    "gettxouts",                    &gettxouts,                 {"address"} },
+    { "rawtransactions",    "getalltxouts",                 &getalltxouts,              {"height"} },
     { "rawtransactions",    "createrawtransaction",         &createrawtransaction,      {"inputs","outputs","locktime","replaceable"} },
     { "rawtransactions",    "decoderawtransaction",         &decoderawtransaction,      {"hexstring","iswitness"} },
     { "rawtransactions",    "decodescript",                 &decodescript,              {"hexstring"} },

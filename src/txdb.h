@@ -84,6 +84,10 @@ public:
     CBindPlotterCoinsMap GetAccountBindPlotterEntries(const CAccountID &accountID, const CPlotterBindData &bindData = {}) const override;
     CBindPlotterCoinsMap GetBindPlotterEntries(const CPlotterBindData &bindData) const override;
 
+    COutPointVec GetAccountCoins(const CAccountID &accountID) const override;
+
+    COutPointVec GetAllCoins() const override;
+
 private:
     CAmount GetBalanceBind(CPlotterBindData::Type type, CAccountID const& accountID, CCoinsMap const& mapChildCoins) const;
 

@@ -239,6 +239,7 @@ struct CBindPlotterCoinInfo
 
 typedef std::map<COutPoint, CBindPlotterCoinInfo> CBindPlotterCoinsMap;
 typedef std::pair<CBindPlotterCoinsMap::key_type, CBindPlotterCoinsMap::mapped_type> CBindPlotterCoinPair;
+typedef std::vector<COutPoint> COutPointVec;
 
 /** Bind plotter information */
 class CBindPlotterInfo
@@ -333,6 +334,12 @@ public:
 
     //! Get plotter bind all coin entries.
     virtual CBindPlotterCoinsMap GetBindPlotterEntries(const CPlotterBindData &bindData) const;
+
+    //! Get related coins which are related to account
+    virtual COutPointVec GetAccountCoins(const CAccountID &accountID) const;
+
+    //! Get all coins
+    virtual COutPointVec GetAllCoins() const;
 };
 
 
@@ -358,6 +365,8 @@ public:
     CAmount GetBalance(const CAccountID &accountID, const CCoinsMap &mapChildCoins, CAmount *balanceBindPlotter, CAmount *balancePointSend, CAmount *balancePointReceive, PledgeTerms const* terms, int nHeight, bool includeBurst) const override;
     CBindPlotterCoinsMap GetAccountBindPlotterEntries(const CAccountID &accountID, const CPlotterBindData &bindData = {}) const override;
     CBindPlotterCoinsMap GetBindPlotterEntries(const CPlotterBindData &bindData) const override;
+    COutPointVec GetAccountCoins(const CAccountID &accountID) const override;
+    COutPointVec GetAllCoins() const override;
 };
 
 

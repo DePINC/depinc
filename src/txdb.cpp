@@ -801,6 +801,44 @@ CBindPlotterCoinsMap CCoinsViewDB::GetBindPlotterEntries(const CPlotterBindData 
     return outpoints;
 }
 
+COutPointVec CCoinsViewDB::GetAccountCoins(const CAccountID &accountID) const {
+    std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+
+    COutPoint outpoint;
+    CAccountID entryAccountID { accountID };
+    CoinIndexEntry entry(&outpoint, &entryAccountID);
+
+    COutPointVec result;
+    pcursor->Seek(entry);
+    while (pcursor->Valid()) {
+        if (pcursor->GetKey(entry) && entryAccountID == accountID) {
+            result.push_back(outpoint);
+        }
+        pcursor->Next();
+    }
+
+    return result;
+}
+
+COutPointVec CCoinsViewDB::GetAllCoins() const {
+    std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+
+    COutPoint outpoint;
+    CAccountID entryAccountID;
+    CoinIndexEntry entry(&outpoint, &entryAccountID);
+
+    COutPointVec result;
+    pcursor->Seek(entry);
+    while (pcursor->Valid()) {
+        if (pcursor->GetKey(entry)) {
+            result.push_back(outpoint);
+        }
+        pcursor->Next();
+    }
+
+    return result;
+}
+
 CAmount CCoinsViewDB::GetBalanceBind(CPlotterBindData::Type type, CAccountID const& accountID, CCoinsMap const& mapChildCoins) const {
     std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
     CAmount balanceBindPlotter = 0;

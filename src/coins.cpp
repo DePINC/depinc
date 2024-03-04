@@ -32,6 +32,9 @@ CAmount CCoinsView::GetBalance(const CAccountID &accountID, const CCoinsMap &map
 }
 CBindPlotterCoinsMap CCoinsView::GetAccountBindPlotterEntries(const CAccountID &accountID, const CPlotterBindData &bindData) const { return {}; }
 CBindPlotterCoinsMap CCoinsView::GetBindPlotterEntries(const CPlotterBindData &bindData) const { return {}; }
+COutPointVec CCoinsView::GetAccountCoins(const CAccountID &accountID) const { return {}; }
+COutPointVec CCoinsView::GetAllCoins() const { return {}; }
+
 bool CCoinsView::HaveCoin(const COutPoint &outpoint) const {
     Coin coin;
     return GetCoin(outpoint, coin);
@@ -57,6 +60,12 @@ CBindPlotterCoinsMap CCoinsViewBacked::GetAccountBindPlotterEntries(const CAccou
 }
 CBindPlotterCoinsMap CCoinsViewBacked::GetBindPlotterEntries(const CPlotterBindData &bindData) const {
     return base->GetBindPlotterEntries(bindData);
+}
+COutPointVec CCoinsViewBacked::GetAccountCoins(const CAccountID &accountID) const {
+    return base->GetAccountCoins(accountID);
+}
+COutPointVec CCoinsViewBacked::GetAllCoins() const {
+    return base->GetAllCoins();
 }
 
 SaltedOutpointHasher::SaltedOutpointHasher() : k0(GetRand(std::numeric_limits<uint64_t>::max())), k1(GetRand(std::numeric_limits<uint64_t>::max())) {}
