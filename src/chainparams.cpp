@@ -745,7 +745,7 @@ public:
 
         // BHDIP010
         constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
-        consensus.BHDIP010Height = consensus.BHDIP009Height + 30; // 100 blocks before BHDIP010
+        consensus.BHDIP010Height = consensus.BHDIP009Height + 10; // 10 blocks before BHDIP010
 
         // Patch for filter-bit
         consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
