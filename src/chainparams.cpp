@@ -748,8 +748,8 @@ public:
         consensus.BHDIP010Height = consensus.BHDIP009Height + 10; // 10 blocks before BHDIP010
 
         // Patch for filter-bit
-        consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
-        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 400;
+        consensus.BHDIP009PlotIdBitsOfFilter = 4; // chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
+        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 100;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 30; // 100 blocks before disabling coins before BHDIP009
