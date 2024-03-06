@@ -140,6 +140,7 @@ struct Params {
     int BHDIP010OverrideFundRoyaltyForLowMortgage;
     std::array<RetargetFee, 4> BHDIP010RetargetFees;
     int BHDIP010BurnPercent;
+    int BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight;
 
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,

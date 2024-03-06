@@ -183,6 +183,8 @@ public:
         consensus.BHDIP010RetargetFees[3] = { 25, 60 };
         consensus.BHDIP010BurnPercent = 50;
 
+        consensus.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height + 99999999;
+
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
@@ -760,6 +762,8 @@ public:
         consensus.BHDIP010RetargetFees[2] = { 10, 25 };
         consensus.BHDIP010RetargetFees[3] = { 25, 60 };
         consensus.BHDIP010BurnPercent = 50;
+
+        consensus.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
