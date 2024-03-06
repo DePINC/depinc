@@ -280,7 +280,7 @@ static UniValue gettxouts(const JSONRPCRequest& request)
         val.pushKV("address", address);
         val.pushKV("value", coin.out.nValue);
         val.pushKV("value(human)", FormatMoney(coin.out.nValue));
-        val.pushKV("height", coin.nHeight);
+        val.pushKV("height", static_cast<int>(coin.nHeight));
         val.pushKV("behind", coin.nHeight < params.BHDIP009Height);
         result.push_back(std::move(val));
     }
@@ -321,7 +321,7 @@ static UniValue getalltxouts(const JSONRPCRequest& request)
             val.pushKV("n", static_cast<int>(outpoint.n));
             CTxDestination dest((ScriptHash)coin.out.scriptPubKey);
             val.pushKV("address", EncodeDestination(dest));
-            val.pushKV("height", coin.nHeight);
+            val.pushKV("height", static_cast<int>(coin.nHeight));
             val.pushKV("value", coin.out.nValue);
             val.pushKV("value(human)", FormatMoney(coin.out.nValue));
             result.push_back(std::move(val));
