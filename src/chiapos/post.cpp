@@ -191,8 +191,8 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
     if (nTargetHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
         targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
     }
-    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = 1.0;
+    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
+        targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
     }
     uint64_t nDifficulty = AdjustDifficulty(nDifficultyPrev, fields.GetTotalDuration(), params.BHDIP008TargetSpacing,
                                             QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
@@ -327,7 +327,7 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params) {
             return i->second;
         }
     }
-    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight) {
+    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
         return 0;
     }
     return params.BHDIP009BaseIters;

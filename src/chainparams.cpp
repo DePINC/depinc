@@ -29,6 +29,8 @@ const int32_t SECONDS_OF_A_DAY = 60 * 60 * 24;
 const int AVERAGE_VDF_SPEED = 200 * 1000; // 200k ips we assume
 const int AVERAGE_VDF_SPEED_TESTNET = 70 * 1000; // 70k ips we assume
 
+const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
+
 static CBlock CreateGenesisBlock(char const* pszTimestamp, CScript const& genesisOutputScript, uint32_t nTime,
                                  uint64_t nNonce, uint64_t nBaseTarget, int32_t nVersion,
                                  CAmount const& genesisReward) {
@@ -183,7 +185,8 @@ public:
         consensus.BHDIP010RetargetFees[3] = { 25, 60 };
         consensus.BHDIP010BurnPercent = 50;
 
-        consensus.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height + 99999999;
+        consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height + 99999999;
+        consensus.BHDIP010ResetTargetSpacingMulFactor = 0.68333;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -763,7 +766,8 @@ public:
         consensus.BHDIP010RetargetFees[3] = { 25, 60 };
         consensus.BHDIP010BurnPercent = 50;
 
-        consensus.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
+        consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
+        consensus.BHDIP010ResetTargetSpacingMulFactor = 0.68333;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

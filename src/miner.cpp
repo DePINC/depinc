@@ -324,8 +324,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewChiaBlock(const CBlockI
     if (nHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
         targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
     }
-    if (nHeight >= params.BHDIP010RemoveBaseIterAndTargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = 1.0;
+    if (nHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
+        targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
     }
     pblock->chiaposFields.nDifficulty =
         chiapos::AdjustDifficulty(nDifficultyPrev, pblock->chiaposFields.GetTotalDuration(), params.BHDIP008TargetSpacing,
