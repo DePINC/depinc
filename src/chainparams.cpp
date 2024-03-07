@@ -185,7 +185,7 @@ public:
         consensus.BHDIP010RetargetFees[3] = { 25, 60 };
         consensus.BHDIP010BurnPercent = 50;
 
-        consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height + 99999999;
+        consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = 939977;
         consensus.BHDIP010ResetTargetSpacingMulFactor = 0.68333;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
