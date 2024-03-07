@@ -186,7 +186,7 @@ public:
         consensus.BHDIP010BurnPercent = 50;
 
         consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = 940060;
-        consensus.BHDIP010ResetTargetSpacingMulFactor = 0.68333;
+        consensus.BHDIP010ResetTargetSpacingMulFactor = RESET_TARGET_SPACING_MUL_FACTOR;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -769,7 +769,7 @@ public:
         consensus.BHDIP010BurnPercent = 50;
 
         consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
-        consensus.BHDIP010ResetTargetSpacingMulFactor = 0.68333;
+        consensus.BHDIP010ResetTargetSpacingMulFactor = RESET_TARGET_SPACING_MUL_FACTOR;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
