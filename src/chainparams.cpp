@@ -764,8 +764,8 @@ public:
         consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 9999;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 30; // 100 blocks before disabling coins before BHDIP009
-        consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 10; // 100 blocks before disabling coins before BHDIP009
+        consensus.BHDIP010TargetSpacingMulFactor = 1;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP009Height; // fix the duration as soon as the chain height reaches BHDIP010
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = 3; // 3 blocks for the number of min heights to do the retargeting
         consensus.BHDIP010OverrideFundRoyaltyForLowMortgage = 100;
@@ -776,7 +776,7 @@ public:
         consensus.BHDIP010BurnPercent = 50;
 
         consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
-        consensus.BHDIP010ResetTargetSpacingMulFactor = RESET_TARGET_SPACING_MUL_FACTOR;
+        consensus.BHDIP010ResetTargetSpacingMulFactor = 1.0;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
