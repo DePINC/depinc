@@ -275,14 +275,16 @@ static UniValue gettxouts(const JSONRPCRequest& request)
         UniValue val(UniValue::VOBJ);
         Coin coin;
         view.GetCoin(txout, coin);
-        val.pushKV("txid", txout.hash.GetHex());
-        val.pushKV("n", static_cast<int>(txout.n));
-        val.pushKV("address", address);
-        val.pushKV("value", coin.out.nValue);
-        val.pushKV("value(human)", FormatMoney(coin.out.nValue));
-        val.pushKV("height", static_cast<int>(coin.nHeight));
-        val.pushKV("behind", coin.nHeight < params.BHDIP009Height);
-        result.push_back(std::move(val));
+        if (coin.out.nValue > 0) {
+            val.pushKV("txid", txout.hash.GetHex());
+            val.pushKV("n", static_cast<int>(txout.n));
+            val.pushKV("address", address);
+            val.pushKV("value", coin.out.nValue);
+            val.pushKV("value(human)", FormatMoney(coin.out.nValue));
+            val.pushKV("height", static_cast<int>(coin.nHeight));
+            val.pushKV("behind", coin.nHeight < params.BHDIP009Height);
+            result.push_back(std::move(val));
+        }
     }
 
     return result;
@@ -315,7 +317,7 @@ static UniValue getalltxouts(const JSONRPCRequest& request)
     auto outpoints = view.GetAllCoins();
     for (auto const& outpoint : outpoints) {
         Coin coin;
-        if (view.GetCoin(outpoint, coin) && coin.nHeight < before_height) {
+        if (view.GetCoin(outpoint, coin) && coin.nHeight < before_height && coin.out.nValue > 0) {
             UniValue val(UniValue::VOBJ);
             val.pushKV("txid", outpoint.hash.GetHex());
             val.pushKV("n", static_cast<int>(outpoint.n));
