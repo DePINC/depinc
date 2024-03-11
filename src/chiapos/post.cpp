@@ -236,13 +236,13 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
         return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, SZ_BAD_WHAT,
                              "mixed quality-string is null(wrong PoS)\n");
     }
-    uint64_t nBaseIters = GetBaseIters(nTargetHeight, params, fields.GetItersPerSec());
+    uint64_t nBaseIters = GetBaseIters(nTargetHeight, params, pindexPrev->chiaposFields.GetItersPerSec());
     int nBitsFilter =
             nTargetHeight < params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? 0 : params.BHDIP009PlotIdBitsOfFilter;
     uint64_t nItersRequired = CalculateIterationsQuality(
             mixed_quality_string, GetDifficultyForNextIterations(pindexPrev, params), nBitsFilter,
             params.BHDIP009DifficultyConstantFactorBits, fields.posProof.nPlotK, nBaseIters);
-    LogPrint(BCLog::POC, "%s: required iters: %ld, actual: %ld\n", __func__, nItersRequired, fields.vdfProof.nVdfIters);
+    LogPrint(BCLog::POC, "%s: required iters: %ld, actual: %ld, iters_sec: %d, base_iters=%d\n", __func__, nItersRequired, fields.vdfProof.nVdfIters, fields.GetItersPerSec(), nBaseIters);
     if (fields.vdfProof.nVdfIters < nItersRequired) {
         return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, SZ_BAD_WHAT,
                              "vdf-iters are not enough");
@@ -328,6 +328,9 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
         }
     }
     if (nTargetHeight >= params.BHDIP010DynamicBaseItersEnableAtHeight) {
+        if (iters_sec == 0) {
+            // TODO: we should warn that the iters_sec is zero
+        }
         // calculate the base iters
         return iters_sec * params.BHDIP010DynamicBaseItersConsumeSeconds;
     }

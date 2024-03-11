@@ -63,7 +63,12 @@ private:
                 m_pindex->chiaposFields.posProof.nPlotK, m_pindex->chiaposFields.posProof.challenge, m_pindex->chiaposFields.posProof.vchProof);
         int nTargetHeight = m_pindex->nHeight;
         int nBitsFilter = nTargetHeight < params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? 0 : params.BHDIP009PlotIdBitsOfFilter;
-        uint64_t nBaseIters = chiapos::GetBaseIters(nTargetHeight, params, m_pindex->chiaposFields.GetItersPerSec());
+        auto const* pindexPrev = m_pindex->pprev;
+        int iters_sec{0};
+        if (pindexPrev != nullptr) {
+            iters_sec = pindexPrev->chiaposFields.GetItersPerSec();
+        }
+        uint64_t nBaseIters = chiapos::GetBaseIters(nTargetHeight, params, iters_sec);
         return chiapos::CalculateIterationsQuality(mixed_quality_string, chiapos::GetDifficultyForNextIterations(m_pindex->pprev, params), nBitsFilter, params.BHDIP009DifficultyConstantFactorBits, m_pindex->chiaposFields.posProof.nPlotK, nBaseIters);
     }
 
