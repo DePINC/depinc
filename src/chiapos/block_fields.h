@@ -104,6 +104,10 @@ public:
         return vdfProof.nVdfDuration;
     }
 
+    int GetItersPerSec() const {
+        return static_cast<int>(vdfProof.nVdfIters / std::max<uint64_t>(1, vdfProof.nVdfDuration));
+    }
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>

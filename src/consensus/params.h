@@ -144,6 +144,9 @@ struct Params {
     int BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight;
     double BHDIP010ResetTargetSpacingMulFactor;
 
+    int BHDIP010DynamicBaseItersEnableAtHeight;
+    int BHDIP010DynamicBaseItersConsumeSeconds;
+
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPocTargetTimespan / BHDIP001TargetSpacing) which is also used for BIP9 deployments.

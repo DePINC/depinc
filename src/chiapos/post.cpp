@@ -236,7 +236,7 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
         return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, SZ_BAD_WHAT,
                              "mixed quality-string is null(wrong PoS)\n");
     }
-    uint64_t nBaseIters = GetBaseIters(nTargetHeight, params);
+    uint64_t nBaseIters = GetBaseIters(nTargetHeight, params, fields.GetItersPerSec());
     int nBitsFilter =
             nTargetHeight < params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? 0 : params.BHDIP009PlotIdBitsOfFilter;
     uint64_t nItersRequired = CalculateIterationsQuality(
@@ -321,11 +321,15 @@ uint64_t GetDifficultyForNextIterations(CBlockIndex const* pindex, Consensus::Pa
     return (totalDifficulty / nBlocksCalc).GetLow64();
 }
 
-int GetBaseIters(int nTargetHeight, Consensus::Params const& params) {
+int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_sec) {
     for (auto i = std::crbegin(params.BHDIP009BaseItersVec); i != std::crend(params.BHDIP009BaseItersVec); ++i) {
         if (nTargetHeight >= i->first) {
             return i->second;
         }
+    }
+    if (nTargetHeight >= params.BHDIP010DynamicBaseItersEnableAtHeight) {
+        // calculate the base iters
+        return iters_sec * params.BHDIP010DynamicBaseItersConsumeSeconds;
     }
     if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
         return 0;

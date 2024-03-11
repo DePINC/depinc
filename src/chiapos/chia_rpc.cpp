@@ -102,7 +102,7 @@ static UniValue queryChallenge(JSONRPCRequest const& request) {
     res.pushKV("target_duration", params.BHDIP008TargetSpacing);
     res.pushKV("filter_bits",
                nTargetHeight < params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? 0 : params.BHDIP009PlotIdBitsOfFilter);
-    int nBaseIters = GetBaseIters(nTargetHeight, params);
+    int nBaseIters = GetBaseIters(nTargetHeight, params, pindexPrev->chiaposFields.GetItersPerSec());
     res.pushKV("base_iters", nBaseIters);
 
     // vdf requests

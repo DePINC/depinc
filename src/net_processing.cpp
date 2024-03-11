@@ -3320,7 +3320,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
             }
             nReqIters = nReqIters32;
         }
-        int nBaseIters = chiapos::GetBaseIters(nTargetHeight, params);
+        int nBaseIters = chiapos::GetBaseIters(nTargetHeight, params, pindex->chiaposFields.GetItersPerSec());
         if (nReqIters < nBaseIters) {
             // invalid iters required, ignore
             return true;
