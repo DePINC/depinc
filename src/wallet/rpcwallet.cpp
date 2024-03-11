@@ -425,7 +425,6 @@ static UniValue sendcointoaddress(JSONRPCRequest const& request)
 
     // check the coin and ensure it does exist
     COutPoint outpoint(hashTxOut, nTxOut);
-    // Coin coin;
     std::vector<COutput> vCoins;
     pwallet->AvailableCoins(*locked_chain, vCoins);
     auto iter = std::find_if(std::cbegin(vCoins), std::cend(vCoins), [&hashTxOut, nTxOut](COutput const& output) {
