@@ -255,6 +255,7 @@ static UniValue gettxouts(const JSONRPCRequest& request)
         "Get related txouts from the provided address",
         {
             {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The retrieved txouts are related to this address"},
+            {"all", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "Show all coins even those disabled"},
         },
         RPCResult("\"txouts\" in json format"),
         RPCExamples("cli gettxouts [address]")
@@ -263,6 +264,11 @@ static UniValue gettxouts(const JSONRPCRequest& request)
     auto const& params = Params().GetConsensus();
 
     std::string address = request.params[0].get_str();
+
+    bool all{false};
+    if (request.params.size() == 2) {
+        all = request.params[1].get_bool();
+    }
     CTxDestination dest = DecodeDestination(address);
     CAccountID accountID = ExtractAccountID(dest);
 
@@ -270,22 +276,39 @@ static UniValue gettxouts(const JSONRPCRequest& request)
     auto const& view = ::ChainstateActive().CoinsDB();
     auto txouts = view.GetAccountCoins(accountID);
 
-    UniValue result(UniValue::VARR);
+    CAmount total{0};
+
+    UniValue result(UniValue::VOBJ);
+    UniValue coins(UniValue::VARR);
     for (auto const& txout : txouts) {
         UniValue val(UniValue::VOBJ);
         Coin coin;
-        view.GetCoin(txout, coin);
+        if (!view.GetCoin(txout, coin) || coin.IsSpent()) {
+            continue;
+        }
         if (coin.out.nValue > 0) {
+            if (!all && coin.nHeight < params.BHDIP009Height) {
+                // skip the disabled coins
+                continue;
+            }
             val.pushKV("txid", txout.hash.GetHex());
             val.pushKV("n", static_cast<int>(txout.n));
             val.pushKV("address", address);
             val.pushKV("value", coin.out.nValue);
             val.pushKV("value(human)", FormatMoney(coin.out.nValue));
             val.pushKV("height", static_cast<int>(coin.nHeight));
-            val.pushKV("behind", coin.nHeight < params.BHDIP009Height);
-            result.push_back(std::move(val));
+            val.pushKV("disabled", coin.nHeight < params.BHDIP009Height);
+            coins.push_back(std::move(val));
+            total += coin.out.nValue;
         }
     }
+
+    result.pushKV("coins", coins);
+
+    UniValue totalEntry(UniValue::VOBJ);
+    totalEntry.pushKV("total", total);
+    totalEntry.pushKV("total(human)", FormatMoney(total));
+    result.pushKV("total", totalEntry);
 
     return result;
 }
