@@ -328,9 +328,9 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
         }
     }
     if (nTargetHeight >= params.BHDIP010DynamicBaseItersEnableAtHeight) {
-        if (iters_sec == 0) {
-            // TODO: we should warn that the iters_sec is zero
-        }
+        // limits the iters/sec
+        iters_sec = std::max(params.BHDIP010DynamicBaseItersItersSecRange.first, iters_sec);
+        iters_sec = std::min(params.BHDIP010DynamicBaseItersItersSecRange.second, iters_sec);
         // calculate the base iters
         return iters_sec * params.BHDIP010DynamicBaseItersConsumeSeconds;
     }

@@ -146,6 +146,7 @@ struct Params {
 
     int BHDIP010DynamicBaseItersEnableAtHeight;
     int BHDIP010DynamicBaseItersConsumeSeconds;
+    std::pair<int, int> BHDIP010DynamicBaseItersItersSecRange;
 
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,

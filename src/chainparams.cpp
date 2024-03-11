@@ -192,6 +192,7 @@ public:
 
         consensus.BHDIP010DynamicBaseItersEnableAtHeight = 99999999;
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
+        consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -785,6 +786,7 @@ public:
 
         consensus.BHDIP010DynamicBaseItersEnableAtHeight = 200155;
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
+        consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
