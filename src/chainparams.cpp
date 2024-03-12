@@ -190,7 +190,7 @@ public:
         consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = 940060;
         consensus.BHDIP010ResetTargetSpacingMulFactor = RESET_TARGET_SPACING_MUL_FACTOR;
 
-        consensus.BHDIP010DynamicBaseItersEnableAtHeight = 99999999;
+        consensus.BHDIP010DynamicBaseItersEnableAtHeight = 942650;
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
