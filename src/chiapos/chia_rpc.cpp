@@ -392,14 +392,8 @@ static UniValue submitProof(JSONRPCRequest const& request) {
                       hashPrevBlock.GetHex());
             return false;
         }
-        double targetMulFactor = 1.0;
         int nTargetHeight = pindexPrev->nHeight + 1;
-        if (nTargetHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
-            targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
-        }
-        if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
-            targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
-        }
+        double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
         nDifficulty = AdjustDifficulty(GetChiaBlockDifficulty(pindexPrev, params), nTotalDuration,
                                        params.BHDIP008TargetSpacing, QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                        GetDifficultyChangeMaxFactor(nTargetHeight, params),

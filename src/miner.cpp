@@ -27,11 +27,9 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <queue>
 #include <utility>
 
 #include <logging.h>
-#include <inttypes.h>
 #include <subsidy_utils.h>
 
 #include <chiapos/post.h>
@@ -320,13 +318,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewChiaBlock(const CBlockI
 
     pblock->chiaposFields.posProof = posProof;
     pblock->chiaposFields.vdfProof = vdfProof;
-    double targetMulFactor = 1.0;
-    if (nHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
-    }
-    if (nHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
-    }
+    double targetMulFactor = chiapos::GetTargetMulFactor(nHeight, params);
     pblock->chiaposFields.nDifficulty =
         chiapos::AdjustDifficulty(nDifficultyPrev, pblock->chiaposFields.GetTotalDuration(), params.BHDIP008TargetSpacing,
                                   chiapos::QueryDurationFix(nHeight, params.BHDIP009TargetDurationFixes),

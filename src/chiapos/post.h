@@ -12,8 +12,6 @@
 #include <uint256.h>
 
 #include <cstdint>
-#include <string>
-#include <tuple>
 #include <vector>
 
 class CChainParams;
@@ -43,6 +41,8 @@ uint64_t GetChiaBlockDifficulty(CBlockIndex const* pindex, Consensus::Params con
 uint64_t GetDifficultyForNextIterations(CBlockIndex const* pindex, Consensus::Params const& params);
 
 int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_sec);
+
+double GetTargetMulFactor(int nTargetHeight, Consensus::Params const& params);
 
 double GetDifficultyChangeMaxFactor(int nTargetHeight, Consensus::Params const& params);
 

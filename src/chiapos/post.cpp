@@ -187,13 +187,7 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
         return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, SZ_BAD_WHAT,
                              "the value of previous difficulty is zero");
     }
-    double targetMulFactor = 1.0;
-    if (nTargetHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
-    }
-    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
-        targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
-    }
+    double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
     uint64_t nDifficulty = AdjustDifficulty(nDifficultyPrev, fields.GetTotalDuration(), params.BHDIP008TargetSpacing,
                                             QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                             GetDifficultyChangeMaxFactor(nTargetHeight, params), params.BHDIP009StartDifficulty, targetMulFactor);
@@ -338,6 +332,20 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
         return 0;
     }
     return params.BHDIP009BaseIters;
+}
+
+double GetTargetMulFactor(int nTargetHeight, const Consensus::Params &params) {
+    double targetMulFactor = 1.0;
+    if (nTargetHeight >= params.BHDIP010TargetSpacingMulFactorEnableAtHeight) {
+        targetMulFactor = params.BHDIP010TargetSpacingMulFactor;
+    }
+    if (nTargetHeight >= params.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight) {
+        targetMulFactor = params.BHDIP010ResetTargetSpacingMulFactor;
+    }
+    if (nTargetHeight >= params.BHDIP010DynamicBaseItersEnableAtHeight) {
+        targetMulFactor = 1.0;
+    }
+    return targetMulFactor;
 }
 
 double GetDifficultyChangeMaxFactor(int nTargetHeight, Consensus::Params const& params) {
