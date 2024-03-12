@@ -443,9 +443,10 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     RPCHelpMan("queryminingrequirement", "Query the pledge requirement for the miner",
                {
                    {"address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "The miner address"},
+                   {"farmerpk", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "The farmer public-key"},
                },
                RPCResult("\"{json}\" the requirement for the miner"),
-               RPCExamples(HelpExampleCli("queryminerpledgeinfo", "xxxxxx xxxxxx")))
+               RPCExamples(HelpExampleCli("queryminerpledgeinfo", "xxxxxx")))
             .Check(request);
 
     LOCK(cs_main);
@@ -472,13 +473,16 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     bool summaryForAddress { false };
 
     if (request.params.size() == 1) {
+        throw std::runtime_error("You also need to provide a farmer public-key in order to query the requirements");
+    } else if (request.params.size() == 2) {
         std::string address = request.params[0].get_str();
         CAccountID accountID = ExtractAccountID(DecodeDestination(address));
 
+        std::vector<uint8_t> vchFarmerPk = ParseHexV(request.params[1], "farmerpk");
+        CChiaFarmerPk farmerPk(vchFarmerPk);
+
         summaryForAddress = true;
 
-        std::vector<uint8_t> vchFarmerPk(chiapos::PK_LEN, '\0');
-        CChiaFarmerPk farmerPk(vchFarmerPk);
         CPlotterBindData bindData(farmerPk);
 
         int nMinedCount, nTotalCount;
