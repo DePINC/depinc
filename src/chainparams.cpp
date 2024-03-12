@@ -763,7 +763,7 @@ public:
 
         // BHDIP010
         constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
-        consensus.BHDIP010Height = consensus.BHDIP009Height + 10; // 10 blocks before BHDIP010
+        consensus.BHDIP010Height = consensus.BHDIP009Height + 1; // 10 blocks before BHDIP010
 
         // Patch for filter-bit
         consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
@@ -784,7 +784,7 @@ public:
         consensus.BHDIP010RemoveBaseIterAndResetTargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
         consensus.BHDIP010ResetTargetSpacingMulFactor = 1.0;
 
-        consensus.BHDIP010DynamicBaseItersEnableAtHeight = consensus.BHDIP010Height;
+        consensus.BHDIP010DynamicBaseItersEnableAtHeight = consensus.BHDIP010Height + 1;
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
