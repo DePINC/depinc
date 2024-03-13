@@ -3,7 +3,6 @@
 #include <arith_uint256.h>
 #include <crypto/sha256.h>
 
-#include <cmath>
 #include <cstdint>
 #include <limits>
 
