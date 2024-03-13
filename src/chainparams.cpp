@@ -194,7 +194,7 @@ public:
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
-        consensus.BHDIP009TargetDurationFixes = { { 943060, -60 } };
+        consensus.BHDIP009TargetDurationFixes = { { 99999999, -60 } };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
