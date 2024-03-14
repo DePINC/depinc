@@ -396,8 +396,12 @@ static UniValue submitProof(JSONRPCRequest const& request) {
         }
         int nTargetHeight = pindexPrev->nHeight + 1;
         double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
+        int adjust_target_spacing = params.BHDIP008TargetSpacing;
+        if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+            adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
+        }
         nDifficulty = AdjustDifficulty(GetChiaBlockDifficulty(pindexPrev, params), nTotalDuration,
-                                       params.BHDIP008TargetSpacing, QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
+                                       adjust_target_spacing, QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                        GetDifficultyChangeMaxFactor(nTargetHeight, params),
                                        params.BHDIP009StartDifficulty, targetMulFactor);
     }
@@ -1354,37 +1358,45 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
 {
     RPCHelpMan("testargetspacing", "Show block time by generating fake blocks, blocks will not write to local database, just in memory",
         {
+            RPCArg("targetspacing", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The seconds of the block targeting"),
             RPCArg("preallocsecs", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "How many seconds for miner to find answers"),
             RPCArg("numanswers", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The number of answers found for each pos"),
             RPCArg("numblocks", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "How many fake blocks to be generated"),
             RPCArg("blocks", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "Show block entries in result"),
         },
-        RPCResult("blocks"), RPCExamples("depinc-cli testtargetspacing 60 1000 1000 0")).Check(request);
+        RPCResult("blocks"), RPCExamples("depinc-cli testtargetspacing 180 60 1000 1000 0")).Check(request);
 
-    int preallocsecs { 0 };
+    int target_duration { 120 };
     if (request.params.size() > 0) {
-        if (!ParseInt32(request.params[0].get_str(), &preallocsecs)) {
+        if (!ParseInt32(request.params[0].get_str(), &target_duration)) {
+            throw std::runtime_error("cannot parse number for param: targetspacing");
+        }
+    }
+
+    int preallocsecs { 40 };
+    if (request.params.size() > 1) {
+        if (!ParseInt32(request.params[1].get_str(), &preallocsecs)) {
             throw std::runtime_error("cannot parse parameter on position 0 to a number");
         }
     }
 
     int num_answers { 1000 };
-    if (request.params.size() > 1) {
-        if (!ParseInt32(request.params[1].get_str(), &num_answers)) {
+    if (request.params.size() > 2) {
+        if (!ParseInt32(request.params[2].get_str(), &num_answers)) {
             throw std::runtime_error("cannot parse parameter on position 0 to a number");
         }
     }
 
     int num_blocks { 1000 };
-    if (request.params.size() > 2) {
-        if (!ParseInt32(request.params[2].get_str(), &num_blocks)) {
+    if (request.params.size() > 3) {
+        if (!ParseInt32(request.params[3].get_str(), &num_blocks)) {
             throw std::runtime_error("invalid parameter: number of the blocks to be generated cannot be converted to a number");
         }
     }
 
     bool show_blocks{false};
-    if (request.params.size() > 3) {
-        show_blocks = request.params[3].get_bool();
+    if (request.params.size() > 4) {
+        show_blocks = request.params[4].get_bool();
     }
 
     auto const& params = Params().GetConsensus();
@@ -1393,7 +1405,6 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
 
     // prepare the base parameters for the chain
     uint32_t iters_sec = 220000;
-    uint32_t target_duration = 3 * 60;
     int duration_fix = 0;
     uint64_t current_difficulty = params.BHDIP009StartDifficulty;
     uint64_t base_iters = static_cast<uint64_t>(preallocsecs) * iters_sec;

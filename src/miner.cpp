@@ -319,8 +319,12 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewChiaBlock(const CBlockI
     pblock->chiaposFields.posProof = posProof;
     pblock->chiaposFields.vdfProof = vdfProof;
     double targetMulFactor = chiapos::GetTargetMulFactor(nHeight, params);
+    int adjust_target_spacing = params.BHDIP008TargetSpacing;
+    if (nHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+        adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
+    }
     pblock->chiaposFields.nDifficulty =
-        chiapos::AdjustDifficulty(nDifficultyPrev, pblock->chiaposFields.GetTotalDuration(), params.BHDIP008TargetSpacing,
+        chiapos::AdjustDifficulty(nDifficultyPrev, pblock->chiaposFields.GetTotalDuration(), adjust_target_spacing,
                                   chiapos::QueryDurationFix(nHeight, params.BHDIP009TargetDurationFixes),
                                   chiapos::GetDifficultyChangeMaxFactor(nHeight, params), params.BHDIP009StartDifficulty, targetMulFactor);
 

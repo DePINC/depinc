@@ -188,7 +188,11 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
                              "the value of previous difficulty is zero");
     }
     double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
-    uint64_t nDifficulty = AdjustDifficulty(nDifficultyPrev, fields.GetTotalDuration(), params.BHDIP008TargetSpacing,
+    int adjust_target_spacing = params.BHDIP008TargetSpacing;
+    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+        adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
+    }
+    uint64_t nDifficulty = AdjustDifficulty(nDifficultyPrev, fields.GetTotalDuration(), adjust_target_spacing,
                                             QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                             GetDifficultyChangeMaxFactor(nTargetHeight, params), params.BHDIP009StartDifficulty, targetMulFactor);
     if (nDifficulty == 0) {
@@ -325,8 +329,8 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
         // limits the iters/sec
         iters_sec = std::max(params.BHDIP010DynamicBaseItersItersSecRange.first, iters_sec);
         iters_sec = std::min(params.BHDIP010DynamicBaseItersItersSecRange.second, iters_sec);
-        if (nTargetHeight >= params.BHDIP010DynamicBaseItersConsumeSecondsFixAtHeight) {
-            return iters_sec * params.BHDIP010DynamicBaseItersConsumeSecondsFix;
+        if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+            return iters_sec * params.BHDIP010AdjustDifficultyConsumeSecondsFix;
         }
         // calculate the base iters
         return iters_sec * params.BHDIP010DynamicBaseItersConsumeSeconds;
