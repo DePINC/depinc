@@ -106,8 +106,9 @@ private:
             AddLogEntry("min-difficulty", chiapos::MakeNumberStr(params.BHDIP009StartDifficulty));
             AddLogEntry("k", m_pindex->chiaposFields.posProof.nPlotK);
             AddLogEntry("farmer-pk", chiapos::BytesToHex(m_pindex->chiaposFields.posProof.vchFarmerPk));
+            auto base_iters = chiapos::GetBaseIters(m_pindex->nHeight, params, m_pindex->chiaposFields.GetItersPerSec());
             // netspace
-            auto netspace = chiapos::CalculateNetworkSpace(chiapos::GetDifficultyForNextIterations(m_pindex->pprev, params), m_pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
+            auto netspace = chiapos::CalculateNetworkSpace(chiapos::GetDifficultyForNextIterations(m_pindex->pprev, params), m_pindex->chiaposFields.GetTotalIters(), base_iters, params.BHDIP009DifficultyConstantFactorBits);
             AddLogEntry("netspace", netspace.GetLow64());
         }
     }
