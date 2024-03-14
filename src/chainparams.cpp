@@ -30,6 +30,7 @@ const int AVERAGE_VDF_SPEED = 200 * 1000; // 200k ips we assume
 const int AVERAGE_VDF_SPEED_TESTNET = 70 * 1000; // 70k ips we assume
 
 const int DYNAMIC_BASE_ITERS_CONSUME_SECONDS = 60;
+const int DYNAMIC_BASE_ITERS_CONSUME_SECONDS_FIX = 130;
 
 const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
 
@@ -193,8 +194,6 @@ public:
         consensus.BHDIP010DynamicBaseItersEnableAtHeight = 942650;
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
-
-        consensus.BHDIP009TargetDurationFixes = { { 99999999, -60 } };
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -790,7 +789,11 @@ public:
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
-        consensus.BHDIP009TargetDurationFixes = { { consensus.BHDIP010Height + 2, -60 } };
+        consensus.BHDIP010DynamicBaseItersConsumeSecondsFixAtHeight = 99999999;
+        consensus.BHDIP010DynamicBaseItersConsumeSecondsFix = DYNAMIC_BASE_ITERS_CONSUME_SECONDS_FIX;
+
+        consensus.BHDIP010DynamicBaseItersConsumeSecondsFixAtHeight = consensus.BHDIP010Height + 2;
+        consensus.BHDIP010DynamicBaseItersConsumeSecondsFix = DYNAMIC_BASE_ITERS_CONSUME_SECONDS_FIX;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
