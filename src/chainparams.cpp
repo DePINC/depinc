@@ -197,7 +197,7 @@ public:
         consensus.BHDIP010DynamicBaseItersConsumeSeconds = DYNAMIC_BASE_ITERS_CONSUME_SECONDS;
         consensus.BHDIP010DynamicBaseItersItersSecRange = { 50 * 1000, 600 * 1000 };
 
-        consensus.BHDIP010AdjustDifficultyFixAtHeight = 99999999;
+        consensus.BHDIP010AdjustDifficultyFixAtHeight = 943283;
         consensus.BHDIP010AdjustDifficultyConsumeSecondsFix = ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
 
