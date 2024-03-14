@@ -20,6 +20,8 @@
 
 #include "consensus/params.h"
 
+#include <openssl/rand.h>
+
 #include "updatetip_log_helper.hpp"
 #include "logging.h"
 #include "post.h"
@@ -1317,6 +1319,132 @@ UniValue burntxout(JSONRPCRequest const& request)
     return retTxid.GetHex();
 }
 
+uint256 GenerateRandomQualityString(uint64_t difficulty, int bits_filter, int difficulty_constant_factor_bits, uint8_t k, uint64_t base_iters, int num_answers, uint32_t iters_sec, int& num_duplicated)
+{
+    std::optional<std::pair<uint64_t, uint256>> best;
+    std::vector<uint64_t> secs_set;
+    secs_set.reserve(num_answers);
+    for (int i = 0; i < num_answers; ++i) {
+        uint256 mixed_quality_string;
+        RAND_bytes(mixed_quality_string.begin(), static_cast<int>(mixed_quality_string.size()));
+        uint64_t iters = CalculateIterationsQuality(mixed_quality_string, difficulty, bits_filter, difficulty_constant_factor_bits, k, base_iters);
+        secs_set.push_back(iters / iters_sec);
+        if (!best.has_value() || best->first > iters) {
+            best = std::make_pair(iters, mixed_quality_string);
+        }
+    }
+    if (best.has_value()) {
+        num_duplicated = 0;
+        std::sort(std::begin(secs_set), std::end(secs_set));
+        auto i = std::cbegin(secs_set);
+        auto best_secs = *i;
+        ++i;
+        for (; i != std::cend(secs_set); ++i) {
+            if (*i - best_secs > 5) {
+                break;
+            }
+            ++num_duplicated;
+        }
+        return best->second;
+    }
+    throw std::runtime_error("no answer can be found!");
+}
+
+UniValue testtargetspacing(JSONRPCRequest const& request)
+{
+    RPCHelpMan("testargetspacing", "Show block time by generating fake blocks, blocks will not write to local database, just in memory",
+        {
+            RPCArg("preallocsecs", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "How many seconds for miner to find answers"),
+            RPCArg("numanswers", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The number of answers found for each pos"),
+            RPCArg("numblocks", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "How many fake blocks to be generated"),
+            RPCArg("blocks", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "Show block entries in result"),
+        },
+        RPCResult("blocks"), RPCExamples("depinc-cli testtargetspacing 60 1000 1000 0")).Check(request);
+
+    int preallocsecs { 0 };
+    if (request.params.size() > 0) {
+        if (!ParseInt32(request.params[0].get_str(), &preallocsecs)) {
+            throw std::runtime_error("cannot parse parameter on position 0 to a number");
+        }
+    }
+
+    int num_answers { 1000 };
+    if (request.params.size() > 1) {
+        if (!ParseInt32(request.params[1].get_str(), &num_answers)) {
+            throw std::runtime_error("cannot parse parameter on position 0 to a number");
+        }
+    }
+
+    int num_blocks { 1000 };
+    if (request.params.size() > 2) {
+        if (!ParseInt32(request.params[2].get_str(), &num_blocks)) {
+            throw std::runtime_error("invalid parameter: number of the blocks to be generated cannot be converted to a number");
+        }
+    }
+
+    bool show_blocks{false};
+    if (request.params.size() > 3) {
+        show_blocks = request.params[3].get_bool();
+    }
+
+    auto const& params = Params().GetConsensus();
+
+    UniValue blocks_val(UniValue::VARR);
+
+    // prepare the base parameters for the chain
+    uint32_t iters_sec = 220000;
+    uint32_t target_duration = 3 * 60;
+    int duration_fix = 0;
+    uint64_t current_difficulty = params.BHDIP009StartDifficulty;
+    uint64_t base_iters = static_cast<uint64_t>(preallocsecs) * iters_sec;
+    uint8_t plot_k = 32;
+    int bits_filter = 9;
+
+    // summary
+    int last_480_duration{0}, last_480_count{0}, last_480_forks{0};
+    arith_uint256 last_480_diff;
+
+    for (int i = 0; i < num_blocks; ++i) {
+        UniValue block_val(UniValue::VOBJ);
+        block_val.pushKV("difficulty", FormatNumberStr(std::to_string(current_difficulty)));
+        block_val.pushKV("height", i);
+        // generate a fake pos quality like the block is mined
+        int duplicated{0};
+        auto mixed_quality_string = GenerateRandomQualityString(current_difficulty, bits_filter, params.BHDIP009DifficultyConstantFactorBits, plot_k, base_iters, num_answers, iters_sec, duplicated);
+        block_val.pushKV("possible_forks", duplicated);
+        block_val.pushKV("quality_str", mixed_quality_string.GetHex());
+        uint64_t iters = chiapos::CalculateIterationsQuality(mixed_quality_string, current_difficulty, bits_filter, params.BHDIP009DifficultyConstantFactorBits, plot_k, base_iters);
+        block_val.pushKV("iters", iters);
+        int duration = static_cast<int>(iters / iters_sec);
+        if (num_blocks - i <= 480) {
+            last_480_diff += current_difficulty;
+            last_480_duration += duration;
+            if (duplicated > 0) {
+                ++last_480_forks;
+            }
+            ++last_480_count;
+        }
+        block_val.pushKV("duration", FormatTime(duration));
+        blocks_val.push_back(block_val);
+        LogPrintf("%s: duration=%s, iters=%d, difficulty=%s, quality_str=%s, height=%d, forks=%d\n", __func__, FormatTime(duration), iters, FormatNumberStr(std::to_string(current_difficulty)), mixed_quality_string.GetHex(), i, duplicated);
+        // next
+        current_difficulty = AdjustDifficulty(current_difficulty, duration, target_duration, duration_fix, params.BHDIP009DifficultyChangeMaxFactor, params.BHDIP009StartDifficulty, 1.0);
+    }
+
+    UniValue res_val(UniValue::VOBJ);
+    if (show_blocks) {
+        res_val.pushKV("blocks", blocks_val);
+    }
+    res_val.pushKV("preallocsecs", preallocsecs);
+    res_val.pushKV("num_answers", num_answers);
+    res_val.pushKV("last_480_count", last_480_count);
+    res_val.pushKV("last_480_avg_blk_time", FormatTime(last_480_duration / last_480_count));
+    res_val.pushKV("last_480_diff", FormatNumberStr(std::to_string((last_480_diff / last_480_count).GetLow64())));
+    res_val.pushKV("last_480_forks", last_480_forks);
+
+    return res_val;
+}
+
 static CRPCCommand const commands[] = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1334,6 +1462,7 @@ static CRPCCommand const commands[] = {
         {"chia", "dumpposproofs", &dumpPosProofs, {"count"}},
         {"chia", "querychainpledgeinfo", &queryChainPledgeInfo, {}},
         {"chia", "burntxout", &burntxout, {"txid","n"} },
+        {"chia", "testtargetspacing", &testtargetspacing, {"numblocks"} },
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
