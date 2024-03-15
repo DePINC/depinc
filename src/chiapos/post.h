@@ -29,7 +29,7 @@ bool CheckPosProof(CPosProof const& proof, CValidationState& state, Consensus::P
 
 bool CheckVdfProof(CVdfProof const& proof, CValidationState& state);
 
-bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlockIndex const* pindexPrev,
+bool CheckBlockFields(CBlockFields const& fields, int64_t nTimeOfTheBlock, CBlockIndex const* pindexPrev,
                       CValidationState& state, Consensus::Params const& params);
 
 bool ReleaseBlock(std::shared_ptr<CBlock> pblock, CChainParams const& params);

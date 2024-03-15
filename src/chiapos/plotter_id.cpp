@@ -103,7 +103,7 @@ CPlotterBindData& CPlotterBindData::operator=(CPlotterBindData const& rhs) {
     return *this;
 }
 
-CPlotterBindData& CPlotterBindData::operator=(CPlotterBindData&& rhs) {
+CPlotterBindData& CPlotterBindData::operator=(CPlotterBindData&& rhs) noexcept {
     if (this != &rhs) {
         m_type = rhs.m_type;
         m_data = std::move(rhs.m_data);

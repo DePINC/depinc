@@ -4,11 +4,6 @@
 #include <util/system.h>
 #include <vdf_computer.h>
 
-#include <atomic>
-#include <chrono>
-#include <map>
-#include <thread>
-
 #include "utils.h"
 
 namespace chiapos {

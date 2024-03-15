@@ -32,6 +32,7 @@
 #include <limits>
 #include <string>
 #include <unordered_map>
+#include <thread>
 
 #include <event2/thread.h>
 

@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 
+#include <cstdint>
+
 class CCoinsViewCache;
 class CTransaction;
 class CMPTransaction;

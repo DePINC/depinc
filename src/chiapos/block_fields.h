@@ -6,9 +6,6 @@
 #include <serialize.h>
 #include <uint256.h>
 
-#include <functional>
-#include <vector>
-
 namespace chiapos {
 
 const uint64_t CHIAHEADER_VERSION = 0x108;

@@ -15,13 +15,13 @@ Bytes StrToBytes(std::string str) {
     return b;
 }
 
-char const hex_chars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+constexpr std::array<char, 16> hex_chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
-char Byte4bToHexChar(uint8_t hex) { return hex_chars[hex]; }
+char Byte4bToHexChar(uint8_t hex) { return hex_chars.at(hex); }
 
 uint8_t HexCharToByte4b(char ch) {
     if (ch >= 'A' && ch <= 'F') {
-        ch = std::tolower(ch);
+        ch = static_cast<char>(std::tolower(ch));
     }
     if (ch >= '0' && ch <= '9') {
         return ch - '0';
@@ -45,7 +45,7 @@ std::string ByteToHex(uint8_t byte) {
 }
 
 uint8_t ByteFromHex(std::string const& hex, int* consumed) {
-    int actual_len = strlen(hex.c_str());
+    int actual_len = static_cast<int>(strlen(hex.c_str()));
     if (actual_len == 0) {
         if (consumed) {
             *consumed = 0;
@@ -98,7 +98,7 @@ Bytes const& BytesConnector::GetData() const { return m_vchData; }
 Bytes SubBytes(Bytes const& bytes, int start, int count) {
     int n;
     if (count == 0) {
-        n = bytes.size() - start;
+        n = static_cast<int>(bytes.size()) - start;
     } else {
         n = count;
     }
@@ -157,7 +157,7 @@ std::vector<HostEntry> ParseHostsStr(std::string const& hosts, uint16_t default_
                 res.push_back(std::move(entry));
             }
         }
-        pos = last_pos + 1;
+        pos = static_cast<int>(last_pos) + 1;
         last_pos = hosts.find_first_of(',', pos);
     }
     std::tie(entry, succ) = ParseHostEntryStr(hosts.substr(pos), default_port);

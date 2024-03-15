@@ -30,9 +30,9 @@ public:
 
     CKey& operator=(CKey const&) = delete;
 
-    CKey(CKey&&);
+    CKey(CKey&&) noexcept;
 
-    CKey& operator=(CKey&&);
+    CKey& operator=(CKey&&) noexcept;
 
     ~CKey();
 

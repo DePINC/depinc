@@ -92,8 +92,12 @@ void FrontEndClient::Exit() {
     st_ = Status::CLOSED;
 
     error_code ignored_ec;
-    s_.shutdown(tcp::socket::shutdown_both, ignored_ec);
-    s_.close(ignored_ec);
+    if (s_.shutdown(tcp::socket::shutdown_both, ignored_ec)) {
+        // ignored
+    }
+    if (s_.close(ignored_ec)) {
+        // ignored
+    }
 }
 
 void FrontEndClient::DoReadNext() {

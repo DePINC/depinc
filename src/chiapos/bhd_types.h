@@ -1,8 +1,9 @@
 #ifndef BHD_MINER_TYPES_H
 #define BHD_MINER_TYPES_H
 
-#include <array>
 #include <cstdint>
+
+#include <array>
 #include <vector>
 #include <string>
 

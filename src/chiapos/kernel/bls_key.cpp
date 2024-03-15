@@ -47,8 +47,8 @@ CKey CKey::CreateKeyWithMnemonicWords(std::string const& words, std::string cons
     std::string mnemonic = utils::NormalizeString(words);
     Bytes64 digest;
     digest.fill('\0');
-    int len = PKCS5_PBKDF2_HMAC(mnemonic.data(), mnemonic.size(), reinterpret_cast<uint8_t const*>(salt.data()),
-                                salt.size(), 2048, EVP_sha512(), 64, digest.data());
+    int len = PKCS5_PBKDF2_HMAC(mnemonic.data(), static_cast<int>(mnemonic.size()), reinterpret_cast<uint8_t const*>(salt.data()),
+                                static_cast<int>(salt.size()), 2048, EVP_sha512(), 64, digest.data());
     assert(len == 1);
     Bytes seed = MakeBytes(digest);
     return CreateKeyWithRandomSeed(seed);
@@ -63,9 +63,9 @@ CKey::CKey(SecreKey const& sk) {
     m_impl.reset(new KeyImpl(privKey));
 }
 
-CKey::CKey(CKey&&) = default;
+CKey::CKey(CKey&&) noexcept = default;
 
-CKey& CKey::operator=(CKey&&) = default;
+CKey& CKey::operator=(CKey&&) noexcept = default;
 
 CKey::~CKey() = default;
 

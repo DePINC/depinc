@@ -32,7 +32,7 @@ uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, uint64_t curr_block_du
         curr_block_duration = -duration_fix + 1;
     }
     uint64_t n = std::max<uint64_t>(prev_block_difficulty / (curr_block_duration + duration_fix), 1);
-    uint64_t new_difficulty = std::max(n * static_cast<uint64_t>(target_duration * target_mul_factor + duration_fix),
+    uint64_t new_difficulty = std::max(n * static_cast<uint64_t>(static_cast<double>(target_duration) * target_mul_factor + duration_fix),
                                        network_min_difficulty);
     if (new_difficulty > prev_block_difficulty) {
         auto max_difficulty = static_cast<uint64_t>(static_cast<double>(prev_block_difficulty) * max_factor);

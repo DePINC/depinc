@@ -28,6 +28,12 @@ public:
     using MessageHandler = std::function<void(UniValue const&)>;
     using ErrorHandler = std::function<void(ErrorType err_type, std::string const& errs)>;
 
+    FrontEndClient(FrontEndClient const&) = delete;
+    FrontEndClient& operator=(FrontEndClient const&) = delete;
+
+    FrontEndClient(FrontEndClient&&) noexcept = delete;
+    FrontEndClient& operator=(FrontEndClient&&) noexcept = delete;
+
     explicit FrontEndClient(asio::io_context& ioc);
 
     ~FrontEndClient();
@@ -72,6 +78,12 @@ public:
     using MessageHandler = std::function<void(UniValue const& msg)>;
 
     static std::shared_ptr<TimelordClient> CreateTimelordClient(asio::io_context& ioc);
+
+    TimelordClient(TimelordClient const&) = delete;
+    TimelordClient& operator=(TimelordClient const&) = delete;
+
+    TimelordClient(TimelordClient&&) noexcept = delete;
+    TimelordClient& operator=(TimelordClient&&) noexcept = delete;
 
     ~TimelordClient();
 

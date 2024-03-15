@@ -18,7 +18,7 @@
 #include <walletinitinterface.h>
 
 #include <memory>
-#include <stdio.h>
+#include <thread>
 
 #include <boost/algorithm/string.hpp> // boost::trim
 

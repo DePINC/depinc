@@ -3,7 +3,6 @@
 
 #include <streams.h>
 
-#include <array>
 #include <boost/variant.hpp>
 #include <cstdint>
 #include <string>
@@ -51,7 +50,7 @@ public:
 
     CPlotterBindData(CPlotterBindData const& rhs) : m_type(rhs.m_type), m_data(rhs.m_data) {}
 
-    CPlotterBindData(CPlotterBindData&& rhs) : m_type(rhs.m_type), m_data(std::move(rhs.m_data)) {}
+    CPlotterBindData(CPlotterBindData&& rhs) noexcept : m_type(rhs.m_type), m_data(std::move(rhs.m_data)) {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -83,7 +82,7 @@ public:
 
     CPlotterBindData& operator=(CPlotterBindData const& rhs);
 
-    CPlotterBindData& operator=(CPlotterBindData&& rhs);
+    CPlotterBindData& operator=(CPlotterBindData&& rhs) noexcept;
 
     bool operator==(uint64_t rhs) const;
 

@@ -6,8 +6,6 @@
 
 #include <array>
 #include <cstdint>
-#include <functional>
-#include <tuple>
 
 #include "chiapos_types.h"
 

@@ -820,7 +820,7 @@ static UniValue queryPledgeInfo(JSONRPCRequest const& request) {
 
     UniValue termsValue(UniValue::VARR);
     for (int i = 0; i < params.BHDIP009PledgeTerms.size(); ++i) {
-        auto const& term = params.BHDIP009PledgeTerms[i];
+        auto const& term = params.BHDIP009PledgeTerms.at(i);
         UniValue termValue(UniValue::VOBJ);
         termValue.pushKV("lock_height", term.nLockHeight);
         termValue.pushKV("actual_percent", term.nWeightPercent);
@@ -1024,8 +1024,8 @@ static void StripPledgeTx(PledgeTxSet& pledgeTxs, CBlock const& block, int nHeig
                     pledgeTx.nPointHeight = nHeight;
                 }
                 // check if it's state is in-term
-                int nTermIndex = pledgeTx.pointType - DATACARRIER_TYPE_CHIA_POINT;
-                auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
+                int nTermIndex = static_cast<int>(pledgeTx.pointType - DATACARRIER_TYPE_CHIA_POINT);
+                auto const& term = params.BHDIP009PledgeTerms.at(nTermIndex);
                 int nExpiresOnHeight = pledgeTx.nPointHeight + term.nLockHeight;
                 pledgeTx.fInTerm = nHeight < nExpiresOnHeight;
                 if (pledgeTx.fInTerm) {
@@ -1327,16 +1327,26 @@ UniValue burntxout(JSONRPCRequest const& request)
     return retTxid.GetHex();
 }
 
-uint256 GenerateRandomQualityString(uint64_t difficulty, int bits_filter, int difficulty_constant_factor_bits, uint8_t k, uint64_t base_iters, int num_answers, uint32_t iters_sec, int& num_duplicated)
+struct QualityStringGenerateParams {
+    uint64_t difficulty;
+    int bits_filter;
+    int difficulty_constant_factor_bits;
+    uint8_t k;
+    uint64_t base_iters;
+    int num_answers;
+    uint32_t iters_sec;
+};
+
+uint256 GenerateRandomQualityString(QualityStringGenerateParams const& params, int& num_duplicated)
 {
     std::optional<std::pair<uint64_t, uint256>> best;
     std::vector<uint64_t> secs_set;
-    secs_set.reserve(num_answers);
-    for (int i = 0; i < num_answers; ++i) {
+    secs_set.reserve(params.num_answers);
+    for (int i = 0; i < params.num_answers; ++i) {
         uint256 mixed_quality_string;
         RAND_bytes(mixed_quality_string.begin(), static_cast<int>(mixed_quality_string.size()));
-        uint64_t iters = CalculateIterationsQuality(mixed_quality_string, difficulty, bits_filter, difficulty_constant_factor_bits, k, base_iters);
-        secs_set.push_back(iters / iters_sec);
+        uint64_t iters = CalculateIterationsQuality(mixed_quality_string, params.difficulty, params.bits_filter, params.difficulty_constant_factor_bits, params.k, params.base_iters);
+        secs_set.push_back(iters / params.iters_sec);
         if (!best.has_value() || best->first > iters) {
             best = std::make_pair(iters, mixed_quality_string);
         }
@@ -1425,7 +1435,7 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
         block_val.pushKV("height", i);
         // generate a fake pos quality like the block is mined
         int duplicated{0};
-        auto mixed_quality_string = GenerateRandomQualityString(current_difficulty, bits_filter, params.BHDIP009DifficultyConstantFactorBits, plot_k, base_iters, num_answers, iters_sec, duplicated);
+        auto mixed_quality_string = GenerateRandomQualityString({ current_difficulty, bits_filter, params.BHDIP009DifficultyConstantFactorBits, plot_k, base_iters, num_answers, iters_sec }, duplicated);
         block_val.pushKV("possible_forks", duplicated);
         block_val.pushKV("quality_str", mixed_quality_string.GetHex());
         uint64_t iters = chiapos::CalculateIterationsQuality(mixed_quality_string, current_difficulty, bits_filter, params.BHDIP009DifficultyConstantFactorBits, plot_k, base_iters);
@@ -1460,7 +1470,7 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
     return res_val;
 }
 
-static CRPCCommand const commands[] = {
+static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
         {"chia", "querynetspace", &queryNetspace, {}},
@@ -1481,8 +1491,8 @@ static CRPCCommand const commands[] = {
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
-    for (unsigned int vcidx = 0; vcidx < ARRAYLEN(commands); vcidx++) {
-        t.appendCommand(commands[vcidx].name, &commands[vcidx]);
+    for (auto const& command : commands) {
+        t.appendCommand(command.name, &command);
     }
 }
 

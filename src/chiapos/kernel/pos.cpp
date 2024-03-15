@@ -7,13 +7,15 @@
 #include <chiapos/src/prover_disk.hpp>
 #include <chiapos/src/verifier.hpp>
 
+#include <tinyformat.h>
+
 #include "utils.h"
 #include "pos.h"
 
 namespace chiapos {
 
 Bytes ToBytes(LargeBits const& src) {
-    int num_bits = src.GetSize();
+    int num_bits = static_cast<int>(src.GetSize());
     if (num_bits == 0) {
         return {};
     }
@@ -93,7 +95,7 @@ bool CPlotFile::ReadMemo(PlotMemo& outMemo) const {
         outMemo = plot_memo;
         return true;
     } catch (std::exception const& e) {
-        std::cerr << __func__ << ": " << e.what();
+        std::cerr << tinyformat::format("%s: %s", __func__, e.what());
     }
     return false;
 }
@@ -110,15 +112,15 @@ bool CPlotFile::GetQualityString(uint256 const& challenge, std::vector<QualitySt
             QualityStringPack qs_pack;
             qs_pack.plot_path = m_path;
             Bytes quality_bytes = ToBytes(quality);
-            qs_pack.quality_str.FromBytes(quality_bytes, quality.GetSize());
+            qs_pack.quality_str.FromBytes(quality_bytes, static_cast<int>(quality.GetSize()));
             qs_pack.k = m_impl->diskProver->GetSize();
             qs_pack.index = index++;
             qs_pack_vec.push_back(std::move(qs_pack));
         }
         out = qs_pack_vec;
         return true;
-    } catch (std::exception const&) {
-        // TODO: need to process this exception
+    } catch (std::exception const& e) {
+        std::cerr << tinyformat::format("%s: %s", __func__, e.what());
     }
     return false;
 }
@@ -134,8 +136,8 @@ bool CPlotFile::GetFullProof(uint256 const& challenge, int index, Bytes& out) co
         proof.ToBytes(proof_data.data());
         out = proof_data;
         return true;
-    } catch (std::exception const&) {
-        // TODO: need to process this exception
+    } catch (std::exception const& e) {
+        std::cerr << tinyformat::format("%s: %s", __func__, e.what());
     }
     return false;
 }
@@ -208,8 +210,9 @@ uint256 MakeMixedQualityString(PubKey const& localPk, PubKey const& farmerPk, Pu
 }
 
 bool PassesFilter(PlotId const& plotId, uint256 const& challenge, int bits) {
-    int const BYTES_uint256 = 32;
-    Bytes data(BYTES_uint256 * 2);
+    constexpr uint32_t BYTES_uint256 = 256/8;
+    Bytes data;
+    data.resize(BYTES_uint256 + BYTES_uint256);
     memcpy(data.data(), plotId.begin(), BYTES_uint256);
     memcpy(data.data() + BYTES_uint256, challenge.begin(), BYTES_uint256);
     Bytes data_hashed = MakeSHA256(data);
@@ -225,7 +228,7 @@ uint256 GetMixedQualityString(Bytes const& quality_string, uint256 const& challe
 bool VerifyPos(uint256 const& challenge, PubKey const& localPk, PubKey const& farmerPk,
                PubKeyOrHash const& poolPkOrHash, uint8_t k, Bytes const& vchProof, uint256* out_mixed_quality_string,
                int bits_of_filter) {
-    if (k * 8 != vchProof.size()) {
+    if (static_cast<uint32_t>(k * 8) != vchProof.size()) {
         // invalid size of the proof
         return false;
     }

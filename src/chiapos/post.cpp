@@ -16,7 +16,6 @@
 #include <validation.h>
 #include <vdf_computer.h>
 
-#include <atomic>
 #include <cstdint>
 #include <memory>
 
@@ -81,7 +80,7 @@ bool CheckPosProof(CPosProof const& proof, CValidationState& state, Consensus::P
                              "empty proof");
     }
 
-    if (proof.vchProof.size() != static_cast<uint32_t>(proof.nPlotK) * 8) {
+    if (proof.vchProof.size() != static_cast<std::size_t>(proof.nPlotK) * 8) {
         return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, SZ_BAD_WHAT,
                              "the size of proof is invalid (require k * 8)");
     }
@@ -135,7 +134,7 @@ bool CheckVdfProof(CVdfProof const& proof, CValidationState& state) {
                      proof.nWitnessType);
 }
 
-bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlockIndex const* pindexPrev,
+bool CheckBlockFields(CBlockFields const& fields, int64_t nTimeOfTheBlock, CBlockIndex const* pindexPrev,
                       CValidationState& state, Consensus::Params const& params) {
     static char const* SZ_BAD_WHAT = "bad-chia-fields";
     // Initial challenge should be calculated from previous block
@@ -172,7 +171,7 @@ bool CheckBlockFields(CBlockFields const& fields, uint64_t nTimeOfTheBlock, CBlo
     }
 
     int64_t nDuration = nTimeOfTheBlock - pindexPrev->GetBlockTime();
-    int64_t nDurationVDF = fields.GetTotalDuration();
+    int64_t nDurationVDF = static_cast<int64_t>(fields.GetTotalDuration());
     int64_t nAbsDuration = nDuration - nDurationVDF;
     if (nAbsDuration > 30) {
         // should we mark this issue as a failure?
