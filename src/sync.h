@@ -11,7 +11,6 @@
 #include <condition_variable>
 #include <mutex>
 
-
 ////////////////////////////////////////////////
 //                                            //
 // THE SIMPLE DEFINITION, EXCLUDING DEBUG CODE //
@@ -134,9 +133,7 @@ private:
     bool TryEnter(const char* pszName, const char* pszFile, int nLine)
     {
         EnterCritical(pszName, pszFile, nLine, (void*)(Base::mutex()), true);
-        if (!Base::try_lock()) {
-            LeaveCritical();
-        }
+        Base::try_lock();
         if (!Base::owns_lock()) {
             LeaveCritical();
         }
