@@ -42,6 +42,8 @@ uint64_t GetDifficultyForNextIterations(CBlockIndex const* pindex, Consensus::Pa
 
 int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_sec);
 
+int GetAdjustTargetSpacing(int nTargetHeight, Consensus::Params const& params);
+
 double GetTargetMulFactor(int nTargetHeight, Consensus::Params const& params);
 
 double GetDifficultyChangeMaxFactor(int nTargetHeight, Consensus::Params const& params);

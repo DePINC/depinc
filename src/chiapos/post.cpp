@@ -187,10 +187,7 @@ bool CheckBlockFields(CBlockFields const& fields, int64_t nTimeOfTheBlock, CBloc
                              "the value of previous difficulty is zero");
     }
     double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
-    int adjust_target_spacing = params.BHDIP008TargetSpacing;
-    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
-        adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
-    }
+    int adjust_target_spacing = GetAdjustTargetSpacing(nTargetHeight, params);
     uint64_t nDifficulty = AdjustDifficulty(nDifficultyPrev, fields.GetTotalDuration(), adjust_target_spacing,
                                             QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                             GetDifficultyChangeMaxFactor(nTargetHeight, params), params.BHDIP009StartDifficulty, targetMulFactor);
@@ -338,6 +335,15 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
         return 0;
     }
     return params.BHDIP009BaseIters;
+}
+
+int GetAdjustTargetSpacing(int nTargetHeight, const Consensus::Params &params)
+{
+    int adjust_target_spacing = params.BHDIP008TargetSpacing;
+    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+        adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
+    }
+    return adjust_target_spacing;
 }
 
 double GetTargetMulFactor(int nTargetHeight, const Consensus::Params &params) {
