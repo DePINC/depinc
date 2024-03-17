@@ -152,6 +152,9 @@ struct Params {
     int BHDIP010AdjustDifficultyConsumeSecondsFix;
     int BHDIP010AdjustDifficultyTargetSpacingFix;
 
+    int BHDIP010AdjustDifficultyFix2AtHeight;
+    int BHDIP010AdjustDifficultyTargetSpacingFix2;
+
     /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPocTargetTimespan / BHDIP001TargetSpacing) which is also used for BIP9 deployments.

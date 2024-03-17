@@ -34,6 +34,8 @@ const int DYNAMIC_BASE_ITERS_CONSUME_SECONDS = 60;
 const int ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX = 40;
 const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX = 118;
 
+const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2 = 114;
+
 const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
 
 static CBlock CreateGenesisBlock(char const* pszTimestamp, CScript const& genesisOutputScript, uint32_t nTime,
@@ -200,6 +202,9 @@ public:
         consensus.BHDIP010AdjustDifficultyFixAtHeight = 943283;
         consensus.BHDIP010AdjustDifficultyConsumeSecondsFix = ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
+
+        consensus.BHDIP010AdjustDifficultyFix2AtHeight = 99999999;
+        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -777,7 +782,7 @@ public:
         consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 9999;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 10; // 100 blocks before disabling coins before BHDIP009
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 10; // 10 blocks before disabling coins before BHDIP009
         consensus.BHDIP010TargetSpacingMulFactor = 1;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP009Height; // fix the duration as soon as the chain height reaches BHDIP010
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = 3; // 3 blocks for the number of min heights to do the retargeting
@@ -798,6 +803,9 @@ public:
         consensus.BHDIP010AdjustDifficultyFixAtHeight = consensus.BHDIP010Height + 2;
         consensus.BHDIP010AdjustDifficultyConsumeSecondsFix = ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
+
+        consensus.BHDIP010AdjustDifficultyFix2AtHeight = 201100;
+        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

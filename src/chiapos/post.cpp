@@ -339,11 +339,13 @@ int GetBaseIters(int nTargetHeight, Consensus::Params const& params, int iters_s
 
 int GetAdjustTargetSpacing(int nTargetHeight, const Consensus::Params &params)
 {
-    int adjust_target_spacing = params.BHDIP008TargetSpacing;
-    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
-        adjust_target_spacing = params.BHDIP010AdjustDifficultyTargetSpacingFix;
+    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFix2AtHeight) {
+        return params.BHDIP010AdjustDifficultyTargetSpacingFix2;
     }
-    return adjust_target_spacing;
+    if (nTargetHeight >= params.BHDIP010AdjustDifficultyFixAtHeight) {
+        return params.BHDIP010AdjustDifficultyTargetSpacingFix;
+    }
+    return params.BHDIP008TargetSpacing;
 }
 
 double GetTargetMulFactor(int nTargetHeight, const Consensus::Params &params) {
