@@ -13,7 +13,7 @@
 
 static const int PROTOCOL_VERSION = MAIN_PROTOCOL_VER;
 
-static const int VDF_P2P_VERSION= MAIN_PROTOCOL_VER;
+static const int VDF_P2P_VERSION= 80027;
 
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
