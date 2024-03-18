@@ -589,6 +589,8 @@ void BlockAssembler::addPackageTxs(int &nPackagesSelected, int &nDescendantsUpda
         std::vector<CTxMemPool::txiter> sortedEntries;
         SortForBlock(ancestors, sortedEntries);
 
+        bool force_to_break{false};
+
         for (size_t i = 0; i < sortedEntries.size(); ++i) {
             // Check transaction inputs and type
             if (!Consensus::CheckTxInputs(sortedEntries[i]->GetTx(), view, ::ChainstateActive().CoinsTip(), nHeight,
@@ -605,6 +607,14 @@ void BlockAssembler::addPackageTxs(int &nPackagesSelected, int &nDescendantsUpda
             AddToBlock(sortedEntries[i]);
             // Erase from the modified set, if present
             mapModifiedTx.erase(sortedEntries[i]);
+            if (nBlockWeight > (nBlockMaxWeight - 4000)) {
+                force_to_break = true;
+                break;
+            }
+        }
+
+        if (force_to_break) {
+            break;
         }
 
         if (ancestors.empty()) {
