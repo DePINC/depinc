@@ -267,7 +267,11 @@ static UniValue gettxouts(const JSONRPCRequest& request)
 
     bool all{false};
     if (request.params.size() == 2) {
-        all = request.params[1].get_bool();
+        int32_t val;
+        if (!ParseInt32(request.params[1].get_str(), &val)) {
+            throw std::runtime_error("cannot parse bool for 2nd param");
+        }
+        all = val != 0;
     }
     CTxDestination dest = DecodeDestination(address);
     CAccountID accountID = ExtractAccountID(dest);
