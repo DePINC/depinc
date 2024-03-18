@@ -277,7 +277,7 @@ static UniValue gettxouts(const JSONRPCRequest& request)
     CAccountID accountID = ExtractAccountID(dest);
 
     LOCK(cs_main);
-    auto const& view = ::ChainstateActive().CoinsDB();
+    auto const& view = ::ChainstateActive().CoinsTip();
     auto txouts = view.GetAccountCoins(accountID);
 
     CAmount total{0};
