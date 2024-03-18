@@ -4014,8 +4014,10 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const CChainParams
     int ser_flags = block.IsChiaBlock() ? SERIALIZE_BLOCK_CHIAPOS : 0;
 
     // Size limits
-    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, 0, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS | ser_flags) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT)
-        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-blk-length", "size limits failed");
+    if (block.vtx.empty() || block.vtx.size() * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT || ::GetSerializeSize(block, 0, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS | ser_flags) * WITNESS_SCALE_FACTOR > MAX_BLOCK_WEIGHT) {
+        auto blocksize = ::GetSerializeSize(block, 0, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS | ser_flags);
+        return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "bad-blk-length", tinyformat::format("size limits failed, vtx.size()=%d(limit=%d), blocksize=%d(limit=%d)", block.vtx.size() * WITNESS_SCALE_FACTOR, MAX_BLOCK_WEIGHT, blocksize * WITNESS_SCALE_FACTOR, MAX_BLOCK_WEIGHT));
+    }
 
     // First transaction must be coinbase, the rest must not be
     if (block.vtx.empty() || !block.vtx[0]->IsCoinBase())
