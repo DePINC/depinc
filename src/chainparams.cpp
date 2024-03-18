@@ -684,8 +684,10 @@ public:
                 { 940400, uint256S("0x4a5307712d9cb98a8be68de4111fbcc2d9a1e1c2579cd2295902d6d873f65a09") },
                 { 940460, uint256S("0xe043861b9449c1826f68951bbbccb37120002b9c69979169c8b679c5c378d914") },
                 { 940474, uint256S("0x652954469426f781e8b7712133ef008e1634bcaed87151403918efc19d2256d7") },
+                { 944555, uint256S("0x9c24b852634eea2e43f5855e8ebca821b91356b5ab0586c0dcbde769dcd14574") },
             }
         };
+        // new best=9c24b852634eea2e43f5855e8ebca821b91356b5ab0586c0dcbde769dcd14574 height=944,555
 
         chainTxData = ChainTxData{
             // Data from RPC: getchaintxstats 4096 915e3ef622459f8b1b04dc274e1097b31111b0c6e0a9e9cd2da60c9d692f2c93
