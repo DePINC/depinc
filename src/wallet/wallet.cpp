@@ -3689,6 +3689,7 @@ bool CWallet::CreateTransaction(interfaces::Chain::Lock& locked_chain, const std
     }
 
     if (!coin_control.m_ignore_max_fee_check && nFeeRet > m_default_max_tx_fee) {
+        LogPrintf("%s: max fee check failed, fee=%s, max fee=%s\n", __func__, FormatMoney(nFeeRet), FormatMoney(m_default_max_tx_fee));
         strFailReason = TransactionErrorString(TransactionError::MAX_FEE_EXCEEDED);
         return false;
     }
