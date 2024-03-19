@@ -624,6 +624,7 @@ static UniValue queryUpdateTipHistory(JSONRPCRequest const& request) {
     RPCHelpMan("queryupdatetiphistory", "Query update tip logs",
                {
                    {"count", RPCArg::Type::NUM, RPCArg::Optional::NO, "how many logs want to be generated"},
+                   {"skip", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "skip number of blocks before starts to count"},
                    {"vdf_match_req", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "only show those vdf match the requires"},
                },
                RPCResult{"\"succ\" (result) The update tips history"},
@@ -631,11 +632,19 @@ static UniValue queryUpdateTipHistory(JSONRPCRequest const& request) {
             .Check(request);
 
     int nCount = atoi(request.params[0].get_str());
-    bool fOnlyVdfMatches {false};
+
+    int nSkip { 0 };
     if (request.params.size() > 1) {
+        if (!ParseInt32(request.params[1].get_str(), &nSkip)) {
+            throw std::runtime_error("cannot parse integer from parameter[1] (skip)");
+        }
+    }
+
+    bool fOnlyVdfMatches {false};
+    if (request.params.size() > 2) {
         int val;
-        if (!ParseInt32(request.params[1].get_str(), &val)) {
-            throw std::runtime_error("cannot parse integer from parameter[1]");
+        if (!ParseInt32(request.params[2].get_str(), &val)) {
+            throw std::runtime_error("cannot parse integer from parameter[2] (only matched vdf tips)");
         }
         fOnlyVdfMatches = val != 0;
     }
@@ -644,6 +653,12 @@ static UniValue queryUpdateTipHistory(JSONRPCRequest const& request) {
 
     LOCK(cs_main);
     auto pindex = ::ChainActive().Tip();
+
+    while (nSkip > 0) {
+        pindex = pindex->pprev;
+        --nSkip;
+    }
+
     UpdateTipLogHelper helper(pindex, Params());
     UniValue tips(UniValue::VARR);
 
