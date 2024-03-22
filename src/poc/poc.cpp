@@ -875,14 +875,13 @@ CAmount GetMiningRequireBalance(const CAccountID& generatorAccountID, const CPlo
         }
     } else if (nMiningHeight < params.BHDIP009Height) {
         // Binded plotter
-        assert(bindData.GetType() == CPlotterBindData::Type::BURST);
-        const std::set<CPlotterBindData> plotters = view.GetAccountBindPlotters(generatorAccountID, bindData.GetType());
+        const std::set<CPlotterBindData> plotters = view.GetAccountBindPlotters(generatorAccountID, CPlotterBindData::Type::BURST);
         nNetCapacityTB = GetCompatibleNetCapacity(nMiningHeight, params,
             [&nBlockCount, &nMinedCount, &plotters, &params] (const CBlockIndex &block) {
                 nBlockCount++;
-                for (const CPlotterBindData &bindData : plotters) {
+                for (const CPlotterBindData &plotter : plotters) {
                     assert(!block.IsChiaBlock());
-                    if (bindData == block.nPlotterId) {
+                    if (plotter == block.nPlotterId) {
                         ++nMinedCount;
                         break;
                     }
@@ -893,8 +892,7 @@ CAmount GetMiningRequireBalance(const CAccountID& generatorAccountID, const CPlo
         if (nMinedCount < nBlockCount) nMinedCount++;
     } else {
         // Binded farmer-pk
-        assert(bindData.GetType() == CPlotterBindData::Type::CHIA);
-        const std::set<CPlotterBindData> plotters = view.GetAccountBindPlotters(generatorAccountID, bindData.GetType());
+        const std::set<CPlotterBindData> plotters = view.GetAccountBindPlotters(generatorAccountID, CPlotterBindData::Type::CHIA);
         nNetCapacityTB = GetCompatibleNetCapacity(nMiningHeight, params,
             [&nBlockCount, &nMinedCount, &plotters, &params] (const CBlockIndex &block) {
                 if (block.nHeight < params.BHDIP009Height) {
@@ -902,9 +900,9 @@ CAmount GetMiningRequireBalance(const CAccountID& generatorAccountID, const CPlo
                     return;
                 }
                 nBlockCount++;
-                for (const CPlotterBindData &bindData : plotters) {
+                for (const CPlotterBindData &plotter : plotters) {
                     assert(block.IsChiaBlock());
-                    if (bindData == CChiaFarmerPk(block.chiaposFields.posProof.vchFarmerPk)) {
+                    if (plotter == CChiaFarmerPk(block.chiaposFields.posProof.vchFarmerPk)) {
                         ++nMinedCount;
                         break;
                     }
