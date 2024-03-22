@@ -90,9 +90,9 @@ uint64_t CalculateIterationsQuality(uint256 const& mixed_quality_string, uint64_
     return std::max<uint64_t>(iters.GetLow64(), 1);
 }
 
-arith_uint256 CalculateNetworkSpace(uint64_t difficulty, uint64_t iters, uint64_t base_iters, int difficulty_constant_factor_bits) {
+arith_uint256 CalculateNetworkSpace(uint64_t difficulty, uint64_t iters, int difficulty_constant_factor_bits) {
     arith_uint256 additional_difficulty_constant = Pow2(difficulty_constant_factor_bits);
-    return arith_uint256(difficulty) / (iters - base_iters) * additional_difficulty_constant * UI_ACTUAL_SPACE_CONSTANT_FACTOR /
+    return arith_uint256(difficulty) / iters * additional_difficulty_constant * UI_ACTUAL_SPACE_CONSTANT_FACTOR /
            UI_ACTUAL_SPACE_CONSTANT_FACTOR_BASE;
 }
 

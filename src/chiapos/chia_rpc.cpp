@@ -425,12 +425,9 @@ static UniValue queryNetspace(JSONRPCRequest const& request) {
 
     auto netspace_avg = poc::CalculateAverageNetworkSpace(pindex, params);
 
-    auto base_iters = GetBaseIters(pindex->nHeight, params, pindex->chiaposFields.GetItersPerSec());
-
     int nBitsOfFilter = pindex->nHeight >= params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? params.BHDIP009PlotIdBitsOfFilter : 0;
     auto netspace = chiapos::CalculateNetworkSpace(GetDifficultyForNextIterations(pindex->pprev, params),
-                                                   pindex->chiaposFields.GetTotalIters(), base_iters,
-                                                   params.BHDIP009DifficultyConstantFactorBits);
+                                                   pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
 
     UniValue res(UniValue::VOBJ);
     res.pushKV("supplied", nTotalSupplied);
