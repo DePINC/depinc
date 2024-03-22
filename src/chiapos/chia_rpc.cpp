@@ -9,6 +9,7 @@
 #include <validation.h>
 #include <subsidy_utils.h>
 #include <core_io.h>
+#include <util/moneystr.h>
 
 #include <cstdint>
 #include <stdexcept>
@@ -447,7 +448,7 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     RPCHelpMan("queryminingrequirement", "Query the pledge requirement for the miner",
                {
                    {"address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "The miner address"},
-                   {"farmerpk", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "The farmer public-key"},
+                   {"plotter-id", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "The arg is useless, provide it only to ensure the consensus is compatible with old blocks."},
                },
                RPCResult("\"{json}\" the requirement for the miner"),
                RPCExamples(HelpExampleCli("queryminerpledgeinfo", "xxxxxx")))
@@ -476,25 +477,31 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
 
     bool summaryForAddress { false };
 
-    if (request.params.size() == 1) {
-        throw std::runtime_error("You also need to provide a farmer public-key in order to query the requirements");
-    } else if (request.params.size() == 2) {
+    if (request.params.size() >= 1) {
         std::string address = request.params[0].get_str();
         CAccountID accountID = ExtractAccountID(DecodeDestination(address));
 
-        std::vector<uint8_t> vchFarmerPk = ParseHexV(request.params[1], "farmerpk");
-        CChiaFarmerPk farmerPk(vchFarmerPk);
+        CPlotterBindData bindData;
+        if (request.params.size() >= 2) {
+            int32_t nPlotterId;
+            if (ParseInt32(request.params[1].get_str(), &nPlotterId)) {
+                // plotter-id, burst
+                bindData = nPlotterId;
+            } else {
+                std::vector<uint8_t> vchFarmerPk = ParseHexV(request.params[1], "farmerpk");
+                CChiaFarmerPk farmerPk(vchFarmerPk);
+                bindData = farmerPk;
+            }
+        }
 
-        summaryForAddress = true;
-
-        CPlotterBindData bindData(farmerPk);
+        summaryForAddress = true; // TODO maybe we need to make this to an optional parameter
 
         int nMinedCount, nTotalCount;
-
         CAmount nReq = poc::GetMiningRequireBalance(accountID, bindData, nTargetHeight, view, nullptr, nullptr, nBurned,
                                                     params, &nMinedCount, &nTotalCount, nHeightForCalculatingTotalSupply);
         summary.pushKV("address", address);
         summary.pushKV("require", nReq);
+        summary.pushKV("require-human", FormatMoney(nReq));
 
         // Retrieve all public-key which are binding with this account
         UniValue pklist(UniValue::VARR);

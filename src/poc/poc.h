@@ -188,6 +188,7 @@ CAmount GetCapacityRequireBalance(int64_t nCapacityTB, CAmount miningRatio);
 
 /**
  * Get mining required balance
+ * @note `bindData` is useless, the only reason to keep it here is because we need to ensure the consensus is compatible with old blocks. Please ignore it.
  *
  * @param generatorAccountID        Block generator
  * @param bindData                  Proof of capacity ID
