@@ -28,6 +28,7 @@
 #include <util/strencodings.h>
 #include <util/system.h>
 #include <util/validation.h>
+#include <util/moneystr.h>
 #include <validation.h>
 #include <subsidy_utils.h>
 #include <validationinterface.h>
@@ -1151,7 +1152,6 @@ static UniValue listbindplotterofaddress(const JSONRPCRequest& request)
             "    \"blockhash\": \"hashvalue\",          (string) The block hash containing the transaction.\n"
             "    \"blocktime\": xxx,                  (numeric) The block time in seconds since epoch (1 Jan 1970 GMT).\n"
             "    \"blockheight\": xxx,                (numeric) The block height.\n"
-            "    \"capacity\": \"xxx TB/PB\",           (string) The plotter capacity.\n"
             "    \"bindheightlimit\": xxx             (numeric) The plotter bind small fee limit height. Other require high fee. Only for verbose mode.\n"
             "    \"unbindheightlimit\": xxx,          (numeric) The plotter unbind limit height.Only for verbose mode.\n"
             "    \"active\": true|false,              (bool, default false) The bind active status.Only for verbose mode.\n"
@@ -1207,6 +1207,14 @@ static UniValue listbindplotterofaddress(const JSONRPCRequest& request)
 
     LOCK(cs_main);
 
+    int nTargetHeight = ::ChainActive().Height() + 1;
+    auto const& view = ::ChainstateActive().CoinsTip();
+    auto const& params = ::Params().GetConsensus();
+
+    int nHeightForCalculatingTotalSupply = GetHeightForCalculatingTotalSupply(nTargetHeight, params);
+    CAmount nBurned = view.GetAccountBalance(false, GetBurnToAccountID(), nullptr, nullptr, nullptr,
+                                             &params.BHDIP009PledgeTerms, nHeightForCalculatingTotalSupply);
+
     // Load all relation coins
     typedef std::map<uint32_t, CBindPlotterCoinsMap, std::greater<uint32_t> > CCoinsOrderByHeightMap;
     CCoinsOrderByHeightMap mapOrderedCoins;
@@ -1221,39 +1229,23 @@ static UniValue listbindplotterofaddress(const JSONRPCRequest& request)
         }
     }
 
-    // Capacity
-    uint64_t nNetCapacityTB = 0;
-    int nBlockCount = 0;
-    std::map<CPlotterBindData, int> mapPlotterMiningCount;
-    if (!mapOrderedCoins.empty()) {
-        nNetCapacityTB = poc::GetNetCapacity(::ChainActive().Height(), Params().GetConsensus(),
-            [&mapPlotterMiningCount, &nBlockCount](const CBlockIndex &block) {
-                nBlockCount++;
-                if (block.IsChiaBlock()) {
-                    mapPlotterMiningCount[CPlotterBindData(CChiaFarmerPk(block.chiaposFields.posProof.vchFarmerPk))]++;
-                } else {
-                    mapPlotterMiningCount[CPlotterBindData(block.nPlotterId)]++;
-                }
-            }
-        );
-    }
-
     bool fContinue = true;
     for (CCoinsOrderByHeightMap::const_iterator itMapCoins = mapOrderedCoins.cbegin(); fContinue && itMapCoins != mapOrderedCoins.cend(); ++itMapCoins) {
         const CBindPlotterCoinsMap &mapCoins = itMapCoins->second;
         for (CBindPlotterCoinsMap::const_reverse_iterator it = mapCoins.rbegin(); fContinue && it != mapCoins.rend(); ++it) {
             UniValue item(UniValue::VOBJ);
+
+            int nMinedCount, nTotalCount;
+            CAmount nReq = poc::GetMiningRequireBalance(accountID, it->second.bindData, nTargetHeight, view, nullptr, nullptr, nBurned,
+                                                        params, &nMinedCount, &nTotalCount, nHeightForCalculatingTotalSupply);
+
             item.pushKV("address", EncodeDestination(ExtractDestination(::ChainstateActive().CoinsTip().AccessCoin(it->first).out.scriptPubKey)));
             item.pushKV("plotterId/farmerPk", it->second.bindData.ToString());
             item.pushKV("txid", it->first.hash.GetHex());
             item.pushKV("blockhash", ::ChainActive()[static_cast<int>(it->second.nHeight)]->GetBlockHash().GetHex());
             item.pushKV("blocktime", ::ChainActive()[static_cast<int>(it->second.nHeight)]->GetBlockTime());
             item.pushKV("blockheight", it->second.nHeight);
-            if (nBlockCount > 0) {
-                item.pushKV("capacity", ValueFromCapacity((nNetCapacityTB * mapPlotterMiningCount[it->second.bindData]) / nBlockCount));
-            } else {
-                item.pushKV("capacity", ValueFromCapacity(0));
-            }
+            item.pushKV("miningreq", FormatMoney(nReq));
             if (fVerbose) {
                 item.pushKV("bindheightlimit", GetBindPlotterLimitHeight(::ChainActive().Height() + 1, CBindPlotterInfo(*it), Params().GetConsensus()));
                 item.pushKV("unbindheightlimit", GetUnbindPlotterLimitHeight(CBindPlotterInfo(*it), ::ChainstateActive().CoinsTip(), Params().GetConsensus()));
