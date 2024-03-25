@@ -811,9 +811,10 @@ COutPointVec CCoinsViewDB::GetAccountCoins(const CAccountID &accountID) const {
     COutPointVec result;
     pcursor->Seek(entry);
     while (pcursor->Valid()) {
-        if (pcursor->GetKey(entry) && entryAccountID == accountID) {
-            result.push_back(outpoint);
+        if (!pcursor->GetKey(entry) || entryAccountID != accountID) {
+            break;
         }
+        result.push_back(outpoint);
         pcursor->Next();
     }
 
@@ -824,13 +825,17 @@ COutPointVec CCoinsViewDB::GetAllCoins() const {
     std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
 
     COutPoint outpoint;
-    CAccountID entryAccountID;
-    CoinIndexEntry entry(&outpoint, &entryAccountID);
+    CoinEntry entry(&outpoint);
 
     COutPointVec result;
     pcursor->Seek(entry);
     while (pcursor->Valid()) {
-        if (pcursor->GetKey(entry)) {
+        if (!pcursor->GetKey(entry)) {
+            break;
+        }
+        Coin coin;
+        pcursor->GetValue(coin);
+        if (!coin.IsSpent()) {
             result.push_back(outpoint);
         }
         pcursor->Next();
