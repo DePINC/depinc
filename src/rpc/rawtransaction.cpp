@@ -248,8 +248,20 @@ static UniValue getrawtransaction(const JSONRPCRequest& request)
     return result;
 }
 
-static UniValue gettxouts(const JSONRPCRequest& request)
+UniValue CoinToUniValue(COutPoint const& outpoint, Coin const& coin)
 {
+    UniValue val(UniValue::VOBJ);
+    val.pushKV("txid", outpoint.hash.GetHex());
+    val.pushKV("n", static_cast<int>(outpoint.n));
+    CTxDestination dest((ScriptHash)coin.out.scriptPubKey);
+    val.pushKV("address", EncodeDestination(dest));
+    val.pushKV("height", static_cast<int>(coin.nHeight));
+    val.pushKV("value", coin.out.nValue);
+    val.pushKV("value(human)", FormatMoney(coin.out.nValue));
+    return val;
+}
+
+static UniValue gettxouts(JSONRPCRequest const& request) {
     RPCHelpMan(
         "gettxouts",
         "Get related txouts from the provided address",
@@ -285,7 +297,6 @@ static UniValue gettxouts(const JSONRPCRequest& request)
     UniValue result(UniValue::VOBJ);
     UniValue coins(UniValue::VARR);
     for (auto const& txout : txouts) {
-        UniValue val(UniValue::VOBJ);
         Coin coin;
         if (!view.GetCoin(txout, coin) || coin.IsSpent()) {
             continue;
@@ -295,14 +306,7 @@ static UniValue gettxouts(const JSONRPCRequest& request)
                 // skip the disabled coins
                 continue;
             }
-            val.pushKV("txid", txout.hash.GetHex());
-            val.pushKV("n", static_cast<int>(txout.n));
-            val.pushKV("address", address);
-            val.pushKV("value", coin.out.nValue);
-            val.pushKV("value(human)", FormatMoney(coin.out.nValue));
-            val.pushKV("height", static_cast<int>(coin.nHeight));
-            val.pushKV("disabled", coin.nHeight < params.BHDIP009Height);
-            coins.push_back(std::move(val));
+            coins.push_back(CoinToUniValue(txout, coin));
             total += coin.out.nValue;
         }
     }
@@ -317,23 +321,74 @@ static UniValue gettxouts(const JSONRPCRequest& request)
     return result;
 }
 
-static UniValue getalltxouts(const JSONRPCRequest& request)
+enum class ReqCoinType : int32_t {
+    ALL = 0,
+    ONLY_DISABLED = 1,
+    AVAILABLE = 2,
+};
+
+[[nodiscard]] UniValue GetExpiredCoins(CCoinsView const& view, int disable_height, ReqCoinType req_type)
 {
+    UniValue result(UniValue::VARR);
+    auto outpoints = view.GetAllCoins();
+    for (auto const& outpoint : outpoints) {
+        Coin coin;
+        if (!view.GetCoin(outpoint, coin)) {
+            throw std::runtime_error("provided an invalid outpoint, the coin cannot be found");
+        }
+        if (coin.out.nValue == 0) {
+            continue;
+        }
+        if (req_type == ReqCoinType::ONLY_DISABLED && coin.nHeight < disable_height) {
+            result.push_back(CoinToUniValue(outpoint, coin));
+            continue;
+        }
+        if (req_type == ReqCoinType::AVAILABLE && coin.nHeight >= disable_height) {
+            result.push_back(CoinToUniValue(outpoint, coin));
+            continue;
+        }
+        if (req_type == ReqCoinType::ALL) {
+            result.push_back(CoinToUniValue(outpoint, coin));
+        }
+    }
+    return result;
+}
+
+[[nodiscard]] ReqCoinType ParseCoinType(std::string const& arg_str)
+{
+    ReqCoinType coin_type {ReqCoinType::ALL};
+    int32_t type_val;
+    if (!ParseInt32(arg_str, &type_val)) {
+        throw std::runtime_error("the type of req-type must be integer");
+    }
+    if (type_val < 0 || type_val > 2) {
+        throw std::runtime_error("invalid range of the req-type");
+    }
+    return static_cast<ReqCoinType>(type_val);
+}
+
+static UniValue getalltxouts(JSONRPCRequest const& request) {
     auto const& params = Params().GetConsensus();
 
     RPCHelpMan(
         "getalltxouts",
         "Get all txouts before hard-fork BHDIP009",
         {
+            {"req-type", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "Retrieved type of txouts. (0-ALL, 1-ONLYDISABLED (before BHDIP009, should be burned), 2-AVAILABLE (after BHDIP009), default=0"},
             {"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, tinyformat::format("This parameter can be omitted, the default value is %d", params.BHDIP009Height)},
         },
         RPCResult("\"txouts\" in json format"),
         RPCExamples("cli gettxouts [address]")
     ).Check(request);
 
-    int before_height = params.BHDIP009Height;
-    if (request.params.size() == 1) {
-        before_height = ParseInt32(request.params[0].get_str(), &before_height);
+    ReqCoinType coin_type {ReqCoinType::ALL};
+    if (request.params.size() >= 1) {
+        coin_type = ParseCoinType(request.params[1].get_str());
+    }
+
+    int disable_height = params.BHDIP009Height;
+    if (request.params.size() == 2) {
+        disable_height = ParseInt32(request.params[0].get_str(), &disable_height);
     }
 
     UniValue result(UniValue::VARR);
@@ -341,52 +396,110 @@ static UniValue getalltxouts(const JSONRPCRequest& request)
     LOCK(cs_main);
     auto const& view = ::ChainstateActive().CoinsDB();
 
-    auto outpoints = view.GetAllCoins();
-    for (auto const& outpoint : outpoints) {
+    return GetExpiredCoins(view, disable_height, coin_type);
+}
+
+static UniValue checkexpiredtxouts(JSONRPCRequest const& request)
+{
+    RPCHelpMan(
+        "checkexpiredtxouts",
+        "Load addresses from json and show the txouts should be expired",
+        {
+            {"json file", RPCArg::Type::STR, RPCArg::Optional::NO, "The file contains an array represents all addresses to check"},
+        },
+        RPCResult("\"expired txouts\" in json format"),
+        RPCExamples("cli checkexpiredtxouts ./myaddresses.json")
+    ).Check(request);
+
+    // read addresses from json file
+
+    std::string json_filepath = request.params[0].get_str();
+    if (!fs::exists(json_filepath) || fs::is_directory(json_filepath)) {
+        throw std::runtime_error("the input json file doesn't exist or it is a directory");
+    }
+
+    std::ifstream in(json_filepath);
+    std::ostringstream ss_str;
+    std::copy(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>(), std::ostreambuf_iterator<char>(ss_str));
+
+    UniValue addresses_val(UniValue::VARR);
+    addresses_val.read(ss_str.str());
+
+    LogPrintf("%s: addresses_val.size()=%d\n", __func__, addresses_val.getValues().size());
+
+    // enumerate all expired coins
+
+    auto const& params = Params().GetConsensus();
+    int disable_height = params.BHDIP009Height;
+
+    std::unordered_map<std::string, UniValue> expired_coins;
+    auto const& view = ::ChainstateActive().CoinsDB();
+    auto all_coins = view.GetAllCoins();
+
+    LogPrintf("%s: all_coins.size()=%d\n", __func__, all_coins.size());
+
+    for (auto const& outpoint : all_coins) {
         Coin coin;
-        if (view.GetCoin(outpoint, coin) && coin.nHeight < before_height && coin.out.nValue > 0) {
-            UniValue val(UniValue::VOBJ);
-            val.pushKV("txid", outpoint.hash.GetHex());
-            val.pushKV("n", static_cast<int>(outpoint.n));
-            CTxDestination dest((ScriptHash)coin.out.scriptPubKey);
-            val.pushKV("address", EncodeDestination(dest));
-            val.pushKV("height", static_cast<int>(coin.nHeight));
-            val.pushKV("value", coin.out.nValue);
-            val.pushKV("value(human)", FormatMoney(coin.out.nValue));
-            result.push_back(std::move(val));
+        if (!view.GetCoin(outpoint, coin)) {
+            LogPrintf("the coin (txid=%s, n=%d) cannot be found\n", outpoint.hash.GetHex(), outpoint.n);
+            continue;
+        }
+        if (coin.out.nValue == 0) {
+            continue;
+        }
+        if (coin.nHeight < params.BHDIP009Height) {
+            auto coin_val = CoinToUniValue(outpoint, coin);
+            auto address_str = coin_val["address"].get_str();
+            expired_coins[address_str] = coin_val;
+        }
+    }
+
+    LogPrintf("%s: expired_coins.size()=%d\n", __func__, expired_coins.size());
+
+    // check addresses from the input file find those which will expired then return the expired coins
+
+    UniValue result(UniValue::VARR);
+    for (auto const& address_val : addresses_val.getValues()) {
+        auto it = expired_coins.find(address_val.get_str());
+        if (it != std::cend(expired_coins)) {
+            result.push_back(it->second);
         }
     }
 
     return result;
 }
 
-static UniValue gettxoutproof(const JSONRPCRequest& request)
-{
-            RPCHelpMan{"gettxoutproof",
-                "\nReturns a hex-encoded proof that \"txid\" was included in a block.\n"
-                "\nNOTE: By default this function only works sometimes. This is when there is an\n"
-                "unspent output in the utxo for this transaction. To make it always work,\n"
-                "you need to maintain a transaction index, using the -txindex command line option or\n"
-                "specify the block in which the transaction is included manually (by blockhash).\n",
-                {
-                    {"txids", RPCArg::Type::ARR, RPCArg::Optional::NO, "A json array of txids to filter",
-                        {
-                            {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "A transaction hash"},
-                        },
-                        },
-                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED_NAMED_ARG, "If specified, looks for txid in the block with this hash"},
-                },
-                RPCResult{
-            "\"data\"           (string) A string that is a serialized, hex-encoded data for the proof.\n"
-                },
-                RPCExamples{""},
-            }.Check(request);
+static UniValue gettxoutproof(JSONRPCRequest const& request) {
+    RPCHelpMan{
+            "gettxoutproof",
+            "\nReturns a hex-encoded proof that \"txid\" was included in a block.\n"
+            "\nNOTE: By default this function only works sometimes. This is when there is an\n"
+            "unspent output in the utxo for this transaction. To make it always work,\n"
+            "you need to maintain a transaction index, using the -txindex command line option or\n"
+            "specify the block in which the transaction is included manually (by blockhash).\n",
+            {
+                    {
+                            "txids",
+                            RPCArg::Type::ARR,
+                            RPCArg::Optional::NO,
+                            "A json array of txids to filter",
+                            {
+                                    {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "A transaction hash"},
+                            },
+                    },
+                    {"blockhash", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED_NAMED_ARG,
+                     "If specified, looks for txid in the block with this hash"},
+            },
+            RPCResult{"\"data\"           (string) A string that is a serialized, hex-encoded data for the proof.\n"},
+            RPCExamples{""},
+    }
+            .Check(request);
 
     std::set<uint256> setTxids;
     uint256 oneTxid;
     UniValue txids = request.params[0].get_array();
     for (unsigned int idx = 0; idx < txids.size(); idx++) {
-        const UniValue& txid = txids[idx];
+        UniValue const& txid = txids[idx];
         uint256 hash(ParseHashV(txid, "txid"));
         if (setTxids.count(hash))
             throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated txid: ")+txid.get_str());
