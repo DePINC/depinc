@@ -12,9 +12,7 @@
  */
 RecursiveMutex cs_main;
 
-CAmount GetBlockSubsidy(int nHeight, Consensus::Params const& consensusParams) {
-    CAmount nSubsidy;
-
+int CalculateHalvings(int nHeight, Consensus::Params const& consensusParams) {
     int halvings;
     if (nHeight < consensusParams.BHDIP008Height) {
         halvings = nHeight / (consensusParams.nSubsidyHalvingInterval * 600 / consensusParams.BHDIP001TargetSpacing);
@@ -27,6 +25,41 @@ CAmount GetBlockSubsidy(int nHeight, Consensus::Params const& consensusParams) {
         halvings = (nHeight - consensusParams.BHDIP008Height + nEqualHeight) /
                    (consensusParams.nSubsidyHalvingInterval * 600 / consensusParams.BHDIP008TargetSpacing);
     }
+    return halvings;
+}
+
+std::map<int, CAmount> GenerateBlockSubsidyWithHalvings(Consensus::Params const& params) {
+    std::map<int, CAmount> result;
+    int nHeight { 1 };
+    int halvings { 0 };
+    CAmount oldSubsidy { 0 };
+    while (halvings < 64) {
+        halvings = CalculateHalvings(nHeight, params);
+        CAmount subsidy = GetBlockSubsidy(nHeight, params);
+        if (subsidy != oldSubsidy) {
+            result[nHeight] = subsidy;
+            oldSubsidy = subsidy;
+        }
+        ++nHeight;
+    }
+    return result;
+}
+
+CAmount GetBlockSubsidy(int nHeight, Consensus::Params const& consensusParams) {
+    CAmount nSubsidy;
+
+    int halvings = CalculateHalvings(nHeight, consensusParams);
+    // if (nHeight < consensusParams.BHDIP008Height) {
+    //     halvings = nHeight / (consensusParams.nSubsidyHalvingInterval * 600 / consensusParams.BHDIP001TargetSpacing);
+    // } else {
+    //     // 197568*5/3=329280, First halving height is 568288 (=197568+(700000-329280))
+    //     // 106848*5/3=178080, First halving height is 628768 (=106848+(700000-178080))
+    //     // 720*5/3=1200, First halving height is 520 (=720+(1000-1200))
+    //     int nEqualHeight = consensusParams.BHDIP008Height * consensusParams.BHDIP001TargetSpacing /
+    //                        consensusParams.BHDIP008TargetSpacing;
+    //     halvings = (nHeight - consensusParams.BHDIP008Height + nEqualHeight) /
+    //                (consensusParams.nSubsidyHalvingInterval * 600 / consensusParams.BHDIP008TargetSpacing);
+    // }
     if (halvings >= 64) {
         // Force block reward to zero when right shift is undefined.
         nSubsidy = 0;

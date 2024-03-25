@@ -1486,6 +1486,40 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
     return res_val;
 }
 
+static UniValue queryhalvings(JSONRPCRequest const& request)
+{
+    auto const& params = Params().GetConsensus();
+    auto result_map = GenerateBlockSubsidyWithHalvings(params);
+
+    LOCK(cs_main);
+    int nHeight = ::ChainActive().Height();
+
+    int nNextHeightForHalvings { 999999999 };
+    UniValue halvings_val(UniValue::VARR);
+    for (auto const& entry : result_map) {
+        UniValue halvings_entry_val(UniValue::VOBJ);
+        halvings_entry_val.pushKV("height", entry.first);
+        halvings_entry_val.pushKV("amount", entry.second);
+        halvings_val.push_back(std::move(halvings_entry_val));
+        // find the height for next halvings
+        if (entry.first > nHeight) {
+            if (nNextHeightForHalvings > entry.first) {
+                nNextHeightForHalvings = entry.first;
+            }
+        }
+    }
+
+    UniValue result(UniValue::VOBJ);
+    result.pushKV("halvings", halvings_val);
+    result.pushKV("halvingsHeight", nNextHeightForHalvings);
+    result.pushKV("halvingsAmount", result_map[nNextHeightForHalvings]);
+    result.pushKV("halvingsDays", (nNextHeightForHalvings - nHeight) * params.BHDIP008TargetSpacing / 60 / 60 / 24);
+    result.pushKV("currentHeight", nHeight);
+    result.pushKV("currentSubsidy", GetBlockSubsidy(nHeight, params));
+
+    return result;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1504,6 +1538,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "querychainpledgeinfo", &queryChainPledgeInfo, {}},
         {"chia", "burntxout", &burntxout, {"txid","n"} },
         {"chia", "testtargetspacing", &testtargetspacing, {"numblocks"} },
+        {"chia", "queryhalvings", &queryhalvings, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
