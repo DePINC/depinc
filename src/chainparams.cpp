@@ -180,7 +180,7 @@ public:
         consensus.BHDIP010Height = 937666; // 2024/3/5
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 30; // disable BHDIP009 coins after 30 days of BHDIP010
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + HEIGHTS_DAY * 30; // disable BHDIP009 coins after 30 days of BHDIP010, height=952066
 
         consensus.BHDIP010TargetSpacingMulFactor = 0.383333;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP010Height;
