@@ -381,14 +381,14 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
         RPCExamples("cli gettxouts [address]")
     ).Check(request);
 
-    ReqCoinType coin_type {ReqCoinType::ALL};
+    ReqCoinType req_type {ReqCoinType::ALL};
     if (request.params.size() >= 1) {
-        coin_type = ParseCoinType(request.params[1].get_str());
+        req_type = ParseCoinType(request.params[0].get_str());
     }
 
     int disable_height = params.BHDIP009Height;
     if (request.params.size() == 2) {
-        disable_height = ParseInt32(request.params[0].get_str(), &disable_height);
+        disable_height = ParseInt32(request.params[1].get_str(), &disable_height);
     }
 
     UniValue result(UniValue::VARR);
@@ -396,7 +396,7 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
     LOCK(cs_main);
     auto const& view = ::ChainstateActive().CoinsDB();
 
-    return GetExpiredCoins(view, disable_height, coin_type);
+    return GetExpiredCoins(view, disable_height, req_type);
 }
 
 static UniValue checkexpiredtxouts(JSONRPCRequest const& request)
