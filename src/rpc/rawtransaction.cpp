@@ -253,8 +253,11 @@ UniValue CoinToUniValue(COutPoint const& outpoint, Coin const& coin)
     UniValue val(UniValue::VOBJ);
     val.pushKV("txid", outpoint.hash.GetHex());
     val.pushKV("n", static_cast<int>(outpoint.n));
-    CTxDestination dest((ScriptHash)coin.out.scriptPubKey);
+
+    auto account_id = ExtractAccountID(coin.out.scriptPubKey);
+    CTxDestination dest((ScriptHash)account_id);
     val.pushKV("address", EncodeDestination(dest));
+
     val.pushKV("height", static_cast<int>(coin.nHeight));
     val.pushKV("value", coin.out.nValue);
     val.pushKV("value(human)", FormatMoney(coin.out.nValue));
