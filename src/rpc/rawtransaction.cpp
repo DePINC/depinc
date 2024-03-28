@@ -327,7 +327,7 @@ enum class ReqCoinType : int32_t {
     AVAILABLE = 2,
 };
 
-[[nodiscard]] UniValue GetExpiredCoins(CCoinsView const& view, int disable_height, ReqCoinType req_type)
+[[nodiscard]] UniValue GetExpiredCoins(CCoinsView const& view, int disable_height, ReqCoinType req_type, CAmount amount_limits)
 {
     UniValue result(UniValue::VARR);
     auto outpoints = view.GetAllCoins();
@@ -336,19 +336,18 @@ enum class ReqCoinType : int32_t {
         if (!view.GetCoin(outpoint, coin)) {
             throw std::runtime_error("provided an invalid outpoint, the coin cannot be found");
         }
-        if (coin.out.nValue == 0) {
-            continue;
-        }
-        if (req_type == ReqCoinType::ONLY_DISABLED && coin.nHeight < disable_height) {
-            result.push_back(CoinToUniValue(outpoint, coin));
-            continue;
-        }
-        if (req_type == ReqCoinType::AVAILABLE && coin.nHeight >= disable_height) {
-            result.push_back(CoinToUniValue(outpoint, coin));
-            continue;
-        }
-        if (req_type == ReqCoinType::ALL) {
-            result.push_back(CoinToUniValue(outpoint, coin));
+        if (coin.out.nValue >= amount_limits) {
+            if (req_type == ReqCoinType::ONLY_DISABLED && coin.nHeight < disable_height) {
+                result.push_back(CoinToUniValue(outpoint, coin));
+                continue;
+            }
+            if (req_type == ReqCoinType::AVAILABLE && coin.nHeight >= disable_height) {
+                result.push_back(CoinToUniValue(outpoint, coin));
+                continue;
+            }
+            if (req_type == ReqCoinType::ALL) {
+                result.push_back(CoinToUniValue(outpoint, coin));
+            }
         }
     }
     return result;
@@ -375,6 +374,7 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
         "Get all txouts before hard-fork BHDIP009",
         {
             {"req-type", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "Retrieved type of txouts. (0-ALL, 1-ONLYDISABLED (before BHDIP009, should be burned), 2-AVAILABLE (after BHDIP009), default=0"},
+            {"amount-limits", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The account amount must remains at least this number of coins"},
             {"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, tinyformat::format("This parameter can be omitted, the default value is %d", params.BHDIP009Height)},
         },
         RPCResult("\"txouts\" in json format"),
@@ -386,9 +386,18 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
         req_type = ParseCoinType(request.params[0].get_str());
     }
 
+    CAmount amount_limits { 0 };
+    if (request.params.size() >= 2) {
+        int32_t amount_limits_num;
+        if (!ParseInt32(request.params[1].get_str(), &amount_limits_num)) {
+            throw std::runtime_error("cannot parse `amount-limits`, the type of this field must be number");
+        }
+        amount_limits = amount_limits_num * COIN;
+    }
+
     int disable_height = params.BHDIP009Height;
-    if (request.params.size() == 2) {
-        disable_height = ParseInt32(request.params[1].get_str(), &disable_height);
+    if (request.params.size() == 3) {
+        disable_height = ParseInt32(request.params[2].get_str(), &disable_height);
     }
 
     UniValue result(UniValue::VARR);
@@ -396,7 +405,7 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
     LOCK(cs_main);
     auto const& view = ::ChainstateActive().CoinsDB();
 
-    return GetExpiredCoins(view, disable_height, req_type);
+    return GetExpiredCoins(view, disable_height, req_type, amount_limits);
 }
 
 static UniValue checkexpiredtxouts(JSONRPCRequest const& request)
