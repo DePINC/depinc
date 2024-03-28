@@ -834,7 +834,9 @@ COutPointVec CCoinsViewDB::GetAllCoins() const {
             break;
         }
         Coin coin;
-        pcursor->GetValue(coin);
+        if (!pcursor->GetValue(coin)) {
+            break;
+        }
         if (!coin.IsSpent()) {
             result.push_back(outpoint);
         }
