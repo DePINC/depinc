@@ -339,17 +339,24 @@ enum class ReqCoinType : int32_t {
         if (!view.GetCoin(outpoint, coin)) {
             throw std::runtime_error("provided an invalid outpoint, the coin cannot be found");
         }
+        if (coin.IsSpent()) {
+            continue;
+        }
         if (coin.out.nValue >= amount_limits) {
-            if (req_type == ReqCoinType::ONLY_DISABLED && coin.nHeight < disable_height) {
+            switch (req_type) {
+            case ReqCoinType::ONLY_DISABLED:
+                if (coin.nHeight < disable_height) {
+                    result.push_back(CoinToUniValue(outpoint, coin));
+                }
+                continue;
+            case ReqCoinType::AVAILABLE:
+                if (coin.nHeight >= disable_height) {
+                    result.push_back(CoinToUniValue(outpoint, coin));
+                }
+                continue;
+            case ReqCoinType::ALL:
                 result.push_back(CoinToUniValue(outpoint, coin));
                 continue;
-            }
-            if (req_type == ReqCoinType::AVAILABLE && coin.nHeight >= disable_height) {
-                result.push_back(CoinToUniValue(outpoint, coin));
-                continue;
-            }
-            if (req_type == ReqCoinType::ALL) {
-                result.push_back(CoinToUniValue(outpoint, coin));
             }
         }
     }
