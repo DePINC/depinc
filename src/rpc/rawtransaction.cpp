@@ -406,7 +406,7 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
     UniValue result(UniValue::VARR);
 
     LOCK(cs_main);
-    auto const& view = ::ChainstateActive().CoinsDB();
+    auto const& view = ::ChainstateActive().CoinsTip();
 
     return GetExpiredCoins(view, disable_height, req_type, amount_limits);
 }
