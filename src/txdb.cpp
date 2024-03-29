@@ -828,18 +828,13 @@ COutPointVec CCoinsViewDB::GetAllCoins() const {
     CoinEntry entry(&outpoint);
 
     COutPointVec result;
-    pcursor->Seek(entry);
+    pcursor->Seek(DB_COIN);
     while (pcursor->Valid()) {
-        if (!pcursor->GetKey(entry)) {
+        if (!pcursor->GetKey(entry) || entry.key != DB_COIN) {
             break;
         }
-        Coin coin;
-        if (!pcursor->GetValue(coin)) {
-            break;
-        }
-        if (!coin.IsSpent()) {
-            result.push_back(outpoint);
-        }
+        result.push_back(outpoint);
+        // go next
         pcursor->Next();
     }
 
