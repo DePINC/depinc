@@ -384,30 +384,24 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
 
 /**
  * @brief Send individual coin to address, for test purpose, also you need to hold the private key for the coin
- *
- * @param hash The transaction hash
- * @param n The number of `n` from outputs
- * @param address The target address
+
+    2 kind of groups of incoming arguments
+
+    1. (tx hash, n, address)
+    2. (txouts json file, max num of inputs, address)
+
  */
 static UniValue sendcointoaddress(JSONRPCRequest const& request)
 {
     if (request.params.size() != 3) {
-        throw std::runtime_error("params: [tx hash] [n] [address]");
+        throw std::runtime_error("invalid parameters! Should be (tx hash, n, address) or (txouts json file, pack number of txins to 1 tx max, address)");
     }
 
-    // parse arguments
-
-    uint256 hashTxOut;
-    if (!ParseHashStr(request.params[0].getValStr(), hashTxOut)) {
-        throw std::runtime_error("cannot convert param 1 to uint256");
+    // retrieve the output address
+    CTxDestination transfer_to_destination = DecodeDestination(request.params[2].getValStr());
+    if (transfer_to_destination.empty()) {
+        throw std::runtime_error("invalid target address");
     }
-
-    int32_t nTxOut;
-    if (!ParseInt32(request.params[1].getValStr(), &nTxOut)) {
-        throw std::runtime_error("cannot convert param 2 to int32_t");
-    }
-
-    CTxDestination destTarget = DecodeDestination(request.params[2].getValStr());
 
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     CWallet* const pwallet = wallet.get();
@@ -423,36 +417,86 @@ static UniValue sendcointoaddress(JSONRPCRequest const& request)
     auto locked_chain = pwallet->chain().lock();
     LOCK(pwallet->cs_wallet);
 
-    // check the coin and ensure it does exist
-    COutPoint outpoint(hashTxOut, nTxOut);
-    std::vector<COutput> vCoins;
-    pwallet->AvailableCoins(*locked_chain, vCoins);
-    auto iter = std::find_if(std::cbegin(vCoins), std::cend(vCoins), [&hashTxOut, nTxOut](COutput const& output) {
-        return output.fSpendable && output.tx->GetHash() == hashTxOut && output.i == nTxOut;
-    });
-    if (iter == std::cend(vCoins)) {
-        throw std::runtime_error(tinyformat::format("the coin (%s, %d) cannot be found from current wallet", outpoint.hash.GetHex(), outpoint.n));
-    }
+    std::vector<COutput> available_coins;
+    pwallet->AvailableCoins(*locked_chain, available_coins);
 
-    CTxOut const& txout = iter->tx->tx->vout[iter->i];
+    auto check_coin_validity = [pwallet, &locked_chain, &available_coins](uint256 const& txout_hash, int txout_index) -> Optional<CTxOut> {
+        // check the coin and ensure it does exist
+        COutPoint outpoint(txout_hash, txout_index);
+        auto iter = std::find_if(std::cbegin(available_coins), std::cend(available_coins), [&txout_hash, txout_index](COutput const& output) {
+            return output.fSpendable && output.tx->GetHash() == txout_hash && output.i == txout_index;
+        });
+        if (iter == std::cend(available_coins)) {
+            return {};
+        }
+        return iter->tx->tx->vout[iter->i];
+    };
 
     // Transaction fee we initial it to 0.001 BHD
-    CAmount nTxFee = COIN / 1000;
+    constexpr CAmount txfee = COIN / 1000;
 
     // create transaction from the address
     CMutableTransaction tx;
+    CAmount total_amount{0};
 
-    // input coin
-    CTxIn input;
-    input.prevout = outpoint;
-    tx.vin.push_back(input);
+    // check if 1st param is pointing to a json file
+    std::string first_arg_str = request.params[0].get_str();
+    if (fs::exists(first_arg_str) && fs::is_regular_file(first_arg_str)) {
+        // read file content
+        std::ifstream in(first_arg_str);
+        std::ostringstream out;
+        std::copy(std::istream_iterator<char>(in), std::istream_iterator<char>(), std::ostream_iterator<char>(out));
+        // ok, parse all txouts from the json file
+        UniValue txout_vals(UniValue::VARR);
+        if (!txout_vals.read(out.str())) {
+            throw std::runtime_error(tinyformat::format("cannot parse json content from file %s", first_arg_str));
+        }
+        if (!txout_vals.isArray()) {
+            throw std::runtime_error("the type of first val from the json file must be array");
+        }
+        int32_t max_num_of_txin{0};
+        if (!ParseInt32(request.params[1].get_str(), &max_num_of_txin)) {
+            throw std::runtime_error("invalid number of argument 2 -> `max num of txin`");
+        }
+        int count{0};
+        for (auto const& txout_val : txout_vals.getValues()) {
+            auto txout_hash = uint256S(txout_val["txid"].get_str());
+            int txout_index = txout_val["n"].get_int();
+            auto txout = check_coin_validity(txout_hash, txout_index);
+            if (txout.has_value()) {
+                // only deal with those available coins
+                tx.vin.push_back(CTxIn(COutPoint(txout_hash, txout_index)));
+                total_amount += txout->nValue;
+                ++count;
+                if (max_num_of_txin > 0 && count >= max_num_of_txin) {
+                    break;
+                }
+            }
+        }
+    } else {
+        // parse hash of the txout
+        uint256 txout_hash;
+        if (!ParseHashStr(first_arg_str, txout_hash)) {
+            throw std::runtime_error("the first argument is invalid, it's not a json file and it's not a hash value");
+        }
+        int32_t txout_index;
+        if (!ParseInt32(request.params[1].getValStr(), &txout_index)) {
+            throw std::runtime_error("cannot convert param 2 to int32_t");
+        }
+        auto txout = check_coin_validity(txout_hash, txout_index);
+        if (!txout.has_value()) {
+            throw std::runtime_error("the input coin doesn't exist or it is invalid");
+        }
+        total_amount = txout->nValue;
+        tx.vin.push_back(CTxIn(COutPoint(txout_hash, txout_index)));
+    }
 
     // output coin
     CTxOut output;
-    output.scriptPubKey = GetScriptForDestination(destTarget);
-    output.nValue = txout.nValue - nTxFee;
+    output.scriptPubKey = GetScriptForDestination(transfer_to_destination);
+    output.nValue = total_amount - txfee;
     if (output.nValue <= 0) {
-        throw std::runtime_error(tinyformat::format("the coin (%s, %d) amount=%ld, txfee=%ld, outpoint is less than zero\n", outpoint.hash.GetHex(), outpoint.n, txout.nValue, nTxFee));
+        throw std::runtime_error(tinyformat::format("the new tx amount=%ld, txfee=%ld, amount of the outpoint is less than zero\n", total_amount, txfee));
     }
     tx.vout.push_back(output);
 
