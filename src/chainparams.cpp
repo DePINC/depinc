@@ -687,7 +687,6 @@ public:
                 { 944555, uint256S("0x9c24b852634eea2e43f5855e8ebca821b91356b5ab0586c0dcbde769dcd14574") },
             }
         };
-        // new best=9c24b852634eea2e43f5855e8ebca821b91356b5ab0586c0dcbde769dcd14574 height=944,555
 
         chainTxData = ChainTxData{
             // Data from RPC: getchaintxstats 4096 915e3ef622459f8b1b04dc274e1097b31111b0c6e0a9e9cd2da60c9d692f2c93
