@@ -424,7 +424,7 @@ static UniValue sendcointoaddress(JSONRPCRequest const& request)
         // check the coin and ensure it does exist
         COutPoint outpoint(txout_hash, txout_index);
         auto iter = std::find_if(std::cbegin(available_coins), std::cend(available_coins), [&txout_hash, txout_index](COutput const& output) {
-            return output.fSpendable && output.tx->GetHash() == txout_hash && output.i == txout_index;
+            return output.tx->GetHash() == txout_hash && output.i == txout_index;
         });
         if (iter == std::cend(available_coins)) {
             return {};
