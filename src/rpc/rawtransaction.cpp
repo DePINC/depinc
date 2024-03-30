@@ -337,7 +337,7 @@ enum class ReqCoinType : int32_t {
     for (auto const& outpoint : outpoints) {
         Coin coin;
         if (!view.GetCoin(outpoint, coin)) {
-            throw std::runtime_error("provided an invalid outpoint, the coin cannot be found");
+            continue;
         }
         if (coin.IsSpent()) {
             continue;
