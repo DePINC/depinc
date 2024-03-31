@@ -2032,6 +2032,69 @@ static UniValue abandontransaction(const JSONRPCRequest& request)
     return NullUniValue;
 }
 
+static UniValue abandoninvalidbindtxs(const JSONRPCRequest& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+            RPCHelpMan{"abandontransaction",
+                "\nMark in-wallet transaction <txid> as abandoned\n"
+                "This will mark this transaction and all its in-wallet descendants as abandoned which will allow\n"
+                "for their inputs to be respent.  It can be used to replace \"stuck\" or evicted transactions.\n"
+                "It only works on transactions which are not included in a block and are not currently in the mempool.\n"
+                "It has no effect on transactions which are already abandoned.\n",
+                {
+                },
+                RPCResults{},
+                RPCExamples{
+                    HelpExampleCli("abandontransaction", "")
+                    + HelpExampleRpc("abandontransaction", "")
+                },
+            }.Check(request);
+
+    // Make sure the results are valid at least up to the most recent block
+    // the user could have gotten from another RPC command prior to now
+    pwallet->BlockUntilSyncedToCurrentChain();
+
+    auto locked_chain = pwallet->chain().lock();
+    LOCK(pwallet->cs_wallet);
+
+    auto const& params = ::Params().GetConsensus();
+    int height = locked_chain->getHeight().get_value_or(0);
+
+    std::set<uint256> abandon_txs;
+
+    // find all invalid transactions here and abandon them
+    for (auto const& wtx : pwallet->mapWallet) {
+        if (wtx.second.isUnconfirmed() && wtx.second.tx->IsUniform()) {
+            // check unconfirmed tx only
+            bool reject {false};
+            bool is_bind_tx {false};
+            int last_active_height {0};
+            auto payload = ExtractTransactionDatacarrier(*wtx.second.tx, height, { DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER }, reject, last_active_height, is_bind_tx);
+            if (payload == nullptr && is_bind_tx) {
+                // invalid bind-tx
+                abandon_txs.insert(wtx.second.tx->GetHash());
+            }
+        }
+    }
+
+    UniValue abandon_txid_vals(UniValue::VARR);
+    for (auto const& txid : abandon_txs) {
+        if (!pwallet->AbandonTransaction(*locked_chain, txid)) {
+            // failed to abandon tx
+            LogPrintf("%s: failed to abandon tx=%s\n", __func__, txid.GetHex());
+        }
+        abandon_txid_vals.push_back(txid.GetHex());
+    }
+
+    return abandon_txid_vals;
+}
+
 
 static UniValue backupwallet(const JSONRPCRequest& request)
 {
@@ -5608,6 +5671,7 @@ static const CRPCCommand commands[] =
     //  --------------------- ------------------------          -----------------------         ----------
     { "rawtransactions",    "fundrawtransaction",               &fundrawtransaction,            {"hexstring","options","iswitness"} },
     { "wallet",             "abandontransaction",               &abandontransaction,            {"txid"} },
+    { "wallet",             "abandoninvalidbindtxs",            &abandoninvalidbindtxs,         {} },
     { "wallet",             "abortrescan",                      &abortrescan,                   {} },
     { "wallet",             "addmultisigaddress",               &addmultisigaddress,            {"nrequired","keys","label","address_type"} },
     { "wallet",             "backupwallet",                     &backupwallet,                  {"destination"} },
