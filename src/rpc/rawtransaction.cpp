@@ -333,10 +333,11 @@ enum class ReqCoinType : int32_t {
     AVAILABLE = 2,
 };
 
-[[nodiscard]] UniValue GetExpiredCoins(CCoinsView const& view, int disable_height, ReqCoinType req_type, CAmount amount_limits)
+[[nodiscard]] UniValue GetExpiredCoins(CCoinsView const& view, int disable_height, ReqCoinType req_type, CAmount amount_limits, CAmount* ptotal = nullptr)
 {
     UniValue result(UniValue::VARR);
     auto outpoints = view.GetAllCoins();
+    CAmount total {0};
     for (auto const& outpoint : outpoints) {
         Coin coin;
         if (!view.GetCoin(outpoint, coin)) {
@@ -350,18 +351,24 @@ enum class ReqCoinType : int32_t {
             case ReqCoinType::ONLY_DISABLED:
                 if (coin.nHeight < disable_height) {
                     result.push_back(CoinToUniValue(outpoint, coin));
+                    total += coin.out.nValue;
                 }
                 continue;
             case ReqCoinType::AVAILABLE:
                 if (coin.nHeight >= disable_height) {
                     result.push_back(CoinToUniValue(outpoint, coin));
+                    total += coin.out.nValue;
                 }
                 continue;
             case ReqCoinType::ALL:
                 result.push_back(CoinToUniValue(outpoint, coin));
+                total += coin.out.nValue;
                 continue;
             }
         }
+    }
+    if (ptotal != nullptr) {
+        *ptotal = total;
     }
     return result;
 }
@@ -418,7 +425,16 @@ static UniValue getalltxouts(JSONRPCRequest const& request) {
     LOCK(cs_main);
     auto const& view = ::ChainstateActive().CoinsTip();
 
-    return GetExpiredCoins(view, disable_height, req_type, amount_limits);
+    CAmount total {0};
+
+    UniValue coins = GetExpiredCoins(view, disable_height, req_type, amount_limits, &total);
+
+    UniValue res(UniValue::VOBJ);
+    res.pushKV("coins", coins);
+    res.pushKV("total", total);
+    res.pushKV("total(human)", FormatMoney(total));
+
+    return res;
 }
 
 static UniValue checkexpiredtxouts(JSONRPCRequest const& request)
