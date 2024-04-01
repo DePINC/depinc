@@ -304,6 +304,9 @@ static UniValue gettxouts(JSONRPCRequest const& request) {
         if (!view.GetCoin(txout, coin) || coin.IsSpent()) {
             continue;
         }
+        if (!all && coin.IsSpent()) {
+            continue;
+        }
         if (coin.out.nValue > 0) {
             if (!all && coin.nHeight < params.BHDIP009Height) {
                 // skip the disabled coins
