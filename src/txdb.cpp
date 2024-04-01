@@ -15,14 +15,12 @@
 #include <util/translation.h>
 #include <validation.h>
 
-#include <exception>
 #include <map>
 #include <set>
 #include <stdexcept>
 #include <unordered_map>
 
 #include <stdint.h>
-#include <inttypes.h>
 #include <optional.h>
 
 #include <boost/thread.hpp>
