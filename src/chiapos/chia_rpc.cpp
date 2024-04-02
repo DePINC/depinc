@@ -762,7 +762,7 @@ static UniValue queryUpdateTipHistory(JSONRPCRequest const& request) {
 
 static UniValue querySupply(JSONRPCRequest const& request) {
     RPCHelpMan("querysupply", "Query distributed amount, burned amount from the height",
-               {{"height", RPCArg::Type::NUM, RPCArg::Optional::NO, "The height to calculate the amounts"}},
+               {{"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The height to calculate the amounts"}},
                RPCResult{"\"succ\" (result) The result of the amounts"},
                RPCExamples{HelpExampleCli("querysupply", "200000")})
             .Check(request);
