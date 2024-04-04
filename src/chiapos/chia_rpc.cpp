@@ -1136,7 +1136,9 @@ optional<CTransaction> create_burn_txouts_transaction(CCoinsViewCache const& coi
         if (coin.IsSpent()) {
             throw std::runtime_error(tinyformat::format("the coin (%s, %d) has already spent", outpoint.hash.GetHex(), outpoint.n));
         }
-        mtx.vin.push_back(CTxIn{ outpoint, CScript(), CTxIn::SEQUENCE_FINAL });
+        CScript scriptSig;
+        scriptSig << OP_0;
+        mtx.vin.push_back(CTxIn{ outpoint, scriptSig, CTxIn::SEQUENCE_FINAL });
         nTotalAmount += coin.out.nValue;
     }
 
@@ -1188,10 +1190,9 @@ std::tuple<uint256, CAmount> create_and_broadcast_burn_tx(CCoinsViewCache const&
     auto ptx = std::make_shared<CTransaction>(tx);
     auto txError = BroadcastTransaction(ptx, strErrorReason, nMaxFee, true, false);
     if (txError != TransactionError::OK) {
-        std::stringstream strs;
         std::string strBroadcastError = TransactionErrorString(txError);
-        strs << "err: " << strBroadcastError << ", reason: " << (strErrorReason.empty() ? "no reason" : strErrorReason) << ", txid: " << tx.GetHash().GetHex();
-        throw std::runtime_error(strs.str());
+        LogPrintf("%s: cannot broadcast tx: %s, tx err: %s, because of %s\n", __func__, tx.GetHash().GetHex(), strBroadcastError, strErrorReason);
+        return std::make_tuple(ptx->GetHash(), 0);
     }
     return std::make_tuple(ptx->GetHash(), value);
 }
@@ -1205,8 +1206,8 @@ UniValue burntxout(JSONRPCRequest const& request)
 {
     RPCHelpMan("burntxout", "Burn a special txout without making signature",
         {
-            RPCArg("txid", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id of the tx owns the out"),
-            RPCArg("n", RPCArg::Type::NUM, RPCArg::Optional::NO,"The number of the txout from the transaction"),
+            RPCArg("txid or json filepath", RPCArg::Type::STR_HEX, RPCArg::Optional::NO, "The transaction id of the tx owns the out"),
+            RPCArg("txout-n or the number of inputs for burning tx", RPCArg::Type::NUM, RPCArg::Optional::NO,"The number of the txout from the transaction"),
         },
         RPCResult("txid"), RPCExamples("depinc-cli burntxout xxxxx 0")).Check(request);
 
@@ -1234,14 +1235,17 @@ UniValue burntxout(JSONRPCRequest const& request)
         }
         std::string strContent;
         std::copy(std::istream_iterator<char>(inf), std::istream_iterator<char>(), std::back_inserter(strContent));
-        UniValue valTxOutsFromFile;
-        valTxOutsFromFile.read(strContent);
+        UniValue valContent;
+        valContent.read(strContent);
+        if (!valContent.exists("coins")) {
+            throw std::runtime_error("wrong json file, field `coins` doesn't exist");
+        }
         std::vector<WrongTxOut> vWrongTxOuts;
         std::map<uint256, CAmount> mSentTxWithAmount;
         std::vector<COutPoint> outpoints;
         // parsed txouts, now read each of the txouts and put them to transaction
         uint32_t nTotalTxOuts { 0 };
-        for (auto const& valTxOutFromFile : valTxOutsFromFile.getValues()) {
+        for (auto const& valTxOutFromFile : valContent["coins"].getValues()) {
             ++nTotalTxOuts;
             if (!valTxOutFromFile.exists("txid")) {
                 vWrongTxOuts.emplace_back(WrongTxOut{valTxOutFromFile, "json string is missing `txid`"});
