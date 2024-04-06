@@ -270,7 +270,7 @@ static UniValue gettxouts(JSONRPCRequest const& request) {
         "Get related txouts from the provided address",
         {
             {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The retrieved txouts are related to this address"},
-            {"all", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "Show all coins even those disabled"},
+            {"expired", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "Show the coins those are disabled (default=no), otherwise all unspent coins will be shown"},
         },
         RPCResult("\"txouts\" in json format"),
         RPCExamples("cli gettxouts [address]")
@@ -280,13 +280,13 @@ static UniValue gettxouts(JSONRPCRequest const& request) {
 
     std::string address = request.params[0].get_str();
 
-    bool all{false};
+    bool expired_only{false};
     if (request.params.size() == 2) {
         int32_t val;
         if (!ParseInt32(request.params[1].get_str(), &val)) {
             throw std::runtime_error("cannot parse bool for 2nd param");
         }
-        all = val != 0;
+        expired_only = val != 0;
     }
     CTxDestination dest = DecodeDestination(address);
     CAccountID accountID = ExtractAccountID(dest);
@@ -304,12 +304,11 @@ static UniValue gettxouts(JSONRPCRequest const& request) {
         if (!view.GetCoin(txout, coin) || coin.IsSpent()) {
             continue;
         }
-        if (!all && coin.IsSpent()) {
-            continue;
-        }
         if (coin.out.nValue > 0) {
-            if (!all && coin.nHeight < params.BHDIP009Height) {
-                // skip the disabled coins
+            if (expired_only) {
+                if (coin.nHeight < params.BHDIP009Height) {
+                    coins.push_back(CoinToUniValue(txout, coin));
+                }
                 continue;
             }
             coins.push_back(CoinToUniValue(txout, coin));
