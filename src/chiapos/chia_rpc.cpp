@@ -1524,6 +1524,60 @@ static UniValue queryhalvings(JSONRPCRequest const& request)
     return result;
 }
 
+static UniValue queryBlockSummary(JSONRPCRequest const& request)
+{
+    RPCHelpMan("queryblocksummary", "Query farmers from last N blocks",
+        {
+            RPCArg("numblocks", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The number of blocks will be counted"),
+        },
+        RPCResult("blocks"), RPCExamples("depinc-cli testtargetspacing 180 60 1000 1000 0")).Check(request);
+
+    LOCK(cs_main);
+    auto pindex = ::ChainActive().Tip();
+    int n {480};
+    if (request.params.size() == 1) {
+        if (!ParseInt32(request.params[0].get_str(), &n)) {
+            throw std::runtime_error("cannot parse number from the first argument");
+        }
+    }
+
+    auto const& params = ::Params().GetConsensus();
+
+    std::map<std::string, int> summary;
+    while (n > 0) {
+        auto const& farmer_pk_data = pindex->GetBlockHeader().chiaposFields.posProof.vchFarmerPk;
+        CBlock block;
+        if (!ReadBlockFromDisk(block, pindex, params)) {
+            throw std::runtime_error(tinyformat::format("cannot read block from disk, block=%s", pindex->GetBlockHash().GetHex()));
+        }
+        for (auto const& tx : block.vtx) {
+            if (tx->IsCoinBase()) {
+                auto account_id = ExtractAccountID(tx->vout[0].scriptPubKey);
+                CTxDestination dest((ScriptHash)account_id);
+                std::string address = EncodeDestination(dest);
+                auto it = summary.find(address);
+                int count {0};
+                if (it != std::cend(summary)) {
+                    count = it->second;
+                }
+                summary[address] = count + 1;
+            }
+        }
+        --n;
+        if (pindex->pprev == nullptr) {
+            break;
+        }
+        pindex = pindex->pprev;
+    }
+    UniValue res(UniValue::VARR);
+    for (auto entry : summary) {
+        UniValue entry_val(UniValue::VOBJ);
+        entry_val.pushKV(entry.first, entry.second);
+        res.push_back(std::move(entry_val));
+    }
+    return res;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1543,6 +1597,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "burntxout", &burntxout, {"txid","n"} },
         {"chia", "testtargetspacing", &testtargetspacing, {"numblocks"} },
         {"chia", "queryhalvings", &queryhalvings, {}},
+        {"chia", "queryblocksummary", &queryBlockSummary, {"numblocks"}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
