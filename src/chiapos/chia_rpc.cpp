@@ -1524,6 +1524,12 @@ static UniValue queryhalvings(JSONRPCRequest const& request)
     return result;
 }
 
+struct RankInfo {
+    int count;
+    uint64_t average_difficulty;
+    CAmount total_reward;
+};
+
 static UniValue queryBlockSummary(JSONRPCRequest const& request)
 {
     RPCHelpMan("queryblocksummary", "Query farmers from last N blocks",
@@ -1543,7 +1549,7 @@ static UniValue queryBlockSummary(JSONRPCRequest const& request)
 
     auto const& params = ::Params().GetConsensus();
 
-    std::map<std::string, int> summary;
+    std::map<std::string, RankInfo> summary;
     while (n > 0) {
         auto const& farmer_pk_data = pindex->GetBlockHeader().chiaposFields.posProof.vchFarmerPk;
         CBlock block;
@@ -1556,11 +1562,17 @@ static UniValue queryBlockSummary(JSONRPCRequest const& request)
                 CTxDestination dest((ScriptHash)account_id);
                 std::string address = EncodeDestination(dest);
                 auto it = summary.find(address);
-                int count {0};
+                RankInfo rank_info;
+                rank_info.count = 0;
+                rank_info.average_difficulty = 0;
+                rank_info.total_reward = 0;
                 if (it != std::cend(summary)) {
-                    count = it->second;
+                    rank_info = it->second;
                 }
-                summary[address] = count + 1;
+                ++rank_info.count;
+                rank_info.average_difficulty += pindex->chiaposFields.nDifficulty;
+                rank_info.total_reward += tx->vout[0].nValue;
+                summary[address] = rank_info;
             }
         }
         --n;
@@ -1572,7 +1584,11 @@ static UniValue queryBlockSummary(JSONRPCRequest const& request)
     UniValue res(UniValue::VARR);
     for (auto entry : summary) {
         UniValue entry_val(UniValue::VOBJ);
-        entry_val.pushKV(entry.first, entry.second);
+        entry_val.pushKV("address", entry.first);
+        entry_val.pushKV("count", entry.second.count);
+        entry_val.pushKV("average_difficulty", entry.second.average_difficulty / entry.second.count);
+        entry_val.pushKV("total_reward", entry.second.total_reward);
+        entry_val.pushKV("total_reward_human", FormatMoney(entry.second.total_reward));
         res.push_back(std::move(entry_val));
     }
     return res;
