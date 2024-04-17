@@ -1594,6 +1594,12 @@ static UniValue queryBlockSummary(JSONRPCRequest const& request)
     return res;
 }
 
+struct AccumulateSummary {
+    CAmount total;
+    int from_height;
+    int to_height;
+};
+
 static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
 {
     RPCHelpMan("queryaccumulateamounts", "Query accumulate reward records with owners",
@@ -1620,13 +1626,12 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
         }
     }
 
-    UniValue res(UniValue::VARR);
+    AccumulateSummary summary { 0, ::ChainActive().Height(), back_to_height };
+
+    UniValue accumulate_amounts_obj(UniValue::VARR);
     LOCK(cs_main);
     for (auto pindex = ::ChainActive().Tip(); pindex != nullptr && pindex->nHeight > back_to_height; pindex = pindex->pprev) {
         if ((pindex->nStatus & BLOCK_UNCONDITIONAL) == 0) {
-            // full rewards
-            CAmount accumulate = GetBlockAccumulateSubsidy(pindex->pprev, params);
-
             // read the block
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, params)) {
@@ -1636,6 +1641,7 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
             // find the miner
             assert(block.vtx[0]->IsCoinBase());
             auto account_id = ExtractAccountID(block.vtx[0]->vout[0].scriptPubKey);
+
             CTxDestination dest((ScriptHash)account_id);
             auto address = EncodeDestination(dest);
 
@@ -1643,6 +1649,10 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
             if (!limit_to_address.empty() && address != limit_to_address) {
                 continue;
             }
+
+            // accumulate value with the block rewards
+            CAmount accumulate = block.vtx[0]->vout[0].nValue;
+            summary.total += accumulate;
 
             // ready to collect information and put to json object
             UniValue entry(UniValue::VOBJ);
@@ -1653,9 +1663,20 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
             entry.pushKV("difficulty", chiapos::FormatNumberStr(std::to_string(pindex->chiaposFields.nDifficulty)));
             auto netspace = chiapos::CalculateNetworkSpace(pindex->chiaposFields.nDifficulty, pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
             entry.pushKV("netspace", chiapos::FormatNumberStr(std::to_string(netspace.GetLow64())));
-            res.push_back(std::move(entry));
+            accumulate_amounts_obj.push_back(std::move(entry));
         }
     }
+
+    UniValue res(UniValue::VOBJ);
+
+    UniValue summary_obj(UniValue::VOBJ);
+    summary_obj.pushKV("total", FormatMoney(summary.total));
+    summary_obj.pushKV("from_height", summary.from_height);
+    summary_obj.pushKV("to_height", summary.to_height);
+    res.pushKV("summary", summary_obj);
+
+    res.pushKV("amounts", accumulate_amounts_obj);
+
     return res;
 }
 
