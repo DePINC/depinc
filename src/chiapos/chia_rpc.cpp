@@ -1594,6 +1594,71 @@ static UniValue queryBlockSummary(JSONRPCRequest const& request)
     return res;
 }
 
+static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
+{
+    RPCHelpMan("queryaccumulateamounts", "Query accumulate reward records with owners",
+        {
+            RPCArg("address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "Only find the blocks belong to this address (default=any address)"),
+            RPCArg("back_to_height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The summary contains blocks since the height (default = BHDIP009Height)"),
+        },
+        RPCResult("entries"),
+        RPCExamples("depinc-cli queryaccumulateamounts")).Check(request);
+
+    auto const& params = Params().GetConsensus();
+
+    // address
+    std::string limit_to_address;
+    if (request.params.size() >= 1) {
+        limit_to_address = request.params[0].get_str();
+    }
+
+    // back_to_height
+    int back_to_height = params.BHDIP009Height;
+    if (request.params.size() == 2) {
+        if (!ParseInt32(request.params[1].get_str(), &back_to_height)) {
+            throw std::runtime_error("failed to parse param `back_to_height`");
+        }
+    }
+
+    UniValue res(UniValue::VARR);
+    LOCK(cs_main);
+    for (auto pindex = ::ChainActive().Tip(); pindex != nullptr && pindex->nHeight > back_to_height; pindex = pindex->pprev) {
+        if ((pindex->nStatus & BLOCK_UNCONDITIONAL) == 0) {
+            // full rewards
+            CAmount accumulate = GetBlockAccumulateSubsidy(pindex->pprev, params);
+
+            // read the block
+            CBlock block;
+            if (!ReadBlockFromDisk(block, pindex, params)) {
+                throw std::runtime_error(tinyformat::format("failed to read block hash=%s from disk", pindex->GetBlockHash().GetHex()));
+            }
+
+            // find the miner
+            assert(block.vtx[0]->IsCoinBase());
+            auto account_id = ExtractAccountID(block.vtx[0]->vout[0].scriptPubKey);
+            CTxDestination dest((ScriptHash)account_id);
+            auto address = EncodeDestination(dest);
+
+            // skip the entry we don't care
+            if (!limit_to_address.empty() && address != limit_to_address) {
+                continue;
+            }
+
+            // ready to collect information and put to json object
+            UniValue entry(UniValue::VOBJ);
+            entry.pushKV("address", address);
+            entry.pushKV("accumulate", accumulate);
+            entry.pushKV("accumulate_human", FormatMoney(accumulate));
+            entry.pushKV("reward_height", pindex->nHeight);
+            entry.pushKV("difficulty", chiapos::FormatNumberStr(std::to_string(pindex->chiaposFields.nDifficulty)));
+            auto netspace = chiapos::CalculateNetworkSpace(pindex->chiaposFields.nDifficulty, pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
+            entry.pushKV("netspace", chiapos::FormatNumberStr(std::to_string(netspace.GetLow64())));
+            res.push_back(std::move(entry));
+        }
+    }
+    return res;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1614,6 +1679,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "testtargetspacing", &testtargetspacing, {"numblocks"} },
         {"chia", "queryhalvings", &queryhalvings, {}},
         {"chia", "queryblocksummary", &queryBlockSummary, {"numblocks"}},
+        {"chia", "queryaccumulateamounts", &queryAccumulateAmounts, {"address", "back_to_height"}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {

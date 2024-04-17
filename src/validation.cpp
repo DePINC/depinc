@@ -1254,23 +1254,28 @@ bool ReadRawBlockFromDisk(std::vector<uint8_t>& block, const CBlockIndex* pindex
     return ReadRawBlockFromDisk(block, block_pos, message_start);
 }
 
+void GetBlockAccumulateByBlockIndex(CBlockIndex const* pindex, Consensus::Params const& consensusParams, CAmount& accumulate)
+{
+    if (pindex->nHeight < consensusParams.BHDIP009Height) {
+        int nPeriod = (pindex->nHeight - consensusParams.BHDIP008Height) / consensusParams.BHDIP008FundRoyaltyDecreasePeriodForLowMortgage;
+        int fundRatio = consensusParams.BHDIP008FundRoyaltyForLowMortgage - consensusParams.BHDIP008FundRoyaltyDecreaseForLowMortgage * nPeriod;
+        if (fundRatio < consensusParams.BHDIP001FundRoyaltyForFullMortgage)
+            fundRatio = consensusParams.BHDIP001FundRoyaltyForFullMortgage;
+        assert(fundRatio <= consensusParams.BHDIP001FundRoyaltyForLowMortgage);
+        accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
+    } else if (pindex->nHeight < consensusParams.BHDIP010Height) {
+        accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage)) / 1000;
+    } else {
+        accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage)) / 1000;
+    }
+}
+
 CAmount GetBlockAccumulateSubsidy(const CBlockIndex* pindexPrev, const Consensus::Params& consensusParams)
 {
     AssertLockHeld(cs_main);
     CAmount accumulate = 0;
     for (const CBlockIndex* pindex = pindexPrev; (pindex != nullptr) && (pindex->nStatus & BLOCK_UNCONDITIONAL) && (pindex->nHeight >= consensusParams.BHDIP008Height); pindex = pindex->pprev) {
-        if (pindex->nHeight < consensusParams.BHDIP009Height) {
-            int nPeriod = (pindex->nHeight - consensusParams.BHDIP008Height) / consensusParams.BHDIP008FundRoyaltyDecreasePeriodForLowMortgage;
-            int fundRatio = consensusParams.BHDIP008FundRoyaltyForLowMortgage - consensusParams.BHDIP008FundRoyaltyDecreaseForLowMortgage * nPeriod;
-            if (fundRatio < consensusParams.BHDIP001FundRoyaltyForFullMortgage)
-                fundRatio = consensusParams.BHDIP001FundRoyaltyForFullMortgage;
-            assert(fundRatio <= consensusParams.BHDIP001FundRoyaltyForLowMortgage);
-            accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
-        } else if (pindex->nHeight < consensusParams.BHDIP010Height) {
-            accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage)) / 1000;
-        } else {
-            accumulate += (GetBlockSubsidy(pindex->nHeight, consensusParams) * (1000 - consensusParams.BHDIP010OverrideFundRoyaltyForLowMortgage)) / 1000;
-        }
+        GetBlockAccumulateByBlockIndex(pindex, consensusParams, accumulate);
     }
     return accumulate;
 }
