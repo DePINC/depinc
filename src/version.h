@@ -9,7 +9,7 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 80029;
+static const int PROTOCOL_VERSION = 80030;
 
 static const int VDF_P2P_VERSION= 80027;
 
