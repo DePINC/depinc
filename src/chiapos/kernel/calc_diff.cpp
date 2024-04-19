@@ -24,14 +24,20 @@ constexpr int QUALITY_BASE_BITS = sizeof(QualityBaseType) * 8;
 
 arith_uint256 Pow2(int bits) { return arith_uint256(1) << bits; }
 
-uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, uint64_t curr_block_duration, uint64_t target_duration,
+uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, int64_t curr_block_duration, uint64_t target_duration,
                           int duration_fix, double max_factor, uint64_t network_min_difficulty,
                           double target_mul_factor) {
     assert(target_duration > 0);
-    if (curr_block_duration + duration_fix <= 0) {
-        curr_block_duration = -duration_fix + 1;
+    int64_t total_fix = curr_block_duration + duration_fix;
+    if (total_fix <= 0) {
+        total_fix = 1;
     }
-    uint64_t n = std::max<uint64_t>(prev_block_difficulty / (curr_block_duration + duration_fix), 1);
+
+    if (total_fix == 0) {
+        throw std::runtime_error("duration and fix is zero");
+    }
+
+    uint64_t n = std::max<uint64_t>(prev_block_difficulty / total_fix, 1);
     uint64_t new_difficulty = std::max(n * static_cast<uint64_t>(static_cast<double>(target_duration) * target_mul_factor + duration_fix),
                                        network_min_difficulty);
     if (new_difficulty > prev_block_difficulty) {
@@ -64,18 +70,16 @@ uint256 GenerateMixedQualityString(CPosProof const& posProof) {
                                            posProof.challenge, posProof.vchProof);
 }
 
-double CalculateQuality(uint256 const& mixed_quality_string) {
-    auto l = lower_bits(mixed_quality_string, QUALITY_BASE_BITS);
-    auto h = Pow2(QUALITY_BASE_BITS);
-    return static_cast<double>(l.GetLow64()) / static_cast<double>(h.GetLow64());
-}
-
 uint64_t CalculateIterationsQuality(uint256 const& mixed_quality_string, uint64_t difficulty, int bits_filter,
                                     int difficulty_constant_factor_bits, uint8_t k, uint64_t base_iters,
                                     double* quality_in_plot, arith_uint256* quality) {
     assert(difficulty > 0);
-    auto l = lower_bits(mixed_quality_string, QUALITY_BASE_BITS);
     auto h = Pow2(QUALITY_BASE_BITS);
+    auto l = lower_bits(mixed_quality_string, QUALITY_BASE_BITS);
+    if (l == 0) {
+        // impossible lower value from quality string, and it will cause `division by zero`
+        l = h;
+    }
     auto size = expected_plot_size<arith_uint256>(k);
     auto iters = difficulty * Pow2(difficulty_constant_factor_bits) * l / Pow2(bits_filter) / (size * h) + base_iters;
     if (quality_in_plot) {

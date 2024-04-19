@@ -34,15 +34,13 @@ Int expected_plot_size(uint8_t k) {
     return a * b;
 }
 
-uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, uint64_t curr_block_duration, uint64_t target_duration,
+uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, int64_t curr_block_duration, uint64_t target_duration,
                           int duration_fix, double max_factor, uint64_t network_min_difficulty,
                           double target_mul_factor);
 
 int QueryDurationFix(int curr_height, std::map<int, int> const& fixes);
 
 uint256 GenerateMixedQualityString(CPosProof const& posProof);
-
-double CalculateQuality(uint256 const& mixed_quality_string);
 
 uint64_t CalculateIterationsQuality(uint256 const& mixed_quality_string, uint64_t difficulty, int bits_filter,
                                     int difficulty_constant_factor_bits, uint8_t k, uint64_t base_iters,
