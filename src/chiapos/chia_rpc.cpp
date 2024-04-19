@@ -1613,9 +1613,14 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
     auto const& params = Params().GetConsensus();
 
     // address
+    bool retrieve_last_one { false };
     std::string limit_to_address;
     if (request.params.size() >= 1) {
         limit_to_address = request.params[0].get_str();
+        if (limit_to_address == "1") {
+            limit_to_address.clear();
+            retrieve_last_one = true;
+        }
     }
 
     // back_to_height
@@ -1661,9 +1666,14 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
             entry.pushKV("accumulate_human", FormatMoney(accumulate));
             entry.pushKV("reward_height", pindex->nHeight);
             entry.pushKV("difficulty", chiapos::FormatNumberStr(std::to_string(pindex->chiaposFields.nDifficulty)));
+            entry.pushKV("block_time", FormatISO8601DateTime(pindex->GetBlockTime()));
             auto netspace = chiapos::CalculateNetworkSpace(pindex->chiaposFields.nDifficulty, pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
             entry.pushKV("netspace", chiapos::FormatNumberStr(std::to_string(netspace.GetLow64())));
             accumulate_amounts_obj.push_back(std::move(entry));
+
+            if (retrieve_last_one) {
+                break;
+            }
         }
     }
 
@@ -1674,7 +1684,6 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
     summary_obj.pushKV("from_height", summary.from_height);
     summary_obj.pushKV("to_height", summary.to_height);
     res.pushKV("summary", summary_obj);
-
     res.pushKV("amounts", accumulate_amounts_obj);
 
     return res;
