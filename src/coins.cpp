@@ -34,6 +34,7 @@ CBindPlotterCoinsMap CCoinsView::GetAccountBindPlotterEntries(const CAccountID &
 CBindPlotterCoinsMap CCoinsView::GetBindPlotterEntries(const CPlotterBindData &bindData) const { return {}; }
 COutPointVec CCoinsView::GetAccountCoins(const CAccountID &accountID) const { return {}; }
 COutPointVec CCoinsView::GetAllCoins() const { return {}; }
+CPointCoins CCoinsView::GetAllPointCoins() const { return {}; }
 
 bool CCoinsView::HaveCoin(const COutPoint &outpoint) const {
     Coin coin;

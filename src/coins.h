@@ -23,6 +23,8 @@
 #include <set>
 #include <unordered_map>
 
+#include <amount.h>
+
 #include <chiapos/plotter_id.h>
 
 // Max height of coin
@@ -241,6 +243,15 @@ typedef std::map<COutPoint, CBindPlotterCoinInfo> CBindPlotterCoinsMap;
 typedef std::pair<CBindPlotterCoinsMap::key_type, CBindPlotterCoinsMap::mapped_type> CBindPlotterCoinPair;
 typedef std::vector<COutPoint> COutPointVec;
 
+struct CPointCoin {
+    DatacarrierType type { DATACARRIER_TYPE_POINT };
+    COutPoint outpoint;
+    CAccountID from;
+    CAccountID to;
+    CAmount total {0};
+};
+typedef std::vector<CPointCoin> CPointCoins;
+
 /** Bind plotter information */
 class CBindPlotterInfo
 {
@@ -340,6 +351,9 @@ public:
 
     //! Get all coins
     virtual COutPointVec GetAllCoins() const;
+
+    //! Get all point coins (including retarget coins)
+    virtual CPointCoins GetAllPointCoins() const;
 };
 
 

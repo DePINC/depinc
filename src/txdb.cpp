@@ -26,6 +26,7 @@
 #include <boost/thread.hpp>
 #include "coins.h"
 #include "logging.h"
+#include "primitives/transaction.h"
 #include "script/standard.h"
 #include "tinyformat.h"
 
@@ -837,6 +838,104 @@ COutPointVec CCoinsViewDB::GetAllCoins() const {
     }
 
     return result;
+}
+
+void CCoinsViewDB::GetPointCoins(char key, DatacarrierType type, CPointCoins& out_coins, CDBIterator* pcursor) const {
+    COutPoint outpoint;
+    CAccountID accountID;
+
+    PointEntry entry(&outpoint, &accountID, key);
+    pcursor->Seek(entry);
+    while (pcursor->Valid()) {
+        if (!pcursor->GetKey(entry) || entry.key != key) {
+            break;
+        }
+        CAccountID receiverID;
+        pcursor->GetValue(receiverID);
+
+        Coin coin;
+        if (!GetCoin(outpoint, coin)) {
+            // cannot find the coin
+            throw std::runtime_error("cannot find the point-coin");
+        }
+
+        assert(coin.GetExtraDataType() == type);
+
+        CPointCoin pointCoin;
+        pointCoin.type = type;
+        pointCoin.outpoint = outpoint;
+        pointCoin.from = accountID;
+        pointCoin.to = receiverID;
+        pointCoin.total = coin.out.nValue;
+        out_coins.push_back(std::move(pointCoin));
+
+        // next
+        pcursor->Next();
+    }
+}
+
+void CCoinsViewDB::GetRetargetPointCoins(CPointCoins& out_coins, CDBIterator* pcursor) const {
+    COutPoint outpoint;
+    CAccountID accountID;
+
+    PointRetargetEntry entry(&outpoint, &accountID);
+    pcursor->Seek(entry);
+    while (pcursor->Valid()) {
+        if (!pcursor->GetKey(entry) || entry.key != DB_COIN_POINT_CHIA_POINT_RETARGET) {
+            break;
+        }
+        CAccountID receiverID;
+        pcursor->GetValue(receiverID);
+
+        Coin coin;
+        if (!GetCoin(outpoint, coin)) {
+            // cannot find the coin
+            throw std::runtime_error("cannot find the point-coin");
+        }
+
+        assert(coin.GetExtraDataType() == DATACARRIER_TYPE_CHIA_POINT_RETARGET);
+
+        CPointCoin pointCoin;
+        pointCoin.type = DATACARRIER_TYPE_CHIA_POINT_RETARGET;
+        pointCoin.outpoint = outpoint;
+        pointCoin.from = accountID;
+        pointCoin.to = receiverID;
+        pointCoin.total = coin.out.nValue;
+        out_coins.push_back(std::move(pointCoin));
+
+        pcursor->Next();
+    }
+}
+
+CPointCoins CCoinsViewDB::GetAllPointCoins() const {
+    CPointCoins coins;
+
+    {
+        std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+        GetPointCoins(DB_COIN_POINT_CHIA_SEND, DATACARRIER_TYPE_CHIA_POINT, coins, pcursor.get());
+    }
+
+    {
+        std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+        GetPointCoins(DB_COIN_POINT_CHIA_SEND_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_1, coins, pcursor.get());
+    }
+
+    {
+        std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+        GetPointCoins(DB_COIN_POINT_CHIA_SEND_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_2, coins, pcursor.get());
+    }
+
+    {
+        std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+        GetPointCoins(DB_COIN_POINT_CHIA_SEND_TERM_3, DATACARRIER_TYPE_CHIA_POINT_TERM_3, coins, pcursor.get());
+    }
+
+    {
+        std::unique_ptr<CDBIterator> pcursor(db.NewIterator());
+        GetRetargetPointCoins(coins, pcursor.get());
+    }
+
+    return coins;
 }
 
 CAmount CCoinsViewDB::GetBalanceBind(CPlotterBindData::Type type, CAccountID const& accountID, CCoinsMap const& mapChildCoins) const {

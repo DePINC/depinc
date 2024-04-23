@@ -14,6 +14,8 @@
 #include <cstdint>
 #include <stdexcept>
 
+#include <amount.h>
+
 #include "chiapos/kernel/bls_key.h"
 #include "chiapos/kernel/calc_diff.h"
 #include "chiapos/kernel/pos.h"
@@ -1689,6 +1691,52 @@ static UniValue queryAccumulateAmounts(JSONRPCRequest const& request)
     return res;
 }
 
+static UniValue queryAllPointCoins(JSONRPCRequest const& request)
+{
+    LOCK(cs_main);
+
+    auto const& view = ::ChainstateActive().CoinsDB();
+    auto coins = view.GetAllPointCoins();
+
+    UniValue points_val(UniValue::VARR);
+
+    CAmount total {0};
+    std::map<CAccountID, CAmount> amount_by_account_id;
+
+    for (auto const& coin : coins) {
+        total += coin.total;
+        CTxDestination fromDest((ScriptHash)coin.from);
+        CTxDestination toDest((ScriptHash)coin.to);
+        amount_by_account_id[coin.to] += coin.total;
+        UniValue val(UniValue::VOBJ);
+        val.pushKV("from", EncodeDestination(fromDest));
+        val.pushKV("to", EncodeDestination(toDest));
+        val.pushKV("type", DatacarrierTypeToString(coin.type));
+        val.pushKV("amount", FormatMoney(coin.total));
+        UniValue outpoint_val(UniValue::VOBJ);
+        outpoint_val.pushKV("hash", coin.outpoint.hash.GetHex());
+        outpoint_val.pushKV("n", static_cast<int>(coin.outpoint.n));
+        val.pushKV("outpoint", outpoint_val);
+        points_val.push_back(std::move(val));
+    }
+
+    UniValue accounts_val(UniValue::VARR);
+    for (auto const& aa : amount_by_account_id) {
+        CTxDestination dest((ScriptHash)aa.first);
+        UniValue aa_val(UniValue::VOBJ);
+        aa_val.pushKV("address", EncodeDestination(dest));
+        aa_val.pushKV("amount", FormatMoney(aa.second));
+        accounts_val.push_back(aa_val);
+    }
+
+    UniValue res_val(UniValue::VOBJ);
+    res_val.pushKV("total", FormatMoney(total));
+    res_val.pushKV("accounts", accounts_val);
+    res_val.pushKV("points", points_val);
+
+    return res_val;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1710,6 +1758,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryhalvings", &queryhalvings, {}},
         {"chia", "queryblocksummary", &queryBlockSummary, {"numblocks"}},
         {"chia", "queryaccumulateamounts", &queryAccumulateAmounts, {"address", "back_to_height"}},
+        {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {

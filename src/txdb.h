@@ -88,6 +88,12 @@ public:
 
     COutPointVec GetAllCoins() const override;
 
+    void GetPointCoins(char key, DatacarrierType type, CPointCoins& out_coins, CDBIterator* pcursor) const;
+
+    void GetRetargetPointCoins(CPointCoins& out_coins, CDBIterator* pcursor) const;
+
+    CPointCoins GetAllPointCoins() const override;
+
 private:
     CAmount GetBalanceBind(CPlotterBindData::Type type, CAccountID const& accountID, CCoinsMap const& mapChildCoins) const;
 
