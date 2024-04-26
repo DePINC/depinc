@@ -33,13 +33,11 @@ uint64_t AdjustDifficulty(uint64_t prev_block_difficulty, int64_t curr_block_dur
         total_fix = 1;
     }
 
-    if (total_fix == 0) {
-        throw std::runtime_error("duration and fix is zero");
-    }
-
     uint64_t n = std::max<uint64_t>(prev_block_difficulty / total_fix, 1);
-    uint64_t new_difficulty = std::max(n * static_cast<uint64_t>(static_cast<double>(target_duration) * target_mul_factor + duration_fix),
-                                       network_min_difficulty);
+    uint64_t new_difficulty =
+            std::max(n * static_cast<uint64_t>(static_cast<double>(target_duration) * target_mul_factor + duration_fix),
+                     network_min_difficulty);
+    assert(max_factor != 0);
     if (new_difficulty > prev_block_difficulty) {
         auto max_difficulty = static_cast<uint64_t>(static_cast<double>(prev_block_difficulty) * max_factor);
         new_difficulty = std::min(new_difficulty, max_difficulty);
@@ -81,6 +79,10 @@ uint64_t CalculateIterationsQuality(uint256 const& mixed_quality_string, uint64_
         l = h;
     }
     auto size = expected_plot_size<arith_uint256>(k);
+    if (size <= 0) {
+        // impossible value of the plot size
+        return std::numeric_limits<uint64_t>::max();
+    }
     auto iters = difficulty * Pow2(difficulty_constant_factor_bits) * l / Pow2(bits_filter) / (size * h) + base_iters;
     if (quality_in_plot) {
         *quality_in_plot = static_cast<double>(l.GetLow64()) / static_cast<double>(h.GetLow64());
@@ -95,6 +97,9 @@ uint64_t CalculateIterationsQuality(uint256 const& mixed_quality_string, uint64_
 }
 
 arith_uint256 CalculateNetworkSpace(uint64_t difficulty, uint64_t iters, int difficulty_constant_factor_bits) {
+    if (iters == 0) {
+        return 0;
+    }
     arith_uint256 additional_difficulty_constant = Pow2(difficulty_constant_factor_bits);
     return arith_uint256(difficulty) / iters * additional_difficulty_constant * UI_ACTUAL_SPACE_CONSTANT_FACTOR /
            UI_ACTUAL_SPACE_CONSTANT_FACTOR_BASE;
