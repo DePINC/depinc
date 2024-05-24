@@ -1904,7 +1904,7 @@ static int ListPoint(CCoinsViewCursorRef pcursor, UniValue& outVal, CAmount& nOu
     return nCount;
 }
 
-void add_listpoint_entry_to_univalue(UniValue& valResult, CCoinsViewCursorRef cursor, std::string const& strTitle)
+CAmount add_listpoint_entry_to_univalue(UniValue& valResult, CCoinsViewCursorRef cursor, std::string const& strTitle)
 {
     UniValue valPointEntries(UniValue::VARR);
     CAmount nTotalAmount { 0 };
@@ -1914,6 +1914,7 @@ void add_listpoint_entry_to_univalue(UniValue& valResult, CCoinsViewCursorRef cu
     valEntryResult.pushKV(strTitle + "Count", nCount);
     valEntryResult.pushKV(strTitle, valPointEntries);
     valResult.pushKV(strTitle, valEntryResult);
+    return nTotalAmount;
 }
 
 static UniValue listpledgeloanofaddress(const JSONRPCRequest& request)
@@ -1958,12 +1959,15 @@ static UniValue listpledgeloanofaddress(const JSONRPCRequest& request)
 
     UniValue res(UniValue::VOBJ);
 
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::Burst), "Burst");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::Chia), "Chia");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT1), "ChiaT1");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT2), "ChiaT2");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT3), "ChiaT3");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaRT), "ChiaRT");
+    CAmount total = add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::Burst), "Burst");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::Chia), "Chia");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT1), "ChiaT1");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT2), "ChiaT2");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaT3), "ChiaT3");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointSendCursor(accountID, PointType::ChiaRT), "ChiaRT");
+
+    res.pushKV("total", total);
+    res.pushKV("total_human", FormatMoney(total));
 
     return res;
 }
@@ -2010,12 +2014,15 @@ static UniValue listpledgedebitofaddress(const JSONRPCRequest& request)
 
     UniValue res(UniValue::VOBJ);
 
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::Burst), "Burst");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::Chia), "Chia");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT1), "ChiaT1");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT2), "ChiaT2");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT3), "ChiaT3");
-    add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaRT), "ChiaRT");
+    CAmount total = add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::Burst), "Burst");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::Chia), "Chia");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT1), "ChiaT1");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT2), "ChiaT2");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaT3), "ChiaT3");
+    total += add_listpoint_entry_to_univalue(res, ::ChainstateActive().CoinsDB().PointReceiveCursor(accountID, PointType::ChiaRT), "ChiaRT");
+
+    res.pushKV("total", total);
+    res.pushKV("total_human", FormatMoney(total));
 
     return res;
 }
