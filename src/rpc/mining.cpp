@@ -1879,12 +1879,16 @@ static int ListPoint(CCoinsViewCursorRef pcursor, UniValue& outVal, CAmount& nOu
         if (pcursor->GetKey(key) && pcursor->GetValue(coin)) {
             assert(key.n == 0);
             assert(!coin.IsSpent());
-            assert(coin.IsPoint());
+            assert(coin.IsChiaPointRelated());
 
             UniValue item(UniValue::VOBJ);
             item.pushKV("type", DatacarrierTypeToString(coin.GetExtraDataType()));
             item.pushKV("from", EncodeDestination(ExtractDestination(coin.out.scriptPubKey)));
-            item.pushKV("to", EncodeDestination(ScriptHash(PointPayload::As(coin.extraData)->GetReceiverID())));
+            if (coin.IsPointRetarget()) {
+                item.pushKV("to", EncodeDestination(ScriptHash(PointRetargetPayload::As(coin.extraData)->GetReceiverID())));
+            } else {
+                item.pushKV("to", EncodeDestination(ScriptHash(PointPayload::As(coin.extraData)->GetReceiverID())));
+            }
             item.pushKV("amount", ValueFromAmount(coin.out.nValue));
             item.pushKV("txid", key.hash.GetHex());
             item.pushKV("blockhash", ::ChainActive()[(int)coin.nHeight]->GetBlockHash().GetHex());
