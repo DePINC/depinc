@@ -28,7 +28,7 @@ PointItemModel::PointItemModel(CWallet* pwallet, int chainHeight, Consensus::Par
     reload();
 }
 
-int PointItemModel::columnCount(QModelIndex const& parent) const { return 6; }
+int PointItemModel::columnCount(QModelIndex const& parent) const { return 7; }
 
 QVariant PointItemModel::data(QModelIndex const& index, int role) const {
     auto params = Params().GetConsensus();
@@ -60,6 +60,8 @@ QVariant PointItemModel::data(QModelIndex const& index, int role) const {
             case 4:
                 return PointTypeToTerm(pledge);
             case 5:
+                return pledge.fOwner ? tr("Yes") : "No";
+            case 6:
                 return QString::fromStdString(pledge.txid.GetHex());
         }
     }
@@ -88,6 +90,8 @@ QVariant PointItemModel::headerData(int section, Qt::Orientation orientation, in
             case 4:
                 return tr("Term");
             case 5:
+                return tr("Owner");
+            case 6:
                 return tr("TxID");
         }
     }
@@ -95,7 +99,7 @@ QVariant PointItemModel::headerData(int section, Qt::Orientation orientation, in
 }
 
 void PointItemModel::reload() {
-    auto pledges = RetrievePledgeMap(m_pwallet, false, ISMINE_ALL);
+    auto pledges = RetrievePledgeMap(m_pwallet, false, ISMINE_SPENDABLE);
     beginResetModel();
     m_pledges.clear();
     std::transform(std::begin(pledges), std::end(pledges), std::back_inserter(m_pledges),

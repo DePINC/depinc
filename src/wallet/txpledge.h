@@ -24,6 +24,7 @@ struct TxPledge {
     bool fChia;
     bool fRevoked{false};
     int nBlockHeight;
+    bool fOwner{false};
 };
 
 using TxPledgeMap = std::multimap<int64_t, TxPledge>;

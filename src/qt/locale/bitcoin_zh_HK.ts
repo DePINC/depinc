@@ -1,5 +1,20 @@
 <TS language="zh_HK" version="2.1">
 <context>
+    <name>Owner</name>
+    <message>
+        <source>Owner</source>
+        <translation>拥有者</translation>
+    </message>
+    <name>Yes</name>
+    <message>
+        <source>Yes</source>
+        <translation>是</translation>
+    </message>
+    <name>No</name>
+    <message>
+        <source>No</source>
+        <translation>否</translation>
+    </message>
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>

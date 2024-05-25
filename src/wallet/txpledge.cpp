@@ -1,6 +1,7 @@
 #include "txpledge.h"
 
 #include <wallet/wallet.h>
+#include "wallet/ismine.h"
 
 TxPledgeMap RetrievePledgeMap(CWallet* pwallet, bool fIncludeInvalid, isminefilter filter) {
     std::set<uint256> revokedPledgeTxs;
@@ -64,6 +65,7 @@ TxPledgeMap RetrievePledgeMap(CWallet* pwallet, bool fIncludeInvalid, isminefilt
             txPledgeRent.fValid = fValid;
             txPledgeRent.fFromWatchonly = (sendIsmine & ISMINE_WATCH_ONLY) != 0;
             txPledgeRent.fToWatchonly = (receiveIsmine & ISMINE_WATCH_ONLY) != 0;
+            txPledgeRent.fOwner = (sendIsmine & ISMINE_SPENDABLE) != 0;
             txPledgeRent.fChia = DatacarrierTypeIsChiaPoint(payload->type) ||
                                  payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET;
             txPledgeRent.nBlockHeight = locked_chain->getBlockHeight(wtx.GetBlockHash()).get_value_or(0);
