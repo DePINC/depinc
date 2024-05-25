@@ -12,19 +12,30 @@
 #include <util/moneystr.h>
 
 #include <cstdint>
+#include <iterator>
 #include <stdexcept>
+#include <utility>
+#include <variant>
 
 #include <amount.h>
 
+#include "arith_uint256.h"
+#include "chain.h"
 #include "chiapos/kernel/bls_key.h"
 #include "chiapos/kernel/calc_diff.h"
+#include "chiapos/kernel/chiapos_types.h"
 #include "chiapos/kernel/pos.h"
 #include "chiapos/kernel/utils.h"
 
+#include "chiapos/chia_helper.h"
+#include "chiapos/plotter_id.h"
+#include "coins.h"
 #include "consensus/params.h"
 
 #include <openssl/rand.h>
 
+#include "primitives/transaction.h"
+#include "uint256.h"
 #include "updatetip_log_helper.hpp"
 #include "logging.h"
 #include "post.h"
@@ -423,14 +434,10 @@ static UniValue queryNetspace(JSONRPCRequest const& request) {
     CBlockIndex* pindex = ::ChainActive().Tip();
 
     auto params = Params().GetConsensus();
-    CAmount nTotalSupplied = GetTotalSupplyBeforeBHDIP009(params) * (params.BHDIP009TotalAmountUpgradeMultiply - 1) +
-                             GetTotalSupplyBeforeHeight(pindex->nHeight, params);
+    CAmount nTotalSupplied = pledge::get_total_supplied(pindex->nHeight, params);
 
-    auto netspace_avg = poc::CalculateAverageNetworkSpace(pindex, params);
-
-    int nBitsOfFilter = pindex->nHeight >= params.BHDIP009PlotIdBitsOfFilterEnableOnHeight ? params.BHDIP009PlotIdBitsOfFilter : 0;
-    auto netspace = chiapos::CalculateNetworkSpace(GetDifficultyForNextIterations(pindex->pprev, params),
-                                                   pindex->chiaposFields.GetTotalIters(), params.BHDIP009DifficultyConstantFactorBits);
+    auto netspace_avg = pledge::get_avg_netspace(pindex, params);
+    auto netspace = pledge::get_netspace(pindex, params);
 
     UniValue res(UniValue::VOBJ);
     res.pushKV("supplied", nTotalSupplied);
@@ -1737,6 +1744,53 @@ static UniValue queryAllPointCoins(JSONRPCRequest const& request)
     return res_val;
 }
 
+static UniValue querypledgeamount(JSONRPCRequest const& request)
+{
+    RPCHelpMan("querypledgeamount", "Query pledge info for account",
+        {
+            RPCArg("address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "Only find the blocks belong to this address (default=any address)"),
+        },
+        RPCResult("json"),
+        RPCExamples("depinc-cli querypledgeamount")).Check(request);
+
+    std::string address = request.params[0].get_str();
+    auto const& params = Params().GetConsensus();
+
+    CTxDestination dest = DecodeDestination(address);
+    CAccountID accountID = ExtractAccountID(dest);
+
+    LOCK(cs_main);
+    CBlockIndex* pindex = ::ChainActive().Tip();
+    auto const& view = ::ChainstateActive().CoinsDB();
+    int nNumBlocks = static_cast<int>(pledge::get_blocks_mined_by_account(accountID, pindex, ::ChainstateActive().CoinsTip(), params).size());
+
+    CAmount nTotalSupplied = pledge::get_total_supplied(pindex->nHeight, params);
+    CAmount nPledgeRequiredAmount = nNumBlocks * nTotalSupplied / params.nCapacityEvalWindow;
+
+    auto points = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::Chia));
+    auto pointT1s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT1));
+    auto pointT2s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT2));
+    auto pointT3s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT3));
+    auto pointRTs = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaRT));
+
+    CAmount nPointsAmount = pledge::calculate_actual_amount(points, pindex->nHeight, params);
+    CAmount nPointsT1Amount = pledge::calculate_actual_amount(pointT1s, pindex->nHeight, params);
+    CAmount nPointsT2Amount = pledge::calculate_actual_amount(pointT2s, pindex->nHeight, params);
+    CAmount nPointsT3Amount = pledge::calculate_actual_amount(pointT3s, pindex->nHeight, params);
+    CAmount nPointsRTAmount = pledge::calculate_actual_amount(pointRTs, pindex->nHeight, params);
+
+    CAmount nTotalPledgeAmount = nPointsAmount + nPointsT1Amount + nPointsT2Amount + nPointsT3Amount + nPointsRTAmount;
+
+    UniValue res;
+    res.pushKV("pledgeAmount", nTotalPledgeAmount);
+    res.pushKV("pledgeRequiredAmount", nPledgeRequiredAmount);
+    res.pushKV("totalSupplied", nTotalSupplied);
+    res.pushKV("minedBlocks", nNumBlocks);
+    res.pushKV("canEarnAccumulates", nTotalPledgeAmount > nPledgeRequiredAmount);
+
+    return 0;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1758,6 +1812,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryhalvings", &queryhalvings, {}},
         {"chia", "queryblocksummary", &queryBlockSummary, {"numblocks"}},
         {"chia", "queryaccumulateamounts", &queryAccumulateAmounts, {"address", "back_to_height"}},
+        {"chia", "querypledgeamount", &querypledgeamount, {"address"}},
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
 };
 

@@ -57,6 +57,7 @@ CHIAPOS_H = \
   chiapos/post.h \
   chiapos/plotter_id.h \
   chiapos/block_fields.h \
+  chiapos/chia_helper.h \
   chiapos/timelord_cli/timelord_client.h \
   $(CHIAPOS_KERNEL_INCLUDES)
 
@@ -65,6 +66,7 @@ CHIAPOS_CPPS = \
   chiapos/plotter_id.cpp \
   chiapos/block_fields.cpp \
   chiapos/timelord_cli/timelord_client.cpp \
+  chiapos/chia_helper.cpp \
   chiapos/chia_rpc.cpp \
   $(CHIAPOS_KERNEL_CPPS)
 
