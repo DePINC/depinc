@@ -109,6 +109,21 @@ std::vector<PointEntry> enumerate_points(CCoinsViewCursorRef pcursor) {
     return res;
 }
 
+int get_remaining_blocks(DatacarrierType type, int nPledgeHeight, int nHeight, Consensus::Params const& params)
+{
+    uint16_t nIndex = type - DATACARRIER_TYPE_CHIA_POINT;
+    auto const& term = params.BHDIP009PledgeTerms.at(nIndex);
+    return std::max<int>(0, (nPledgeHeight + term.nLockHeight) - nHeight);
+}
+
+bool is_pledge_expired(DatacarrierType type, int nPledgeHeight, int nHeight, Consensus::Params const& params)
+{
+    uint16_t nIndex = type - DATACARRIER_TYPE_CHIA_POINT;
+    auto const& term = params.BHDIP009PledgeTerms.at(nIndex);
+    bool expired = nPledgeHeight + term.nLockHeight <= nHeight;
+    return expired;
+ }
+
 CAmount calculate_actual_amount(DatacarrierType type, int nPledgeHeight, int nCurrHeight, CAmount nAmount, Consensus::Params const& params)
 {
     uint16_t nIndex = type - DATACARRIER_TYPE_CHIA_POINT;
@@ -134,7 +149,7 @@ CAmount calculate_actual_amount(std::vector<PointEntry> const& entries, int nHei
         } else if (entry.type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
             nActualTotal += calculate_actual_amount(entry.originalType, entry.nOriginalHeight, nHeight, entry.nAmount, params);
         } else {
-            // TODO otherwise the entry type is invalid, need to check bug from the way to making these entries
+            // TODO otherwise the entry type is invalid, need to check bug from the way to make these entries
             assert(false);
         }
     }

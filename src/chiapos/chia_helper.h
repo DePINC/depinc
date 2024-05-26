@@ -43,21 +43,25 @@ struct PointEntry
     int nHeight;
 };
 
-CAmount get_total_supplied(int nHeight, Consensus::Params const& params);
+[[nodiscard]] CAmount get_total_supplied(int nHeight, Consensus::Params const& params);
 
-arith_uint256 get_netspace(CBlockIndex* pindex, Consensus::Params const& params);
+[[nodiscard]] arith_uint256 get_netspace(CBlockIndex* pindex, Consensus::Params const& params);
 
-arith_uint256 get_avg_netspace(CBlockIndex* pindex, Consensus::Params const& params);
+[[nodiscard]] arith_uint256 get_avg_netspace(CBlockIndex* pindex, Consensus::Params const& params);
 
-std::vector<MinedBlock> get_blocks_mined_by_account(CAccountID const& accountID, CBlockIndex* pstartIndex, CCoinsViewCache const& view, Consensus::Params const& params);
+[[nodiscard]] std::vector<MinedBlock> get_blocks_mined_by_account(CAccountID const& accountID, CBlockIndex* pstartIndex, CCoinsViewCache const& view, Consensus::Params const& params);
 
-ChainSupplyInfo get_chain_supply_info(CBlockIndex* pindex, CCoinsViewCache const& view, Consensus::Params const& params);
+[[nodiscard]] ChainSupplyInfo get_chain_supply_info(CBlockIndex* pindex, CCoinsViewCache const& view, Consensus::Params const& params);
 
-std::vector<PointEntry> enumerate_points(CCoinsViewCursorRef pcursor);
+[[nodiscard]] std::vector<PointEntry> enumerate_points(CCoinsViewCursorRef pcursor);
 
-CAmount calculate_actual_amount(DatacarrierType type, int nPledgeHeight, int nCurrHeight, CAmount nAmount, Consensus::Params const& params);
+[[nodiscard]] int get_remaining_blocks(DatacarrierType type, int nPledgeHeight, int nHeight, Consensus::Params const& params);
 
-CAmount calculate_actual_amount(std::vector<PointEntry> const& entries, int nHeight, Consensus::Params const& params);
+[[nodiscard]] bool is_pledge_expired(DatacarrierType type, int nPledgeHeight, int nHeight, Consensus::Params const& params);
+
+[[nodiscard]] CAmount calculate_actual_amount(DatacarrierType type, int nPledgeHeight, int nCurrHeight, CAmount nAmount, Consensus::Params const& params);
+
+[[nodiscard]] CAmount calculate_actual_amount(std::vector<PointEntry> const& entries, int nHeight, Consensus::Params const& params);
 
 } // namespace chiapos::pledge
 

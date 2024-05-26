@@ -1748,12 +1748,22 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
 {
     RPCHelpMan("querypledgeamount", "Query pledge info for account",
         {
-            RPCArg("address", RPCArg::Type::STR, RPCArg::Optional::OMITTED, "Only find the blocks belong to this address (default=any address)"),
+            RPCArg("address", RPCArg::Type::STR, RPCArg::Optional::NO, "Query the pledge details for this address only"),
+            RPCArg("detail", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "Put 1 here to show more details to exam"),
         },
         RPCResult("json"),
         RPCExamples("depinc-cli querypledgeamount")).Check(request);
 
     std::string address = request.params[0].get_str();
+    bool fShowDetails{false};
+    if (request.params.size() == 2) {
+        int32_t val;
+        if (!ParseInt32(request.params[1].get_str(), &val)) {
+            throw std::runtime_error("The second parameter cannot be parsed into type: int32");
+        }
+        fShowDetails = val != 0;
+    }
+
     auto const& params = Params().GetConsensus();
 
     CTxDestination dest = DecodeDestination(address);
@@ -1781,14 +1791,57 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
 
     CAmount nTotalPledgeAmount = nPointsAmount + nPointsT1Amount + nPointsT2Amount + nPointsT3Amount + nPointsRTAmount;
 
-    UniValue res;
+    UniValue res(UniValue::VOBJ);
+
+    if (fShowDetails) {
+        UniValue pledgeVals(UniValue::VARR);
+
+        auto conv_point_to_val = [nHeight = pindex->nHeight, &params](pledge::PointEntry const& entry) -> UniValue {
+            UniValue res(UniValue::VOBJ);
+            res.pushKV("type", DatacarrierTypeToString(entry.type));
+            res.pushKV("from", EncodeDestination(entry.from));
+            res.pushKV("to", EncodeDestination(entry.to));
+            res.pushKV("amount", entry.nAmount);
+            if (entry.type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
+                res.pushKV("originalType", DatacarrierTypeToString(entry.originalType));
+                res.pushKV("originalHeight", entry.nOriginalHeight);
+                res.pushKV("actualAmount", pledge::calculate_actual_amount(entry.originalType, entry.nOriginalHeight, nHeight, entry.nAmount, params));
+                res.pushKV("expired", pledge::is_pledge_expired(entry.originalType, entry.nOriginalHeight, nHeight, params));
+                res.pushKV("remainingBlocks", pledge::get_remaining_blocks(entry.originalType, entry.nOriginalHeight, nHeight, params));
+            } else {
+                res.pushKV("actualAmount", pledge::calculate_actual_amount(entry.type, entry.nHeight, nHeight, entry.nAmount, params));
+                res.pushKV("expired", pledge::is_pledge_expired(entry.type, entry.nHeight, nHeight, params));
+                res.pushKV("remainingBlocks", pledge::get_remaining_blocks(entry.type, entry.nHeight, nHeight, params));
+            }
+            res.pushKV("txid", entry.txid.GetHex());
+            res.pushKV("blockHash", entry.blockHash.GetHex());
+            res.pushKV("blockTime", FormatISO8601DateTime(entry.blockTime));
+            res.pushKV("height", entry.nHeight);
+            return res;
+        };
+
+        using PointCIter = std::vector<pledge::PointEntry>::const_iterator;
+        auto trans = [&conv_point_to_val](PointCIter begin, PointCIter end, UniValue& outVals) {
+            for (; begin != end; ++begin) {
+                outVals.push_back(conv_point_to_val(*begin));
+            }
+        };
+        trans(std::cbegin(points), std::cend(points), pledgeVals);
+        trans(std::cbegin(pointT1s), std::cend(pointT1s), pledgeVals);
+        trans(std::cbegin(pointT2s), std::cend(pointT2s), pledgeVals);
+        trans(std::cbegin(pointT3s), std::cend(pointT3s), pledgeVals);
+        trans(std::cbegin(pointRTs), std::cend(pointRTs), pledgeVals);
+        res.pushKV("details", pledgeVals);
+    }
+
     res.pushKV("pledgeAmount", nTotalPledgeAmount);
     res.pushKV("pledgeRequiredAmount", nPledgeRequiredAmount);
     res.pushKV("totalSupplied", nTotalSupplied);
     res.pushKV("minedBlocks", nNumBlocks);
+    res.pushKV("minedEvalWindow", params.nCapacityEvalWindow);
     res.pushKV("canEarnAccumulates", nTotalPledgeAmount > nPledgeRequiredAmount);
 
-    return 0;
+    return res;
 }
 
 static std::vector<CRPCCommand> commands = {
