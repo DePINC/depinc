@@ -31,6 +31,6 @@ using TxPledgeMap = std::multimap<int64_t, TxPledge>;
 
 TxPledgeMap RetrievePledgeMap(CWallet* pwallet, bool fIncludeInvalid, isminefilter filter);
 
-CAmount CalcActualAmount(CAmount pledgeAmount, int pledgeOnHeight, PledgeTerm const& term, PledgeTerm const& fallbackTerm, int chainHeight);
+CAmount CalcActualAmount(CAmount pledgeAmount, int pledgeOnHeight, PledgeTerm const& term, PledgeTerm const& fallbackTerm, int chainHeight) noexcept;
 
 #endif
