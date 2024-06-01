@@ -1744,6 +1744,91 @@ static UniValue queryAllPointCoins(JSONRPCRequest const& request)
     return res_val;
 }
 
+struct MinerInfo {
+    std::string address;
+    CAmount rewards;
+};
+
+std::optional<MinerInfo> QueryMinerInfo(CBlockIndex* pindex, Consensus::Params const& params)
+{
+    CBlock block;
+    if (!ReadBlockFromDisk(block, pindex, params)) {
+        throw std::runtime_error("block cannot be read from disk");
+    }
+
+    std::vector<MinerInfo> details;
+    for (auto const& tx : block.vtx) {
+        if (tx->IsCoinBase()) {
+            MinerInfo miner_info;
+            auto account_id = ExtractAccountID(tx->vout[0].scriptPubKey);
+            CTxDestination dest((ScriptHash)account_id);
+            miner_info.address = EncodeDestination(dest);
+            miner_info.rewards = tx->vout[0].nValue;
+            return miner_info;
+        }
+    }
+
+    return {};
+}
+
+static UniValue queryownblocks(JSONRPCRequest const& request)
+{
+    RPCHelpMan("queryownblocks", "query block owners and total rewards since a height", {
+        RPCArg("address", RPCArg::Type::STR, RPCArg::Optional::NO, "count for the address"),
+        RPCArg("height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "count the summary since the height"),
+    }, RPCResult {"json result"}, RPCExamples{""}).Check(request);
+
+    LOCK(cs_main);
+    auto pindex = ::ChainActive().Tip();
+    auto const& params = Params().GetConsensus();
+
+    std::string address = request.params[0].get_str();
+    int height = params.BHDIP009Height;
+    if (request.params.size() == 2) {
+        if (!ParseInt32(request.params[1].get_str(), &height)) {
+            throw std::runtime_error("cannot parse height");
+        }
+    }
+
+    int count{0};
+    CAmount total_rewards{0};
+    int first_height{0};
+    int last_height{0};
+    UniValue miner_info_vals(UniValue::VARR);
+    for (; pindex->nHeight >= height; pindex = pindex->pprev) {
+        auto miner_info = QueryMinerInfo(pindex, params);
+        if (miner_info.has_value()) {
+            if (miner_info->address == address) {
+                if (last_height == 0) {
+                    last_height = pindex->nHeight;
+                }
+                first_height = pindex->nHeight;
+                total_rewards += miner_info->rewards;
+                ++count;
+                UniValue miner_info_val(UniValue::VOBJ);
+                miner_info_val.pushKV("height", pindex->nHeight);
+                miner_info_val.pushKV("address", miner_info->address);
+                miner_info_val.pushKV("reward", miner_info->rewards);
+                miner_info_vals.push_back(miner_info_val);
+            }
+        }
+    }
+
+    UniValue res(UniValue::VOBJ);
+    res.pushKV("details", miner_info_vals);
+    res.pushKV("address", address);
+    res.pushKV("since", height);
+    res.pushKV("count", count);
+    res.pushKV("first_height", first_height);
+    res.pushKV("last_height", last_height);
+    res.pushKV("total", total_rewards);
+    res.pushKV("total_human", FormatMoney(total_rewards));
+    res.pushKV("rewards_block", total_rewards / count);
+    res.pushKV("rewards_block_human", FormatMoney(total_rewards / count));
+
+    return res;
+}
+
 static UniValue querypledgeamount(JSONRPCRequest const& request)
 {
     RPCHelpMan("querypledgeamount", "Query pledge info for account",
@@ -1865,6 +1950,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryhalvings", &queryhalvings, {}},
         {"chia", "queryblocksummary", &queryBlockSummary, {"numblocks"}},
         {"chia", "queryaccumulateamounts", &queryAccumulateAmounts, {"address", "back_to_height"}},
+        {"chia", "queryownblocks", &queryownblocks, {"address", "height"}},
         {"chia", "querypledgeamount", &querypledgeamount, {"address"}},
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
 };
