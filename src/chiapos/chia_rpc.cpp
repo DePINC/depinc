@@ -15,7 +15,6 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
-#include <variant>
 
 #include <amount.h>
 
@@ -411,7 +410,7 @@ static UniValue submitProof(JSONRPCRequest const& request) {
         int nTargetHeight = pindexPrev->nHeight + 1;
         double targetMulFactor = GetTargetMulFactor(nTargetHeight, params);
         int adjust_target_spacing = GetAdjustTargetSpacing(nTargetHeight, params);
-        nDifficulty = AdjustDifficulty(GetChiaBlockDifficulty(pindexPrev, params), nTotalDuration,
+        nDifficulty = AdjustDifficulty(GetChiaBlockDifficulty(pindexPrev, params), static_cast<int64_t>(nTotalDuration),
                                        adjust_target_spacing, QueryDurationFix(nTargetHeight, params.BHDIP009TargetDurationFixes),
                                        GetDifficultyChangeMaxFactor(nTargetHeight, params),
                                        params.BHDIP009StartDifficulty, targetMulFactor);
