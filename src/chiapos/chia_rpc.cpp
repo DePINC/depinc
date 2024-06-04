@@ -1501,7 +1501,8 @@ UniValue testtargetspacing(JSONRPCRequest const& request)
 static UniValue queryhalvings(JSONRPCRequest const& request)
 {
     auto const& params = Params().GetConsensus();
-    auto result_map = GenerateBlockSubsidyWithHalvings(params);
+    CAmount nTotal;
+    auto result_map = GenerateBlockSubsidyWithHalvings(&nTotal, params);
 
     LOCK(cs_main);
     int nHeight = ::ChainActive().Height();
@@ -1511,7 +1512,10 @@ static UniValue queryhalvings(JSONRPCRequest const& request)
     for (auto const& entry : result_map) {
         UniValue halvings_entry_val(UniValue::VOBJ);
         halvings_entry_val.pushKV("height", entry.first);
-        halvings_entry_val.pushKV("amount", entry.second);
+        halvings_entry_val.pushKV("amount", entry.second.nAmountPerBlock);
+        halvings_entry_val.pushKV("amountHuman", FormatMoney(entry.second.nAmountPerBlock));
+        halvings_entry_val.pushKV("halvingsAmount", entry.second.nTotalAmount);
+        halvings_entry_val.pushKV("halvingsAmountHuman", FormatMoney(entry.second.nTotalAmount));
         halvings_val.push_back(std::move(halvings_entry_val));
         // find the height for next halvings
         if (entry.first > nHeight) {
@@ -1524,10 +1528,12 @@ static UniValue queryhalvings(JSONRPCRequest const& request)
     UniValue result(UniValue::VOBJ);
     result.pushKV("halvings", halvings_val);
     result.pushKV("halvingsHeight", nNextHeightForHalvings);
-    result.pushKV("halvingsAmount", result_map[nNextHeightForHalvings]);
+    result.pushKV("halvingsAmount", result_map[nNextHeightForHalvings].nAmountPerBlock);
     result.pushKV("halvingsDays", (nNextHeightForHalvings - nHeight) * params.BHDIP008TargetSpacing / 60 / 60 / 24);
     result.pushKV("currentHeight", nHeight);
     result.pushKV("currentSubsidy", GetBlockSubsidy(nHeight, params));
+    result.pushKV("total", nTotal);
+    result.pushKV("totalHuman", FormatMoney(nTotal));
 
     return result;
 }

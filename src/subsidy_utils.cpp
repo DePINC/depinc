@@ -28,17 +28,25 @@ int CalculateHalvings(int nHeight, Consensus::Params const& consensusParams) {
     return halvings;
 }
 
-std::map<int, CAmount> GenerateBlockSubsidyWithHalvings(Consensus::Params const& params) {
-    std::map<int, CAmount> result;
+HalvingMap GenerateBlockSubsidyWithHalvings(CAmount* pnTotalAmount, Consensus::Params const& params) {
+    HalvingMap result;
     int nHeight { 1 };
     int halvings { 0 };
-    CAmount oldSubsidy { 0 };
+    CAmount nOldSubsidy { 0 };
+    int nOldHeight { 0 };
+    *pnTotalAmount = 0;
     while (halvings < 64) {
         halvings = CalculateHalvings(nHeight, params);
-        CAmount subsidy = GetBlockSubsidy(nHeight, params);
-        if (subsidy != oldSubsidy) {
-            result[nHeight] = subsidy;
-            oldSubsidy = subsidy;
+        CAmount nSubsidy = GetBlockSubsidy(nHeight, params);
+        if (nSubsidy != nOldSubsidy) {
+            HalvingInfo hi;
+            hi.nAmountPerBlock = nSubsidy;
+            hi.nTotalAmount = (nHeight - nOldHeight) * nOldSubsidy;
+            result[nHeight] = hi;
+            *pnTotalAmount += hi.nTotalAmount;
+            // prepare for next subsidy
+            nOldHeight = nHeight;
+            nOldSubsidy = nSubsidy;
         }
         ++nHeight;
     }

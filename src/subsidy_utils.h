@@ -8,7 +8,14 @@
 
 extern CCriticalSection cs_main;
 
-std::map<int, CAmount> GenerateBlockSubsidyWithHalvings(Consensus::Params const& params);
+struct HalvingInfo {
+    CAmount nAmountPerBlock;
+    CAmount nTotalAmount;
+};
+
+using HalvingMap = std::map<int, HalvingInfo>;
+
+HalvingMap GenerateBlockSubsidyWithHalvings(CAmount* pnTotalAmount, Consensus::Params const& params);
 
 /** Get block subsidy */
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
