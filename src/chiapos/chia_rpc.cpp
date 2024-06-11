@@ -18,28 +18,28 @@
 
 #include <amount.h>
 
-#include "arith_uint256.h"
-#include "chain.h"
-#include "chiapos/kernel/bls_key.h"
-#include "chiapos/kernel/calc_diff.h"
-#include "chiapos/kernel/chiapos_types.h"
-#include "chiapos/kernel/pos.h"
-#include "chiapos/kernel/utils.h"
+#include <arith_uint256.h>
+#include <chain.h>
 
-#include "chiapos/chia_helper.h"
-#include "chiapos/plotter_id.h"
 #include "coins.h"
-#include "consensus/params.h"
+#include <consensus/params.h>
 
 #include <openssl/rand.h>
 
-#include "primitives/transaction.h"
-#include "uint256.h"
-#include "updatetip_log_helper.hpp"
-#include "logging.h"
-#include "post.h"
+#include <primitives/transaction.h>
+#include <uint256.h>
+#include <updatetip_log_helper.hpp>
+#include <logging.h>
 
-#include "poc/poc.h"
+#include <poc/poc.h>
+
+#include "kernel/bls_key.h"
+#include "kernel/calc_diff.h"
+#include "kernel/chiapos_types.h"
+#include "kernel/pos.h"
+#include "kernel/utils.h"
+
+#include "chain_info_querier.h"
 
 extern std::unique_ptr<CConnman> g_connman;
 
@@ -430,13 +430,14 @@ static UniValue queryNetspace(JSONRPCRequest const& request) {
 
     LOCK(cs_main);
 
+    auto querier = ChainInfoQuerier::CreateQuerier();
+
     CBlockIndex* pindex = ::ChainActive().Tip();
-
     auto params = Params().GetConsensus();
-    CAmount nTotalSupplied = pledge::get_total_supplied(pindex->nHeight, params);
+    CAmount nTotalSupplied = querier.GetTotalSupplied();
 
-    auto netspace_avg = pledge::get_avg_netspace(pindex, params);
-    auto netspace = pledge::get_netspace(pindex, params);
+    auto netspace_avg = querier.GetAverageNetSpace();
+    auto netspace = querier.GetNetSpace();
 
     UniValue res(UniValue::VOBJ);
     res.pushKV("supplied", nTotalSupplied);
@@ -1861,32 +1862,24 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
 
     LOCK(cs_main);
     CBlockIndex* pindex = ::ChainActive().Tip();
-    auto const& view = ::ChainstateActive().CoinsDB();
-    int nNumBlocks = static_cast<int>(pledge::get_blocks_mined_by_account(accountID, pindex, ::ChainstateActive().CoinsTip(), params).size());
 
-    CAmount nTotalSupplied = pledge::get_total_supplied(pindex->nHeight, params);
-    CAmount nPledgeRequiredAmount = nNumBlocks * nTotalSupplied / params.nCapacityEvalWindow;
+    auto querier = ChainInfoQuerier::CreateQuerier();
+    // auto fpks = querier.GetBoundFarmerPkList(accountID);
+    // auto blks = querier.GetMinedBlockList(fpks);
+    // auto nNumBlocks = blks.size();
 
-    auto points = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::Chia));
-    auto pointT1s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT1));
-    auto pointT2s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT2));
-    auto pointT3s = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaT3));
-    auto pointRTs = pledge::enumerate_points(view.PointReceiveCursor(accountID, PointType::ChiaRT));
+    CAmount nTotalSupplied = querier.GetTotalSupplied();
+    int nMined, nCounted;
+    CAmount nPledgeRequiredAmount = querier.GetMiningRequireBalance(accountID, &nMined, &nCounted);
 
-    CAmount nPointsAmount = pledge::calculate_actual_amount(points, pindex->nHeight, params);
-    CAmount nPointsT1Amount = pledge::calculate_actual_amount(pointT1s, pindex->nHeight, params);
-    CAmount nPointsT2Amount = pledge::calculate_actual_amount(pointT2s, pindex->nHeight, params);
-    CAmount nPointsT3Amount = pledge::calculate_actual_amount(pointT3s, pindex->nHeight, params);
-    CAmount nPointsRTAmount = pledge::calculate_actual_amount(pointRTs, pindex->nHeight, params);
-
-    CAmount nTotalPledgeAmount = nPointsAmount + nPointsT1Amount + nPointsT2Amount + nPointsT3Amount + nPointsRTAmount;
+    auto [nTotalPledgeAmount, entries] = querier.GetTotalPledgedAmount(accountID);
 
     UniValue res(UniValue::VOBJ);
 
     if (fShowDetails) {
         UniValue pledgeVals(UniValue::VARR);
 
-        auto conv_point_to_val = [nHeight = pindex->nHeight, &params](pledge::PointEntry const& entry) -> UniValue {
+        auto conv_point_to_val = [nHeight = pindex->nHeight, &querier](PointEntry const& entry) -> UniValue {
             UniValue res(UniValue::VOBJ);
             res.pushKV("type", DatacarrierTypeToString(entry.type));
             res.pushKV("from", EncodeDestination(entry.from));
@@ -1895,13 +1888,13 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
             if (entry.type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
                 res.pushKV("originalType", DatacarrierTypeToString(entry.originalType));
                 res.pushKV("originalHeight", entry.nOriginalHeight);
-                res.pushKV("actualAmount", pledge::calculate_actual_amount(entry.originalType, entry.nOriginalHeight, nHeight, entry.nAmount, params));
-                res.pushKV("expired", pledge::is_pledge_expired(entry.originalType, entry.nOriginalHeight, nHeight, params));
-                res.pushKV("remainingBlocks", pledge::get_remaining_blocks(entry.originalType, entry.nOriginalHeight, nHeight, params));
+                res.pushKV("actualAmount", querier.GetPledgeActualAmount(entry.originalType, entry.nOriginalHeight, nHeight, entry.nAmount));
+                res.pushKV("expired", querier.CheckPledgeIsExpired(entry.originalType, entry.nOriginalHeight, nHeight));
+                res.pushKV("remainingBlocks", querier.GetPledgeRemainingBlocks(entry.originalType, entry.nOriginalHeight, nHeight));
             } else {
-                res.pushKV("actualAmount", pledge::calculate_actual_amount(entry.type, entry.nHeight, nHeight, entry.nAmount, params));
-                res.pushKV("expired", pledge::is_pledge_expired(entry.type, entry.nHeight, nHeight, params));
-                res.pushKV("remainingBlocks", pledge::get_remaining_blocks(entry.type, entry.nHeight, nHeight, params));
+                res.pushKV("actualAmount", querier.GetPledgeActualAmount(entry.type, entry.nHeight, nHeight, entry.nAmount));
+                res.pushKV("expired", querier.CheckPledgeIsExpired(entry.type, entry.nHeight, nHeight));
+                res.pushKV("remainingBlocks", querier.GetPledgeRemainingBlocks(entry.type, entry.nHeight, nHeight));
             }
             res.pushKV("txid", entry.txid.GetHex());
             res.pushKV("blockHash", entry.blockHash.GetHex());
@@ -1910,25 +1903,25 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
             return res;
         };
 
-        using PointCIter = std::vector<pledge::PointEntry>::const_iterator;
+        using PointCIter = std::vector<PointEntry>::const_iterator;
         auto trans = [&conv_point_to_val](PointCIter begin, PointCIter end, UniValue& outVals) {
             for (; begin != end; ++begin) {
                 outVals.push_back(conv_point_to_val(*begin));
             }
         };
-        trans(std::cbegin(points), std::cend(points), pledgeVals);
-        trans(std::cbegin(pointT1s), std::cend(pointT1s), pledgeVals);
-        trans(std::cbegin(pointT2s), std::cend(pointT2s), pledgeVals);
-        trans(std::cbegin(pointT3s), std::cend(pointT3s), pledgeVals);
-        trans(std::cbegin(pointRTs), std::cend(pointRTs), pledgeVals);
+        trans(std::cbegin(entries.points), std::cend(entries.points), pledgeVals);
+        trans(std::cbegin(entries.pointT1s), std::cend(entries.pointT1s), pledgeVals);
+        trans(std::cbegin(entries.pointT2s), std::cend(entries.pointT2s), pledgeVals);
+        trans(std::cbegin(entries.pointT3s), std::cend(entries.pointT3s), pledgeVals);
+        trans(std::cbegin(entries.pointRTs), std::cend(entries.pointRTs), pledgeVals);
         res.pushKV("details", pledgeVals);
     }
 
     res.pushKV("pledgeAmount", nTotalPledgeAmount);
     res.pushKV("pledgeRequiredAmount", nPledgeRequiredAmount);
     res.pushKV("totalSupplied", nTotalSupplied);
-    res.pushKV("minedBlocks", nNumBlocks);
-    res.pushKV("minedEvalWindow", params.nCapacityEvalWindow);
+    res.pushKV("minedBlocks", static_cast<int>(nMined));
+    res.pushKV("minedEvalWindow", nCounted);
     res.pushKV("canEarnAccumulates", nTotalPledgeAmount > nPledgeRequiredAmount);
 
     return res;
