@@ -1868,7 +1868,7 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     int nMined, nCounted;
     CAmount nPledgeRequiredAmount = querier.GetMiningRequireBalance(accountID, &nMined, &nCounted);
 
-    auto [nTotalPledgeAmount, entries] = querier.GetTotalPledgedAmount(accountID);
+    auto [nTotalPledgeAmount, nTotalActualAmount, entries] = querier.GetTotalPledgedAmount(accountID);
 
     UniValue res(UniValue::VOBJ);
 
@@ -1905,15 +1905,16 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
                 outVals.push_back(conv_point_to_val(*begin));
             }
         };
-        trans(std::cbegin(entries.points), std::cend(entries.points), pledgeVals);
-        trans(std::cbegin(entries.pointT1s), std::cend(entries.pointT1s), pledgeVals);
-        trans(std::cbegin(entries.pointT2s), std::cend(entries.pointT2s), pledgeVals);
-        trans(std::cbegin(entries.pointT3s), std::cend(entries.pointT3s), pledgeVals);
-        trans(std::cbegin(entries.pointRTs), std::cend(entries.pointRTs), pledgeVals);
+        trans(std::cbegin(entries[DATACARRIER_TYPE_CHIA_POINT].points), std::cend(entries[DATACARRIER_TYPE_CHIA_POINT].points), pledgeVals);
+        trans(std::cbegin(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_1].points), std::cend(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_1].points), pledgeVals);
+        trans(std::cbegin(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_2].points), std::cend(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_2].points), pledgeVals);
+        trans(std::cbegin(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_3].points), std::cend(entries[DATACARRIER_TYPE_CHIA_POINT_TERM_3].points), pledgeVals);
+        trans(std::cbegin(entries[DATACARRIER_TYPE_CHIA_POINT_RETARGET].points), std::cend(entries[DATACARRIER_TYPE_CHIA_POINT_RETARGET].points), pledgeVals);
         res.pushKV("details", pledgeVals);
     }
 
     res.pushKV("pledgeAmount", nTotalPledgeAmount);
+    res.pushKV("pledgeActualAmount", nTotalActualAmount);
     res.pushKV("pledgeRequiredAmount", nPledgeRequiredAmount);
     res.pushKV("totalSupplied", nTotalSupplied);
     res.pushKV("minedBlocks", static_cast<int>(nMined));

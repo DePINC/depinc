@@ -43,13 +43,13 @@ struct PointEntry {
     int nHeight;
 };
 
-struct PointEntries {
+struct PointEntriesWithAmounts {
     std::vector<PointEntry> points;
-    std::vector<PointEntry> pointT1s;
-    std::vector<PointEntry> pointT2s;
-    std::vector<PointEntry> pointT3s;
-    std::vector<PointEntry> pointRTs;
+    CAmount nTotalAmount;
+    CAmount nActualAmount;
 };
+
+using PointEntries = std::map<DatacarrierType, PointEntriesWithAmounts>;
 
 class ChainInfoQuerier {
     CCoinsViewCache* m_pviewCache;
@@ -84,12 +84,20 @@ public:
 
     NODISCARD std::vector<MinedBlock> GetMinedBlockList(std::vector<CChiaFarmerPk> const& fpks) const;
 
-    NODISCARD std::tuple<CAmount, PointEntries> GetTotalPledgedAmount(CAccountID accountID) const;
+    /**
+     * @brief Get total pledge details by some accountID
+     *
+     * @param accountID the argument represents an account
+     *
+     * @return <_1, _2, _3> _1: The total amount deposit on chain, _2: The actual amount, _3: details
+     */
+    NODISCARD std::tuple<CAmount, CAmount, PointEntries> GetTotalPledgedAmount(CAccountID accountID) const;
 
     NODISCARD CAmount GetPledgeActualAmount(DatacarrierType type, int nPledgeHeight, int nCurrHeight,
                                             CAmount nAmount) const;
 
-    NODISCARD CAmount GetPledgeActualAmount(std::vector<PointEntry> const& entries, int nHeight) const;
+    NODISCARD CAmount GetPledgeActualAmount(std::vector<PointEntry> const& entries, int nHeight,
+                                            CAmount* pnTotalAmount = nullptr) const;
 
     NODISCARD int GetPledgeRemainingBlocks(DatacarrierType type, int nPledgeHeight, int nHeight) const;
 

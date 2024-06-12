@@ -134,22 +134,34 @@ std::vector<MinedBlock> ChainInfoQuerier::GetMinedBlockList(std::vector<CChiaFar
     return blks;
 }
 
-std::tuple<CAmount, PointEntries> ChainInfoQuerier::GetTotalPledgedAmount(CAccountID accountID) const {
+std::tuple<CAmount, CAmount, PointEntries> ChainInfoQuerier::GetTotalPledgedAmount(CAccountID accountID) const {
     PointEntries entries;
-    entries.points = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::Chia));
-    entries.pointT1s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT1));
-    entries.pointT2s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT2));
-    entries.pointT3s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT3));
-    entries.pointRTs = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaRT));
+    auto points = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::Chia));
+    auto pointT1s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT1));
+    auto pointT2s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT2));
+    auto pointT3s = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaT3));
+    auto pointRTs = enumerate_points(m_pviewDB->PointReceiveCursor(accountID, PointType::ChiaRT));
 
-    CAmount nPointsAmount = GetPledgeActualAmount(entries.points, m_pindex->nHeight);
-    CAmount nPointsT1Amount = GetPledgeActualAmount(entries.pointT1s, m_pindex->nHeight);
-    CAmount nPointsT2Amount = GetPledgeActualAmount(entries.pointT2s, m_pindex->nHeight);
-    CAmount nPointsT3Amount = GetPledgeActualAmount(entries.pointT3s, m_pindex->nHeight);
-    CAmount nPointsRTAmount = GetPledgeActualAmount(entries.pointRTs, m_pindex->nHeight);
+    CAmount nPointsTotalAmount{0}, nPointsTotalT1Amount{0}, nPointsTotalT2Amount{0}, nPointsTotalT3Amount{0},
+            nPointsTotalRTAmount{0};
 
-    CAmount nTotalPledgeAmount = nPointsAmount + nPointsT1Amount + nPointsT2Amount + nPointsT3Amount + nPointsRTAmount;
-    return std::make_tuple(nTotalPledgeAmount, entries);
+    CAmount nPointsActualAmount = GetPledgeActualAmount(points, m_pindex->nHeight, &nPointsTotalAmount);
+    CAmount nPointsActualT1Amount = GetPledgeActualAmount(pointT1s, m_pindex->nHeight, &nPointsTotalT1Amount);
+    CAmount nPointsActualT2Amount = GetPledgeActualAmount(pointT2s, m_pindex->nHeight, &nPointsTotalT2Amount);
+    CAmount nPointsActualT3Amount = GetPledgeActualAmount(pointT3s, m_pindex->nHeight, &nPointsTotalT3Amount);
+    CAmount nPointsActualRTAmount = GetPledgeActualAmount(pointRTs, m_pindex->nHeight, &nPointsTotalRTAmount);
+
+    entries[DATACARRIER_TYPE_CHIA_POINT] = {points, nPointsTotalAmount, nPointsActualAmount};
+    entries[DATACARRIER_TYPE_CHIA_POINT_TERM_1] = {pointT1s, nPointsTotalT1Amount, nPointsActualT1Amount};
+    entries[DATACARRIER_TYPE_CHIA_POINT_TERM_2] = {pointT2s, nPointsTotalT2Amount, nPointsActualT2Amount};
+    entries[DATACARRIER_TYPE_CHIA_POINT_TERM_3] = {pointT3s, nPointsTotalT3Amount, nPointsActualT3Amount};
+    entries[DATACARRIER_TYPE_CHIA_POINT_RETARGET] = {pointRTs, nPointsTotalRTAmount, nPointsActualRTAmount};
+
+    CAmount nTotalPledgeAmount = nPointsTotalAmount + nPointsTotalT1Amount + nPointsTotalT2Amount +
+                                 nPointsTotalT3Amount + nPointsTotalRTAmount;
+    CAmount nTotalActualAmount = nPointsActualAmount + nPointsActualT1Amount + nPointsActualT2Amount +
+                                 nPointsActualT3Amount + nPointsActualRTAmount;
+    return std::make_tuple(nTotalPledgeAmount, nTotalActualAmount, entries);
 }
 
 CAmount ChainInfoQuerier::GetPledgeActualAmount(DatacarrierType type, int nPledgeHeight, int nCurrHeight,
@@ -167,9 +179,11 @@ CAmount ChainInfoQuerier::GetPledgeActualAmount(DatacarrierType type, int nPledg
     return nActual;
 }
 
-CAmount ChainInfoQuerier::GetPledgeActualAmount(std::vector<PointEntry> const& entries, int nHeight) const {
-    CAmount nActualTotal{0};
+CAmount ChainInfoQuerier::GetPledgeActualAmount(std::vector<PointEntry> const& entries, int nHeight,
+                                                CAmount* pnTotalAmount) const {
+    CAmount nActualTotal{0}, nTotalAmount{0};
     for (auto const& entry : entries) {
+        nTotalAmount += entry.nAmount;
         // check the entry expired
         if (DatacarrierTypeIsChiaPoint(entry.type)) {
             nActualTotal += GetPledgeActualAmount(entry.type, entry.nHeight, nHeight, entry.nAmount);
@@ -179,6 +193,9 @@ CAmount ChainInfoQuerier::GetPledgeActualAmount(std::vector<PointEntry> const& e
             // TODO otherwise the entry type is invalid, need to check bug from the way to make these entries
             assert(false);
         }
+    }
+    if (pnTotalAmount != nullptr) {
+        *pnTotalAmount = nTotalAmount;
     }
     return nActualTotal;
 }
