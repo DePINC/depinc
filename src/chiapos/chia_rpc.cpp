@@ -1864,10 +1864,6 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     CBlockIndex* pindex = ::ChainActive().Tip();
 
     auto querier = ChainInfoQuerier::CreateQuerier();
-    // auto fpks = querier.GetBoundFarmerPkList(accountID);
-    // auto blks = querier.GetMinedBlockList(fpks);
-    // auto nNumBlocks = blks.size();
-
     CAmount nTotalSupplied = querier.GetTotalSupplied();
     int nMined, nCounted;
     CAmount nPledgeRequiredAmount = querier.GetMiningRequireBalance(accountID, &nMined, &nCounted);
