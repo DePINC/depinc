@@ -280,11 +280,13 @@ void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOu
     if (payload->type == DATACARRIER_TYPE_BINDPLOTTER || payload->type == DATACARRIER_TYPE_BINDCHIAFARMER) {
         out.pushKV("type", "bindplotter");
         out.pushKV("amount", ValueFromAmount(txOut.nValue));
+        out.pushKV("amount64", txOut.nValue);
         out.pushKV("address", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
         out.pushKV("id", BindPlotterPayload::As(payload)->GetId().ToString());
     } else if (payload->type == DATACARRIER_TYPE_POINT || DatacarrierTypeIsChiaPoint(payload->type)) {
         out.pushKV("type", "pledge");
         out.pushKV("amount", ValueFromAmount(txOut.nValue));
+        out.pushKV("amount64", txOut.nValue);
         out.pushKV("from", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
         auto ppayloadPoint = PointPayload::As(payload);
         out.pushKV("to", EncodeDestination((ScriptHash)ppayloadPoint->GetReceiverID()));
@@ -293,6 +295,7 @@ void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOu
         out.pushKV("type", "pledge");
         out.pushKV("from", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
         out.pushKV("amount", ValueFromAmount(txOut.nValue));
+        out.pushKV("amount64", txOut.nValue);
         out.pushKV("point_type", DatacarrierTypeToString(retargetPayload->GetPointType()));
         out.pushKV("point_height", retargetPayload->GetPointHeight());
         out.pushKV("to", EncodeDestination(ScriptHash(retargetPayload->GetReceiverID())));
