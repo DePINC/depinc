@@ -728,10 +728,11 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
     // blocks
     if (!bypass_limits && !CheckFeeRate(nSize, nModifiedFees, state)) return false;
 
-    if (nAbsurdFee && nFees > nAbsurdFee)
+    if (!gArgs.IsArgSet("-dontchecktxfee") && nAbsurdFee > 0 && nFees > nAbsurdFee) {
         return state.Invalid(ValidationInvalidReason::TX_NOT_STANDARD, false,
                 REJECT_HIGHFEE, "absurdly-high-fee",
                 strprintf("%d > %d", nFees, nAbsurdFee));
+    }
 
     const CTxMemPool::setEntries setIterConflicting = m_pool.GetIterSet(setConflicts);
     // Calculate in-mempool ancestors, up to a limit.
