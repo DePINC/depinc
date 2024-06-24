@@ -605,7 +605,6 @@ case $host in
      fi
 
      AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
-     CXXFLAGS="-mmacosx-version-min=13.6 $CXXFLAGS"
      CPPFLAGS="$CPPFLAGS -DMAC_OSX -DOBJC_OLD_DISPATCH_PROTOTYPES=0"
      OBJCXXFLAGS="$CXXFLAGS"
      ;;
@@ -1326,8 +1325,8 @@ else
   fi
 fi
 
-AC_CHECK_HEADER([mpir.h],,AC_MSG_ERROR(gmp headers missing),)
-AC_CHECK_LIB([mpir],[main],GMP_LIBS=-lmpir,AC_MSG_ERROR(libgmp missing))
+AC_CHECK_HEADER([gmp.h],,AC_MSG_ERROR(gmp headers missing),)
+AC_CHECK_LIB([gmp],[main],GMP_LIBS=-lgmp,AC_MSG_ERROR(libgmp missing))
 
 save_CXXFLAGS="${CXXFLAGS}"
 CXXFLAGS="${CXXFLAGS} ${CRYPTO_CFLAGS} ${SSL_CFLAGS}"
