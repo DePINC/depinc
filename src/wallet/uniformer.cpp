@@ -314,7 +314,7 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
     }
 
     CAmount nWithdrawAmount;
-    CAmount nBurnAmount;
+    CAmount nBurnAmount{0};
 
     // Create transaction
     CMutableTransaction txNew;
