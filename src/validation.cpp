@@ -60,8 +60,6 @@
 #endif
 
 #include <cinttypes>
-#include <future>
-#include <sstream>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
