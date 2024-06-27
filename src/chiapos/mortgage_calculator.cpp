@@ -21,6 +21,26 @@ void FindBlocksToDistribute(CBlockIndex* pfrom, CBlockIndex* pto, int nNumOfDist
 
 }  // namespace
 
+UniValue FullMortgageBlock::ToUniValue() const {
+    auto trans_func = [](std::set<int> const& heights) -> UniValue {
+        UniValue outVals(UniValue::VARR);
+        for (int nHeight : heights) {
+            outVals.push_back(nHeight);
+        }
+        return outVals;
+    };
+
+    UniValue resVal(UniValue::VOBJ);
+    resVal.pushKV("height", nHeight);
+    resVal.pushKV("originalAccumulated", nOriginalAccumulatedToDistribute);
+    resVal.pushKV("numOfDistribution", nNumOfDistribution);
+    resVal.pushKV("distributedToBlocks", trans_func(vDistributedToBlocks));
+    resVal.pushKV("distributedFromBlocks", trans_func(vDistributedFromBlocks));
+    resVal.pushKV("actualAccumulated", nActualAccumulated);
+
+    return resVal;
+}
+
 CMortgageCalculator::CMortgageCalculator(Consensus::Params params) : m_params(std::move(params)) {}
 
 bool CMortgageCalculator::IsEmpty() const {
@@ -75,6 +95,8 @@ CAmount CMortgageCalculator::GetActualAccumulatedForBlockHeight(int nHeight) con
     }
     return iter->second.CalcActualAccumulatedAmount(m_mapBlocks);
 }
+
+FullMortgageBlockMap const& CMortgageCalculator::GetMap() const { return m_mapBlocks; }
 
 int CMortgageCalculator::GetNumOfBlocksToDistribute(CBlockIndex* pindexPrev) const {
     int nLowestHeight = pindexPrev->nHeight - m_params.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage;

@@ -5,6 +5,8 @@
 
 #include <consensus/params.h>
 
+#include <univalue.h>
+
 class CBlockIndex;
 
 struct FullMortgageBlock;
@@ -31,6 +33,8 @@ struct FullMortgageBlock {
         }
         return nActualAccumulated;
     }
+
+    NODISCARD UniValue ToUniValue() const;
 };
 
 class CMortgageCalculator {
@@ -58,16 +62,22 @@ public:
      * @brief Get the Actual Accumulated For Block Height object
      *
      * @param nHeight The height to calculate accumulated amount
+     *
      * @return The calculated amount
      */
     NODISCARD CAmount GetActualAccumulatedForBlockHeight(int nHeight) const;
+
+    /**
+     * @brief Return the full map
+     *
+     * @return The full map
+     */
+    NODISCARD FullMortgageBlockMap const& GetMap() const;
 
 private:
     NODISCARD int GetNumOfBlocksToDistribute(CBlockIndex* pindexFullMortgage) const;
 
     NODISCARD bool IsBlockFullMortgage(CBlockIndex* pindex) const;
-
-    // NODISCARD int GetNumOfFullMortgageBlocksSinceBlock(CBlockIndex* pindexSince) const;
 
     Consensus::Params m_params;
     FullMortgageBlockMap m_mapBlocks;

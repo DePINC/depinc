@@ -30,6 +30,7 @@
 #include <uint256.h>
 #include <updatetip_log_helper.hpp>
 #include <logging.h>
+#include <chiapos/mortgage_calculator.h>
 
 #include <poc/poc.h>
 
@@ -1924,6 +1925,26 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     return res;
 }
 
+UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
+{
+    RPCHelpMan("queryfullmortgageinfo", "query full mortgage reward and related info. from current chain",
+            {},
+            RPCResults({ RPCResult("(json array)", "the json string contains the mortgage info.")}),
+            RPCExamples("./cli queryfullmortgageinfo")).Check(request);
+
+    LOCK(cs_main);
+    auto pindex = ::ChainActive().Tip();
+
+    CMortgageCalculator calculator(Params().GetConsensus());
+    calculator.Build(pindex);
+
+    UniValue resVal(UniValue::VARR);
+    for (auto const& entry : calculator.GetMap()) {
+        resVal.push_back(entry.second.ToUniValue());
+    }
+    return resVal;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -1948,6 +1969,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryownblocks", &queryownblocks, {"address", "height"}},
         {"chia", "querypledgeamount", &querypledgeamount, {"address"}},
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
+        {"chia", "queryfullmortgageinfo", &queryfullmortgageinfo, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
