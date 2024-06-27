@@ -260,7 +260,7 @@ public:
         hashMerkleRoot = block.hashMerkleRoot;
         nTime          = block.nTime;
         nBaseTarget    = block.nBaseTarget;
-        nNonce         = block.nNonce;
+        nNonce         = block.nNonceOrExtFlags;
         nPlotterId     = block.nPlotterId;
         vchPubKey      = block.vchPubKey;
         vchSignature   = block.vchSignature;
@@ -294,7 +294,7 @@ public:
         block.hashMerkleRoot = hashMerkleRoot;
         block.nTime          = nTime;
         block.nBaseTarget    = nBaseTarget;
-        block.nNonce         = nNonce;
+        block.nNonceOrExtFlags         = nNonce;
         block.nPlotterId     = nPlotterId;
         block.vchPubKey      = vchPubKey;
         block.vchSignature   = vchSignature;
@@ -471,7 +471,7 @@ public:
         block.hashMerkleRoot  = hashMerkleRoot;
         block.nTime           = nTime;
         block.nBaseTarget     = nBaseTarget;
-        block.nNonce          = nNonce;
+        block.nNonceOrExtFlags          = nNonce;
         block.nPlotterId      = nPlotterId;
         block.vchPubKey       = vchPubKey;
         block.vchSignature    = vchSignature;

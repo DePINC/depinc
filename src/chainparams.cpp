@@ -38,6 +38,8 @@ const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2 = 114;
 
 const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
 
+constexpr int INFINITE_HEIGHT = 999999999;
+
 static CBlock CreateGenesisBlock(char const* pszTimestamp, CScript const& genesisOutputScript, uint32_t nTime,
                                  uint64_t nNonce, uint64_t nBaseTarget, int32_t nVersion,
                                  CAmount const& genesisReward) {
@@ -58,7 +60,7 @@ static CBlock CreateGenesisBlock(char const* pszTimestamp, CScript const& genesi
     CBlock genesis;
     genesis.nTime       = nTime;
     genesis.nBaseTarget = nBaseTarget;
-    genesis.nNonce      = nNonce;
+    genesis.nNonceOrExtFlags      = nNonce;
     genesis.nVersion    = nVersion;
     genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
     genesis.hashPrevBlock.SetNull();
@@ -205,6 +207,10 @@ public:
 
         consensus.BHDIP010AdjustDifficultyFix2AtHeight = 99999999;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
+
+        consensus.BHDIP011Height = INFINITE_HEIGHT;
+        consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
+        consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -807,6 +813,10 @@ public:
 
         consensus.BHDIP010AdjustDifficultyFix2AtHeight = 201100;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
+
+        consensus.BHDIP011Height = INFINITE_HEIGHT;
+        consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
+        consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

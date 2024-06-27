@@ -278,9 +278,9 @@ static uint64_t CalculateUnformattedDeadline(const CBlockIndex& prevBlockIndex, 
 
     // Regtest use nonce as deadline
     if (params.fAllowMinDifficultyBlocks)
-        return block.nNonce * prevBlockIndex.nBaseTarget;
+        return block.nNonceOrExtFlags * prevBlockIndex.nBaseTarget;
 
-    return CalcDL(prevBlockIndex.nHeight + 1, prevBlockIndex.GetNextGenerationSignature(), block.nPlotterId, block.nNonce, params);
+    return CalcDL(prevBlockIndex.nHeight + 1, prevBlockIndex.GetNextGenerationSignature(), block.nPlotterId, block.nNonceOrExtFlags, params);
 }
 
 // Require hold cs_main
@@ -490,7 +490,7 @@ uint64_t AddNonce(uint64_t& bestDeadline, const CBlockIndex& miningBlockIndex,
 
     CBlockHeader block;
     block.nPlotterId = nPlotterId;
-    block.nNonce     = nNonce;
+    block.nNonceOrExtFlags     = nNonce;
     const uint64_t calcUnformattedDeadline = CalculateUnformattedDeadline(miningBlockIndex, block, params);
     if (calcUnformattedDeadline == INVALID_DEADLINE)
         throw JSONRPCError(RPC_INVALID_REQUEST, "Invalid deadline");

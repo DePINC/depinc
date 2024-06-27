@@ -273,7 +273,7 @@ typedef struct {
 } BlockReward;
 CAmount GetTotalReward(BlockReward const& reward);
 BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, const CAccountID& generatorAccountID, const CPlotterBindData& bindData, const CCoinsViewCache& view, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
-BlockReward GetFullMortgageBlockReward(int nHeight, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
+BlockReward GetFullMortgageBlockReward(CBlockIndex* pindex, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 BlockReward GetLowMortgageBlockReward(int nHeight, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 int GetFullMortgageFundRoyaltyRatio(int nHeight, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 int GetLowMortgageFundRoyaltyRatio(int nHeight, const Consensus::Params& consensusParams) EXCLUSIVE_LOCKS_REQUIRED(cs_main);

@@ -156,6 +156,13 @@ struct Params {
     int BHDIP010AdjustDifficultyTargetSpacingFix2;
 
     /**
+     * @brief BHD011 hard-fork parameters
+     */
+    int BHDIP011Height;
+    int BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage;
+    int BHDIP011MinFullMortgageBlocksToDistribute;
+
+    /**
      * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargeting period,
      * (nPocTargetTimespan / BHDIP001TargetSpacing) which is also used for BIP9 deployments.
      * Examples: 1916 for 95%, 1512 for testchains.

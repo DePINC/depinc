@@ -175,7 +175,7 @@ static UniValue getmininginfo(const JSONRPCRequest& request)
     // reward
     obj.pushKV("reward", [&params]() -> UniValue {
         AssertLockHeld(cs_main);
-        const BlockReward fullReward = GetFullMortgageBlockReward(::ChainActive().Height() + 1, params);
+        const BlockReward fullReward = GetFullMortgageBlockReward(::ChainActive().Tip(), params);
         const BlockReward lowReward = GetLowMortgageBlockReward(::ChainActive().Height() + 1, params);
         const int fullFundRatio = GetFullMortgageFundRoyaltyRatio(::ChainActive().Height() + 1, params);
         const int lowFundRatio = GetLowMortgageFundRoyaltyRatio(::ChainActive().Height() + 1, params);

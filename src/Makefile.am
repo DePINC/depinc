@@ -59,6 +59,7 @@ CHIAPOS_H = \
   chiapos/block_fields.h \
   chiapos/chain_info_querier.h \
   chiapos/timelord_cli/timelord_client.h \
+  chiapos/mortgage_calculator.h \
   $(CHIAPOS_KERNEL_INCLUDES)
 
 CHIAPOS_CPPS = \
@@ -68,6 +69,7 @@ CHIAPOS_CPPS = \
   chiapos/timelord_cli/timelord_client.cpp \
   chiapos/chain_info_querier.cpp \
   chiapos/chia_rpc.cpp \
+  chiapos/mortgage_calculator.cpp \
   $(CHIAPOS_KERNEL_CPPS)
 
 LIBCHIA_COMMON=libchia_common.a

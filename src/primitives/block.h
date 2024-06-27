@@ -21,7 +21,7 @@ static const int SERIALIZE_BLOCK_CHIAPOS = 0x04000000;
     do { \
         uint64_t nFlags = nBaseTarget | (vchPubKey.empty() ? 0 : 0x8000000000000000L); \
         READWRITE(nFlags); \
-        READWRITE(nNonce); \
+        READWRITE(nNonceOrExtFlags); \
         READWRITE(nPlotterId); \
         nBaseTarget = nFlags & 0x7fffffffffffffffL; \
         if (nFlags & 0x8000000000000000L) { \
@@ -31,6 +31,13 @@ static const int SERIALIZE_BLOCK_CHIAPOS = 0x04000000;
             } \
         } \
     } while (0)
+/**
+ * @brief ExtFlags represents some external information about current block,
+ *        TODO: it should be verified from the consensus
+ */
+ enum class ExtFlags: uint64_t {
+    CONDITIONAL = 1, // the block with full mortgage rewards
+ };
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -48,7 +55,7 @@ public:
     uint256 hashMerkleRoot;
     uint32_t nTime;
     uint64_t nBaseTarget;
-    uint64_t nNonce;
+    uint64_t nNonceOrExtFlags;
     uint64_t nPlotterId;
     // block signature by generator
     std::vector<unsigned char> vchPubKey;
@@ -94,7 +101,7 @@ public:
         hashMerkleRoot.SetNull();
         nTime = 0;
         nBaseTarget = 0;
-        nNonce = 0;
+        nNonceOrExtFlags = 0;
         nPlotterId = 0;
         vchPubKey.clear();
         vchSignature.clear();
@@ -110,6 +117,12 @@ public:
     bool IsChiaBlock() const
     {
         return !chiaposFields.IsNull();
+    }
+
+    // the returning value of this method only valid since BHDIP011
+    bool IsFullMortgageBlock() const
+    {
+        return (nNonceOrExtFlags & static_cast<uint64_t>(ExtFlags::CONDITIONAL)) != 0;
     }
 
     uint256 GetHash() const;
@@ -164,7 +177,7 @@ public:
         block.hashMerkleRoot = hashMerkleRoot;
         block.nTime          = nTime;
         block.nBaseTarget    = nBaseTarget;
-        block.nNonce         = nNonce;
+        block.nNonceOrExtFlags         = nNonceOrExtFlags;
         block.nPlotterId     = nPlotterId;
         block.vchPubKey      = vchPubKey;
         block.vchSignature   = vchSignature;

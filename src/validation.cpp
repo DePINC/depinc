@@ -47,19 +47,20 @@
 #include <validationinterface.h>
 #include <warnings.h>
 #include <subsidy_utils.h>
-
-#include <chiapos/post.h>
 #include <amount.h>
-#include <chiapos/kernel/bls_key.h>
 #include <coins.h>
 #include <logging.h>
-#include <cstdint>
+#include <chiapos/post.h>
+
+#include <chiapos/kernel/bls_key.h>
+#include <chiapos/mortgage_calculator.h>
 
 #ifdef ENABLE_OMNICORE
 #include <omnicore_api.h>
 #endif
 
 #include <cinttypes>
+#include <cstdint>
 #include <string>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -1415,8 +1416,9 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
     return reward;
 }
 
-BlockReward GetFullMortgageBlockReward(int nHeight, const Consensus::Params& consensusParams)
+BlockReward GetFullMortgageBlockReward(CBlockIndex* pindex, const Consensus::Params& consensusParams)
 {
+    int nHeight = pindex->nHeight + 1;
     const CAmount nSubsidy = GetBlockSubsidy(nHeight, consensusParams);
 
     BlockReward reward = { 0, 0, 0, 0, false, 0 };
@@ -1433,9 +1435,12 @@ BlockReward GetFullMortgageBlockReward(int nHeight, const Consensus::Params& con
     } else if (nHeight < consensusParams.BHDIP009Height) {
         reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
         reward.accumulate = GetBlockAccumulateSubsidy(::ChainActive().Tip(), consensusParams);
-    } else {
+    } else if (nHeight < consensusParams.BHDIP011Height) {
         reward.fund = 0;
         reward.accumulate = GetBlockAccumulateSubsidy(::ChainActive().Tip(), consensusParams);
+    } else {
+        reward.fund = 0;
+        reward.accumulate = CMortgageCalculator(consensusParams).GetActualAccumulatedForBlockHeight(nHeight);
     }
 
     reward.miner = nSubsidy - reward.fund - reward.miner0;
@@ -2570,6 +2575,13 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         bindData = pindex->nPlotterId;
     }
     BlockReward blockReward = GetBlockReward(pindex->pprev, nFees, pindex->generatorAccountID, bindData, view, chainparams.GetConsensus());
+    if (pindex->nHeight >= chainparams.GetConsensus().BHDIP011Height) {
+        // check ExtFlags
+        auto nFlags = blockReward.fUnconditional ? 0 : static_cast<uint64_t>(ExtFlags::CONDITIONAL);
+        if (pindex->GetBlockHeader().nNonceOrExtFlags != nFlags) {
+            return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, tinyformat::format("%s: ExtFlags (should be %d but %d) can not be verified, block height: %d", __func__, nFlags, pindex->GetBlockHeader().nNonceOrExtFlags, pindex->nHeight));
+        }
+    }
     // Check coinbase amount
     if (block.vtx[0]->GetValueOut() > GetTotalReward(blockReward)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS,
