@@ -31,7 +31,7 @@ std::string CBlock::ToString() const
         nVersion,
         hashPrevBlock.ToString(),
         hashMerkleRoot.ToString(),
-        nTime, nBaseTarget, nNonce, nPlotterId,
+        nTime, nBaseTarget, nNonceOrExtFlags, nPlotterId,
         vtx.size());
     for (const auto& tx : vtx) {
         s << "  " << tx->ToString() << "\n";
