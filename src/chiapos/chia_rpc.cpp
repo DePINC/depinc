@@ -1920,7 +1920,7 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     res.pushKV("totalSupplied", nTotalSupplied);
     res.pushKV("minedBlocks", static_cast<int>(nMined));
     res.pushKV("minedEvalWindow", nCounted);
-    res.pushKV("canEarnAccumulates", nTotalPledgeAmount > nPledgeRequiredAmount);
+    res.pushKV("canEarnAccumulates", nTotalActualAmount > nPledgeRequiredAmount);
 
     return res;
 }
