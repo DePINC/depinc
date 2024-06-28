@@ -814,7 +814,7 @@ public:
         consensus.BHDIP010AdjustDifficultyFix2AtHeight = 201100;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
-        consensus.BHDIP011Height = INFINITE_HEIGHT;
+        consensus.BHDIP011Height = 242580;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
 
