@@ -47,7 +47,6 @@ public:
      * @brief Build data for mortgage calculator
      *
      * @param pindex Current top block
-     * @param cache Coins view
      */
     void Build(CBlockIndex* pindex);
 
