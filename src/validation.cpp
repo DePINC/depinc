@@ -1440,7 +1440,9 @@ BlockReward GetFullMortgageBlockReward(CBlockIndex* pindex, const Consensus::Par
         reward.accumulate = GetBlockAccumulateSubsidy(::ChainActive().Tip(), consensusParams);
     } else {
         reward.fund = 0;
-        reward.accumulate = CMortgageCalculator(consensusParams).GetActualAccumulatedForBlockHeight(nHeight);
+        CMortgageCalculator calculator(consensusParams);
+        calculator.Build(pindex);
+        reward.accumulate = calculator.GetActualAccumulatedForBlockHeight(nHeight);
     }
 
     reward.miner = nSubsidy - reward.fund - reward.miner0;
@@ -2575,13 +2577,6 @@ bool CChainState::ConnectBlock(const CBlock& block, CValidationState& state, CBl
         bindData = pindex->nPlotterId;
     }
     BlockReward blockReward = GetBlockReward(pindex->pprev, nFees, pindex->generatorAccountID, bindData, view, chainparams.GetConsensus());
-    if (pindex->nHeight >= chainparams.GetConsensus().BHDIP011Height) {
-        // check ExtFlags
-        auto nFlags = blockReward.fUnconditional ? 0 : static_cast<uint64_t>(ExtFlags::CONDITIONAL);
-        if (pindex->GetBlockHeader().nNonceOrExtFlags != nFlags) {
-            return state.Invalid(ValidationInvalidReason::BLOCK_INVALID_HEADER, false, REJECT_INVALID, tinyformat::format("%s: ExtFlags (should be %d but %d) can not be verified, block height: %d", __func__, nFlags, pindex->GetBlockHeader().nNonceOrExtFlags, pindex->nHeight));
-        }
-    }
     // Check coinbase amount
     if (block.vtx[0]->GetValueOut() > GetTotalReward(blockReward)) {
         return state.Invalid(ValidationInvalidReason::CONSENSUS,

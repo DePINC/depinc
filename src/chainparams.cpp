@@ -60,7 +60,7 @@ static CBlock CreateGenesisBlock(char const* pszTimestamp, CScript const& genesi
     CBlock genesis;
     genesis.nTime       = nTime;
     genesis.nBaseTarget = nBaseTarget;
-    genesis.nNonceOrExtFlags      = nNonce;
+    genesis.nNonce      = nNonce;
     genesis.nVersion    = nVersion;
     genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
     genesis.hashPrevBlock.SetNull();

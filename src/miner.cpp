@@ -191,7 +191,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript &sc
 
     // Fill in header
     pblock->hashPrevBlock = pindexPrev->GetBlockHash();
-    pblock->nNonceOrExtFlags = nonce;
+    pblock->nNonce = nonce;
     pblock->nPlotterId = nPlotterId;
     pblock->nBaseTarget = poc::CalculateBaseTarget(*pindexPrev, *pblock, chainparams.GetConsensus());
 
@@ -313,13 +313,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewChiaBlock(const CBlockI
     pblock->hashPrevBlock = pindexPrev->GetBlockHash();
 
     // burst fields
-    pblock->nNonceOrExtFlags = 0;
+    pblock->nNonce = 0;
     pblock->nPlotterId = 0;
     pblock->nBaseTarget = 0;
-
-    if (nHeight >= params.BHDIP011Height) {
-        pblock->nNonceOrExtFlags = blockReward.fUnconditional ? 0 : static_cast<uint64_t>(ExtFlags::CONDITIONAL);
-    }
 
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(*pblock->vtx[0]);

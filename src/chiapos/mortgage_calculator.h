@@ -8,6 +8,7 @@
 #include <univalue.h>
 
 class CBlockIndex;
+class CCoinsViewCache;
 
 struct FullMortgageBlock;
 using FullMortgageBlockMap = std::map<int, FullMortgageBlock>;
@@ -18,7 +19,6 @@ struct FullMortgageBlock {
     int nNumOfDistribution{0};  // number of full mortgage blocks from previous 3360 blocks
     std::set<int> vDistributedToBlocks;
     std::set<int> vDistributedFromBlocks;
-    CAmount nActualAccumulated{0};
 
     NODISCARD CAmount GetDistributeAmount() const { return nOriginalAccumulatedToDistribute / nNumOfDistribution; }
 
@@ -34,7 +34,7 @@ struct FullMortgageBlock {
         return nActualAccumulated;
     }
 
-    NODISCARD UniValue ToUniValue() const;
+    NODISCARD UniValue ToUniValue(FullMortgageBlockMap const& mapBlocks) const;
 };
 
 class CMortgageCalculator {
@@ -47,6 +47,7 @@ public:
      * @brief Build data for mortgage calculator
      *
      * @param pindex Current top block
+     * @param cache Coins view
      */
     void Build(CBlockIndex* pindex);
 
@@ -55,8 +56,9 @@ public:
      * data
      *
      * @param pindexPrev Last top block
+     * @param view Coins view
      */
-    void AddNewFullMortgageBlock(CBlockIndex* pindexPrev);
+    void AddNewFullMortgageBlock(CBlockIndex* pindexPrev, CCoinsViewCache const& view);
 
     /**
      * @brief Get the Actual Accumulated For Block Height object
@@ -76,8 +78,6 @@ public:
 
 private:
     NODISCARD int GetNumOfBlocksToDistribute(CBlockIndex* pindexFullMortgage) const;
-
-    NODISCARD bool IsBlockFullMortgage(CBlockIndex* pindex) const;
 
     Consensus::Params m_params;
     FullMortgageBlockMap m_mapBlocks;

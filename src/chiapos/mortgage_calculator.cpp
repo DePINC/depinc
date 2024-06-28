@@ -6,11 +6,13 @@
 
 namespace {
 
-using BlockPred = std::function<int64_t(CBlockIndex* curr)>;
+bool IsBlockFullMortgage(CBlockIndex* pindex) { return (pindex->nStatus & BLOCK_UNCONDITIONAL) == 0; }
 
 void FindBlocksToDistribute(CBlockIndex* pfrom, CBlockIndex* pto, int nNumOfDistributions,
                             std::set<int>& outBlockHeights) {
-    while (!pfrom->GetBlockHeader().IsFullMortgageBlock()) pfrom = pfrom->pprev;
+    while (!IsBlockFullMortgage(pfrom)) {
+        pfrom = pfrom->pprev;
+    }
     if (pfrom != pto) {
         FindBlocksToDistribute(pfrom->pprev, pto, nNumOfDistributions, outBlockHeights);
     }
@@ -21,7 +23,7 @@ void FindBlocksToDistribute(CBlockIndex* pfrom, CBlockIndex* pto, int nNumOfDist
 
 }  // namespace
 
-UniValue FullMortgageBlock::ToUniValue() const {
+UniValue FullMortgageBlock::ToUniValue(FullMortgageBlockMap const& mapBlocks) const {
     auto trans_func = [](std::set<int> const& heights) -> UniValue {
         UniValue outVals(UniValue::VARR);
         for (int nHeight : heights) {
@@ -36,7 +38,7 @@ UniValue FullMortgageBlock::ToUniValue() const {
     resVal.pushKV("numOfDistribution", nNumOfDistribution);
     resVal.pushKV("distributedToBlocks", trans_func(vDistributedToBlocks));
     resVal.pushKV("distributedFromBlocks", trans_func(vDistributedFromBlocks));
-    resVal.pushKV("actualAccumulated", nActualAccumulated);
+    resVal.pushKV("actualAccumulated", CalcActualAccumulatedAmount(mapBlocks));
 
     return resVal;
 }
@@ -51,7 +53,7 @@ bool CMortgageCalculator::IsEmpty() const {
 void CMortgageCalculator::Build(CBlockIndex* pindex) {
     assert(IsEmpty());
     for (auto pcurr = pindex; pcurr != nullptr && pcurr->nHeight >= m_params.BHDIP011Height; pcurr = pcurr->pprev) {
-        if (pcurr->GetBlockHeader().IsFullMortgageBlock()) {
+        if (IsBlockFullMortgage(pcurr)) {
             // build full mortgage block
             FullMortgageBlock fmb;
             fmb.nHeight = pcurr->nHeight;
@@ -69,7 +71,7 @@ void CMortgageCalculator::Build(CBlockIndex* pindex) {
     }
 }
 
-void CMortgageCalculator::AddNewFullMortgageBlock(CBlockIndex* pindexPrev) {
+void CMortgageCalculator::AddNewFullMortgageBlock(CBlockIndex* pindexPrev, CCoinsViewCache const& view) {
     // ensure the mortgage block doesn't exist
     assert(m_mapBlocks.find(pindexPrev->nHeight + 1) == std::cend(m_mapBlocks));
 
@@ -109,24 +111,4 @@ int CMortgageCalculator::GetNumOfBlocksToDistribute(CBlockIndex* pindexPrev) con
         pindexPrev = pindexPrev->pprev;
     }
     return std::max(m_params.BHDIP011MinFullMortgageBlocksToDistribute, nDistribution);
-}
-
-bool CMortgageCalculator::IsBlockFullMortgage(CBlockIndex* pindex) const {
-    if (pindex->nHeight >= m_params.BHDIP011Height) {
-        return pindex->GetBlockHeader().IsFullMortgageBlock();
-    }
-    CBlock block;
-    if (!ReadBlockFromDisk(block, pindex, m_params)) {
-        throw std::runtime_error(tinyformat::format("the block cannot be found from disk, height=%d", pindex->nHeight));
-    }
-    CAmount nSubsidy = GetBlockSubsidy(pindex->nHeight, m_params);
-    for (auto const& tx : block.vtx) {
-        if (tx->IsCoinBase()) {
-            if (tx->GetValueOut() > nSubsidy) {
-                return true;
-            }
-            break;
-        }
-    }
-    return false;
 }

@@ -1942,7 +1942,7 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
 
     UniValue resVal(UniValue::VARR);
     for (auto const& entry : calculator.GetMap()) {
-        resVal.push_back(entry.second.ToUniValue());
+        resVal.push_back(entry.second.ToUniValue(calculator.GetMap()));
     }
     return resVal;
 }
