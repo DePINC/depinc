@@ -1862,6 +1862,8 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     CAccountID accountID = ExtractAccountID(dest);
 
     LOCK(cs_main);
+    ::ChainstateActive().ForceFlushStateToDisk();
+
     CBlockIndex* pindex = ::ChainActive().Tip();
 
     auto querier = ChainInfoQuerier::CreateQuerier();
