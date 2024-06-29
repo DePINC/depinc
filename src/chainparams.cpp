@@ -791,7 +791,7 @@ public:
         consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = INFINITE_HEIGHT;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
-        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 10; // 10 blocks before disabling coins before BHDIP009
+        consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = INFINITE_HEIGHT; // do not disable coins from testnet3
         consensus.BHDIP010TargetSpacingMulFactor = 1;
         consensus.BHDIP010TargetSpacingMulFactorEnableAtHeight = consensus.BHDIP009Height; // fix the duration as soon as the chain height reaches BHDIP010
         consensus.BHDIP010PledgeOverrideRetargetMinHeights = 3; // 3 blocks for the number of min heights to do the retargeting
