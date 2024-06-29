@@ -208,6 +208,7 @@ public:
         consensus.BHDIP010AdjustDifficultyFix2AtHeight = 99999999;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
+        // BHDIP011
         consensus.BHDIP011Height = INFINITE_HEIGHT;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
@@ -781,12 +782,11 @@ public:
         consensus.BHDIP009DifficultyChangeMaxFactor = chiapos::DIFFICULTY_CHANGE_MAX_FACTOR;
 
         // BHDIP010
-        constexpr int ONE_HOUR_HEIGHTS = 60 / 3;
         consensus.BHDIP010Height = consensus.BHDIP009Height + 1; // 10 blocks before BHDIP010
 
         // Patch for filter-bit
         consensus.BHDIP009PlotIdBitsOfFilter = chiapos::NUMBER_OF_ZEROS_BITS_FOR_FILTER;
-        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = consensus.BHDIP010Height + 9999999;
+        consensus.BHDIP009PlotIdBitsOfFilterEnableOnHeight = INFINITE_HEIGHT;
 
         consensus.BHDIP010TotalAmountUpgradeMultiply = 3;
         consensus.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight = consensus.BHDIP010Height + 10; // 10 blocks before disabling coins before BHDIP009
@@ -811,10 +811,11 @@ public:
         consensus.BHDIP010AdjustDifficultyConsumeSecondsFix = ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
 
-        consensus.BHDIP010AdjustDifficultyFix2AtHeight = 201100;
+        consensus.BHDIP010AdjustDifficultyFix2AtHeight = consensus.BHDIP010Height + 3;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
-        consensus.BHDIP011Height = 242580;
+        // BHDIP011
+        consensus.BHDIP011Height = consensus.BHDIP010Height + 10;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
 
