@@ -2932,6 +2932,8 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
                 auto params = Params().GetConsensus();
                 if (nSpendHeight >= params.BHDIP010DisableCoinsBeforeBHDIP009EnableAtHeight && nTxHeight < params.BHDIP009Height) {
                     // the tx should not be added
+                    // warn by adding a log
+                    LogPrintf("%s: cannot select coin (%s, %n) to spend cause the coin is older than BHDIP009 and the related chain consensus is activated\n", __func__, wtxid.GetHex(), i);
                     continue;
                 }
             }
