@@ -523,44 +523,44 @@ static UniValue sendtoaddress(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-            RPCHelpMan{"sendtoaddress",
-                "\nSend an amount to a given address." +
-                    HelpRequiringPassphrase(pwallet) + "\n",
-                {
-                    {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The bitcoin address to send to."},
-                    {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::NO, "The amount in " + CURRENCY_UNIT + " to send. eg 0.1"},
-                    {"comment", RPCArg::Type::STR, RPCArg::Optional::OMITTED_NAMED_ARG, "A comment used to store what the transaction is for.\n"
-            "                             This is not part of the transaction, just kept in your wallet."},
-                    {"comment_to", RPCArg::Type::STR, RPCArg::Optional::OMITTED_NAMED_ARG, "A comment to store the name of the person or organization\n"
-            "                             to which you're sending the transaction. This is not part of the \n"
-            "                             transaction, just kept in your wallet."},
-                    {"subtractfeefromamount", RPCArg::Type::BOOL, /* default */ "false", "The fee will be deducted from the amount being sent.\n"
-            "                             The recipient will receive less bitcoins than you enter in the amount field."},
-                    {"replaceable", RPCArg::Type::BOOL, /* default */ "wallet default", "Allow this transaction to be replaced by a transaction with higher fees via BIP 125"},
-                    {"conf_target", RPCArg::Type::NUM, /* default */ "wallet default", "Confirmation target (in blocks)"},
-                    {"estimate_mode", RPCArg::Type::STR, /* default */ "UNSET", "The fee estimate mode, must be one of:\n"
-            "       \"UNSET\"\n"
-            "       \"ECONOMICAL\"\n"
-            "       \"CONSERVATIVE\""},
-                    {"pay_policy", RPCArg::Type::STR, /* default */ "ANY", "The pay from policy, must be one of:\n"
-            "       \"ANY\"\n"
-            "       \"PRIMARYONLY\"\n"
-            "       \"PRIMARYEXCLUDE\"\n"
-            "       \"MOVEALL\""},
-                    {"changeaddress", RPCArg::Type::STR, /* default */ "", "The change address. Invalid on pay_policy=MOVEALL"},
-                    {"avoid_reuse", RPCArg::Type::BOOL, /* default */ "true", "(only available if avoid_reuse wallet flag is set) Avoid spending from dirty addresses; addresses are considered\n"
-            "                             dirty if they have previously been used in a transaction."},
-                },
-                RPCResult{
-            "\"txid\"                  (string) The transaction id.\n"
-                },
-                RPCExamples{
-                    HelpExampleCli("sendtoaddress", "\"1M72Sfpbz1BPpXFHz9m3CdqATR44Jvaydd\" 0.1")
+    RPCHelpMan{"sendtoaddress",
+        "\nSend an amount to a given address." +
+            HelpRequiringPassphrase(pwallet) + "\n",
+        {
+            {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The bitcoin address to send to."},
+            {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::NO, "The amount in " + CURRENCY_UNIT + " to send. eg 0.1"},
+            {"comment", RPCArg::Type::STR, RPCArg::Optional::OMITTED_NAMED_ARG, "A comment used to store what the transaction is for.\n"
+                "                             This is not part of the transaction, just kept in your wallet."},
+            {"comment_to", RPCArg::Type::STR, RPCArg::Optional::OMITTED_NAMED_ARG, "A comment to store the name of the person or organization\n"
+                "                             to which you're sending the transaction. This is not part of the \n"
+                "                             transaction, just kept in your wallet."},
+            {"subtractfeefromamount", RPCArg::Type::BOOL, /* default */ "false", "The fee will be deducted from the amount being sent.\n"
+                "                             The recipient will receive less bitcoins than you enter in the amount field."},
+            {"replaceable", RPCArg::Type::BOOL, /* default */ "wallet default", "Allow this transaction to be replaced by a transaction with higher fees via BIP 125"},
+            {"conf_target", RPCArg::Type::NUM, /* default */ "wallet default", "Confirmation target (in blocks)"},
+            {"estimate_mode", RPCArg::Type::STR, /* default */ "UNSET", "The fee estimate mode, must be one of:\n"
+                "       \"UNSET\"\n"
+                "       \"ECONOMICAL\"\n"
+                "       \"CONSERVATIVE\""},
+            {"pay_policy", RPCArg::Type::STR, /* default */ "ANY", "The pay from policy, must be one of:\n"
+                "       \"ANY\"\n"
+                "       \"PRIMARYONLY\"\n"
+                "       \"PRIMARYEXCLUDE\"\n"
+                "       \"MOVEALL\""},
+            {"changeaddress", RPCArg::Type::STR, /* default */ "", "The change address. Invalid on pay_policy=MOVEALL"},
+            {"avoid_reuse", RPCArg::Type::BOOL, /* default */ "true", "(only available if avoid_reuse wallet flag is set) Avoid spending from dirty addresses; addresses are considered\n"
+                "                             dirty if they have previously been used in a transaction."},
+        },
+        RPCResult{
+                "\"txid\"                  (string) The transaction id.\n"
+        },
+        RPCExamples{
+            HelpExampleCli("sendtoaddress", "\"1M72Sfpbz1BPpXFHz9m3CdqATR44Jvaydd\" 0.1")
             + HelpExampleCli("sendtoaddress", "\"1M72Sfpbz1BPpXFHz9m3CdqATR44Jvaydd\" 0.1 \"donation\" \"seans outpost\"")
             + HelpExampleCli("sendtoaddress", "\"1M72Sfpbz1BPpXFHz9m3CdqATR44Jvaydd\" 0.1 \"\" \"\" true")
             + HelpExampleRpc("sendtoaddress", "\"1M72Sfpbz1BPpXFHz9m3CdqATR44Jvaydd\", 0.1, \"donation\", \"seans outpost\"")
-                },
-            }.Check(request);
+        },
+    }.Check(request);
 
     // Make sure the results are valid at least up to the most recent block
     // the user could have gotten from another RPC command prior to now
@@ -4145,23 +4145,23 @@ static UniValue getaddressesbylabel(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-            RPCHelpMan{"getaddressesbylabel",
-                "\nReturns the list of addresses assigned the specified label.\n",
-                {
-                    {"label", RPCArg::Type::STR, RPCArg::Optional::NO, "The label."},
-                },
-                RPCResult{
+    RPCHelpMan{"getaddressesbylabel",
+        "\nReturns the list of addresses assigned the specified label.\n",
+        {
+            {"label", RPCArg::Type::STR, RPCArg::Optional::NO, "The label."},
+        },
+        RPCResult{
             "{ (json object with addresses as keys)\n"
             "  \"address\": { (json object with information about address)\n"
             "    \"purpose\": \"string\" (string)  Purpose of address (\"send\" for sending address, \"receive\" for receiving address)\n"
             "  },...\n"
             "}\n"
-                },
-                RPCExamples{
-                    HelpExampleCli("getaddressesbylabel", "\"tabby\"")
-            + HelpExampleRpc("getaddressesbylabel", "\"tabby\"")
-                },
-            }.Check(request);
+        },
+        RPCExamples{
+            HelpExampleCli("getaddressesbylabel", "\"tabby\"") +
+            HelpExampleRpc("getaddressesbylabel", "\"tabby\"")
+        },
+    }.Check(request);
 
     LOCK(pwallet->cs_wallet);
 
