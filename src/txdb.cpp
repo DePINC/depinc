@@ -810,7 +810,7 @@ COutPointVec CCoinsViewDB::GetAccountCoins(const CAccountID &accountID) const {
     COutPointVec result;
     pcursor->Seek(entry);
     while (pcursor->Valid()) {
-        if (!pcursor->GetKey(entry) || entryAccountID != accountID) {
+        if (!pcursor->GetKey(entry) || entryAccountID != accountID || entry.key != DB_COIN_INDEX) {
             break;
         }
         result.push_back(outpoint);
