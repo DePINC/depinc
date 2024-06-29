@@ -155,6 +155,8 @@ struct Params {
     int BHDIP010AdjustDifficultyFix2AtHeight;
     int BHDIP010AdjustDifficultyTargetSpacingFix2;
 
+    int NetProtocolMinVersion;
+
     /**
      * @brief BHD011 hard-fork parameters
      */

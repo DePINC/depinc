@@ -209,6 +209,8 @@ public:
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
         // BHDIP011
+        consensus.NetProtocolMinVersion = 80028;
+
         consensus.BHDIP011Height = INFINITE_HEIGHT;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
@@ -815,6 +817,8 @@ public:
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
         // BHDIP011
+        consensus.NetProtocolMinVersion = 80031;
+
         consensus.BHDIP011Height = consensus.BHDIP010Height + 10;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
