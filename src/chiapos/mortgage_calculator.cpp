@@ -4,6 +4,8 @@
 #include <validation.h>
 #include <subsidy_utils.h>
 
+#include <util/moneystr.h>
+
 namespace {
 
 bool IsBlockFullMortgage(CBlockIndex* pindex) { return (pindex->nStatus & BLOCK_UNCONDITIONAL) == 0; }
@@ -34,11 +36,23 @@ UniValue FullMortgageBlock::ToUniValue(FullMortgageBlockMap const& mapBlocks) co
 
     UniValue resVal(UniValue::VOBJ);
     resVal.pushKV("height", nHeight);
+    resVal.pushKV("totalReward", nTotalReward);
+    resVal.pushKV("blockSubsidy", nBlockSubsidy);
     resVal.pushKV("originalAccumulated", nOriginalAccumulatedToDistribute);
+
+    CAmount nActualAccumulated = CalcActualAccumulatedAmount(mapBlocks);
+    resVal.pushKV("actualAccumulated", nActualAccumulated);
+
+    UniValue humanVal(UniValue::VOBJ);
+    humanVal.pushKV("totalReward", FormatMoney(nTotalReward));
+    humanVal.pushKV("blockSubsidy", FormatMoney(nBlockSubsidy));
+    humanVal.pushKV("originalAccumulated", FormatMoney(nOriginalAccumulatedToDistribute));
+    humanVal.pushKV("actualAccumulated", FormatMoney(nActualAccumulated));
+    resVal.pushKV("forHuman", humanVal);
+
     resVal.pushKV("numOfDistribution", nNumOfDistribution);
     resVal.pushKV("distributedToBlocks", trans_func(vDistributedToBlocks));
     resVal.pushKV("distributedFromBlocks", trans_func(vDistributedFromBlocks));
-    resVal.pushKV("actualAccumulated", CalcActualAccumulatedAmount(mapBlocks));
 
     return resVal;
 }
@@ -59,6 +73,8 @@ void CMortgageCalculator::Build(CBlockIndex* pindex) {
             fmb.nHeight = pcurr->nHeight;
             fmb.nOriginalAccumulatedToDistribute = GetBlockAccumulateSubsidy(pcurr->pprev, m_params);
             fmb.nNumOfDistribution = GetNumOfBlocksToDistribute(pcurr);
+            fmb.nTotalReward = GetBlockTotalReward(pcurr);
+            fmb.nBlockSubsidy = GetBlockSubsidy(pcurr->nHeight, m_params);
             // find those blocks to distribute
             FindBlocksToDistribute(pindex, pcurr, fmb.nNumOfDistribution, fmb.vDistributedToBlocks);
             m_mapBlocks.insert(std::make_pair(pcurr->nHeight, std::move(fmb)));
@@ -111,4 +127,21 @@ int CMortgageCalculator::GetNumOfBlocksToDistribute(CBlockIndex* pindexPrev) con
         pindexPrev = pindexPrev->pprev;
     }
     return std::max(m_params.BHDIP011MinFullMortgageBlocksToDistribute, nDistribution);
+}
+
+CAmount CMortgageCalculator::GetBlockTotalReward(CBlockIndex* pindex) const {
+    // read the block from disk
+    CBlock block;
+    if (!ReadBlockFromDisk(block, pindex, m_params)) {
+        throw std::runtime_error(tinyformat::format("cannot read block from disk, height=%d", pindex->nHeight));
+    }
+    // find the coinbase and get exactly the reward amount
+    for (auto const& tx : block.vtx) {
+        if (tx->IsCoinBase()) {
+            return tx->vout[0].nValue;
+            break;
+        }
+    }
+    throw std::runtime_error(
+            tinyformat::format("coinbase from block (height=%d) is not able to be found", pindex->nHeight));
 }

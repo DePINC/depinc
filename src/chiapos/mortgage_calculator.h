@@ -19,6 +19,8 @@ struct FullMortgageBlock {
     int nNumOfDistribution{0};  // number of full mortgage blocks from previous 3360 blocks
     std::set<int> vDistributedToBlocks;
     std::set<int> vDistributedFromBlocks;
+    CAmount nTotalReward{0};
+    CAmount nBlockSubsidy{0};
 
     NODISCARD CAmount GetDistributeAmount() const { return nOriginalAccumulatedToDistribute / nNumOfDistribution; }
 
@@ -77,6 +79,8 @@ public:
 
 private:
     NODISCARD int GetNumOfBlocksToDistribute(CBlockIndex* pindexFullMortgage) const;
+
+    NODISCARD CAmount GetBlockTotalReward(CBlockIndex* pindex) const;
 
     Consensus::Params m_params;
     FullMortgageBlockMap m_mapBlocks;
