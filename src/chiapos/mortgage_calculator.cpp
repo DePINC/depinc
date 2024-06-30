@@ -8,15 +8,20 @@
 
 namespace {
 
-bool IsBlockFullMortgage(CBlockIndex* pindex) { return (pindex->nStatus & BLOCK_UNCONDITIONAL) == 0; }
+bool IsBlockFullMortgage(CBlockIndex* pindex, Consensus::Params const& params) {
+    if (pindex->nHeight >= params.BHDIP009Height) {
+        return (pindex->nStatus & BLOCK_UNCONDITIONAL) == 0;
+    }
+    return false;
+}
 
 void FindBlocksToDistribute(CBlockIndex* pfrom, CBlockIndex* pto, int nNumOfDistributions,
-                            std::set<int>& outBlockHeights) {
-    while (!IsBlockFullMortgage(pfrom)) {
+                            Consensus::Params const& params, std::set<int>& outBlockHeights) {
+    while (!IsBlockFullMortgage(pfrom, params)) {
         pfrom = pfrom->pprev;
     }
     if (pfrom != pto) {
-        FindBlocksToDistribute(pfrom->pprev, pto, nNumOfDistributions, outBlockHeights);
+        FindBlocksToDistribute(pfrom->pprev, pto, nNumOfDistributions, params, outBlockHeights);
     }
     if (outBlockHeights.size() < nNumOfDistributions) {
         outBlockHeights.insert(pfrom->nHeight);
@@ -67,7 +72,7 @@ bool CMortgageCalculator::IsEmpty() const {
 void CMortgageCalculator::Build(CBlockIndex* pindex) {
     assert(IsEmpty());
     for (auto pcurr = pindex; pcurr != nullptr && pcurr->nHeight >= m_params.BHDIP011Height; pcurr = pcurr->pprev) {
-        if (IsBlockFullMortgage(pcurr)) {
+        if (IsBlockFullMortgage(pcurr, m_params)) {
             // build full mortgage block
             FullMortgageBlock fmb;
             fmb.nHeight = pcurr->nHeight;
@@ -76,7 +81,7 @@ void CMortgageCalculator::Build(CBlockIndex* pindex) {
             fmb.nTotalReward = GetBlockTotalReward(pcurr);
             fmb.nBlockSubsidy = GetBlockSubsidy(pcurr->nHeight, m_params);
             // find those blocks to distribute
-            FindBlocksToDistribute(pindex, pcurr, fmb.nNumOfDistribution, fmb.vDistributedToBlocks);
+            FindBlocksToDistribute(pindex, pcurr, fmb.nNumOfDistribution, m_params, fmb.vDistributedToBlocks);
             m_mapBlocks.insert(std::make_pair(pcurr->nHeight, std::move(fmb)));
         }
     }
@@ -120,7 +125,7 @@ int CMortgageCalculator::GetNumOfBlocksToDistribute(CBlockIndex* pindexPrev) con
     int nLowestHeight = pindexPrev->nHeight - m_params.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage;
     int nDistribution{0};
     while (pindexPrev->nHeight >= nLowestHeight) {
-        if (IsBlockFullMortgage(pindexPrev)) {
+        if (IsBlockFullMortgage(pindexPrev, m_params)) {
             ++nDistribution;
         }
         // next
