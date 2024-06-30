@@ -14,11 +14,11 @@ class CMortgageCalculator {
 public:
     CMortgageCalculator(CBlockIndex const* pindexTip, Consensus::Params params);
 
-    NODISCARD int CalcNumOfDistributions(CBlockIndex const* pindexFullMortgage) const;
+    NODISCARD int CalcNumOfDistributions(int nHeight) const;
 
-    NODISCARD int CalcNumOfDistributed(CBlockIndex const* pindexFullMortgage, CBlockIndex const* pindexPrev) const;
+    NODISCARD int CalcNumOfDistributed(int nHeight, CBlockIndex const* pindexPrev) const;
 
-    NODISCARD CAmount CalcDistributeAmount(CBlockIndex const* pindexFullMortgage, int nTargetHeight) const;
+    NODISCARD CAmount CalcDistributeAmount(int nHeight, int nTargetHeight) const;
 
     NODISCARD CAmount CalcAccumulatedAmount(int nTargetHeight) const;
 

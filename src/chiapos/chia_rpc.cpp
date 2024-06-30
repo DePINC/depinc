@@ -1941,13 +1941,17 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
 
     auto params = Params().GetConsensus();
     // CMortgageCalculator calculator(pindexTip, params);
-    for (auto pcurr = pindexTip; pcurr->nHeight > params.BHDIP009Height; pcurr = pcurr->pprev) {
+    for (auto pcurr = pindexTip; pcurr->nHeight >= params.BHDIP009Height; pcurr = pcurr->pprev) {
         if (CMortgageCalculator::IsFullMortgageBlock(pcurr, params)) {
             UniValue fullMortgageVal(UniValue::VOBJ);
             CMortgageCalculator calculator(pcurr->pprev, params);
             fullMortgageVal.pushKV("height", pcurr->nHeight);
-            fullMortgageVal.pushKV("numOfDistributions", calculator.CalcNumOfDistributions(pcurr));
-            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr, pindexTip));
+            fullMortgageVal.pushKV("numOfDistributions", calculator.CalcNumOfDistributions(pcurr->nHeight));
+            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr->nHeight, pindexTip));
+
+            CAmount nSubsidy = GetBlockSubsidy(pcurr->nHeight, params);
+            fullMortgageVal.pushKV("subsidy", nSubsidy);
+            fullMortgageVal.pushKV("subsidy(human)", FormatMoney(nSubsidy));
 
             CAmount nOriginalAccumulated = GetBlockAccumulateSubsidy(pcurr->pprev, params);
             fullMortgageVal.pushKV("originalAccumulated", nOriginalAccumulated);
@@ -1972,6 +1976,7 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
                     break;
                 }
             }
+            resVal.push_back(fullMortgageVal);
         }
     }
 

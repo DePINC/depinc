@@ -6,28 +6,35 @@
 
 #include <util/moneystr.h>
 
+CBlockIndex const* FindPrevIndex(int nHeight, CBlockIndex const* pindex) {
+    while (pindex->nHeight >= nHeight) {
+        pindex = pindex->pprev;
+    }
+    return pindex;
+}
+
 CMortgageCalculator::CMortgageCalculator(CBlockIndex const* pindexTip, Consensus::Params params)
         : m_pindexTip(pindexTip), m_params(std::move(params)) {}
 
-int CMortgageCalculator::CalcNumOfDistributions(CBlockIndex const* pindexFullMortgage) const {
-    assert(IsFullMortgageBlock(pindexFullMortgage, m_params));
-
+int CMortgageCalculator::CalcNumOfDistributions(int nHeight) const {
+    CBlockIndex const* pcurr = m_pindexTip;
+    while (pcurr->nHeight >= nHeight) {
+        pcurr = pcurr->pprev;
+    }
     int nNumOfFullMortgageBlocks{0};
-    int nLowestHeight = std::max(
-            m_params.BHDIP009Height,
-            pindexFullMortgage->nHeight - m_params.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage);
-    for (auto pindex = pindexFullMortgage->pprev; pindex->nHeight >= nLowestHeight; pindex = pindex->pprev) {
+    int nLowestHeight = std::max(m_params.BHDIP009Height,
+                                 nHeight - m_params.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage);
+    for (auto pindex = pcurr; pindex->nHeight >= nLowestHeight; pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             ++nNumOfFullMortgageBlocks;
         }
     }
-    return nNumOfFullMortgageBlocks;
+    return std::max(m_params.BHDIP011MinFullMortgageBlocksToDistribute, nNumOfFullMortgageBlocks);
 }
 
-int CMortgageCalculator::CalcNumOfDistributed(CBlockIndex const* pindexFullMortgage,
-                                              CBlockIndex const* pindexPrev) const {
+int CMortgageCalculator::CalcNumOfDistributed(int nHeight, CBlockIndex const* pindexPrev) const {
     int nNumOfDistributed{1};
-    for (auto pindex = pindexPrev; pindex != pindexFullMortgage; pindex = pindex->pprev) {
+    for (auto pindex = pindexPrev; pindex->nHeight >= nHeight; pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             ++nNumOfDistributed;
         }
@@ -35,15 +42,15 @@ int CMortgageCalculator::CalcNumOfDistributed(CBlockIndex const* pindexFullMortg
     return nNumOfDistributed;
 }
 
-CAmount CMortgageCalculator::CalcDistributeAmount(CBlockIndex const* pindexFullMortgage, int nTargetHeight) const {
-    int nDistributions = CalcNumOfDistributions(pindexFullMortgage);
-    int nDistributed = CalcNumOfDistributed(pindexFullMortgage, m_pindexTip);
+CAmount CMortgageCalculator::CalcDistributeAmount(int nHeight, int nTargetHeight) const {
+    int nDistributions = CalcNumOfDistributions(nHeight);
+    int nDistributed = CalcNumOfDistributed(nHeight, m_pindexTip);
 
     if (nDistributed >= nDistributions) {
         return 0;
     }
 
-    CAmount nOriginalAccumulatedAmount = GetBlockAccumulateSubsidy(pindexFullMortgage->pprev, m_params);
+    CAmount nOriginalAccumulatedAmount = GetBlockAccumulateSubsidy(FindPrevIndex(nHeight, m_pindexTip), m_params);
     return nOriginalAccumulatedAmount / nDistributions;
 }
 
@@ -51,10 +58,13 @@ CAmount CMortgageCalculator::CalcAccumulatedAmount(int nTargetHeight) const {
     CAmount nTotalAmount{0};
     for (auto pindex = m_pindexTip; pindex->nHeight >= m_params.BHDIP009Height; pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
-            nTotalAmount += CalcDistributeAmount(pindex, nTargetHeight);
+            nTotalAmount += CalcDistributeAmount(pindex->nHeight, nTargetHeight);
         }
     }
-    return nTotalAmount;
+    // don't forget to calculate the accumulate amount from current block
+    CAmount nOriginalAccumulated = GetBlockAccumulateSubsidy(FindPrevIndex(nTargetHeight, m_pindexTip), m_params);
+    CAmount nDistributions = CalcNumOfDistributions(nTargetHeight);
+    return nTotalAmount + nOriginalAccumulated / nDistributions;
 }
 
 bool CMortgageCalculator::IsFullMortgageBlock(CBlockIndex const* pindex, Consensus::Params const& params) {
