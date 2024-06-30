@@ -10,80 +10,23 @@
 class CBlockIndex;
 class CCoinsViewCache;
 
-struct FullMortgageBlock;
-using FullMortgageBlockMap = std::map<int, FullMortgageBlock>;
-
-struct FullMortgageBlock {
-    int nHeight{0};
-    CAmount nOriginalAccumulatedToDistribute{0};
-    int nNumOfDistribution{0};  // number of full mortgage blocks from previous 3360 blocks
-    std::set<int> vDistributedToBlocks;
-    std::set<int> vDistributedFromBlocks;
-    CAmount nTotalReward{0};
-    CAmount nBlockSubsidy{0};
-
-    NODISCARD CAmount GetDistributeAmount() const { return nOriginalAccumulatedToDistribute / nNumOfDistribution; }
-
-    NODISCARD bool IsDistributionFinished() const { return vDistributedToBlocks.size() == nNumOfDistribution; }
-
-    NODISCARD CAmount CalcActualAccumulatedAmount(FullMortgageBlockMap const& mapBlocks) const {
-        CAmount nActualAccumulated{0};
-        for (int nFromHeight : vDistributedFromBlocks) {
-            auto iter = mapBlocks.find(nFromHeight);
-            assert(iter != std::cend(mapBlocks));
-            nActualAccumulated += iter->second.GetDistributeAmount();
-        }
-        return nActualAccumulated;
-    }
-
-    NODISCARD UniValue ToUniValue(FullMortgageBlockMap const& mapBlocks) const;
-};
-
 class CMortgageCalculator {
 public:
-    explicit CMortgageCalculator(Consensus::Params params);
+    CMortgageCalculator(CBlockIndex const* pindexTip, Consensus::Params params);
 
-    NODISCARD bool IsEmpty() const;
+    NODISCARD int CalcNumOfDistributions(CBlockIndex const* pindexFullMortgage) const;
 
-    /**
-     * @brief Build data for mortgage calculator
-     *
-     * @param pindex Current top block
-     */
-    void Build(CBlockIndex* pindex);
+    NODISCARD int CalcNumOfDistributed(CBlockIndex const* pindexFullMortgage, CBlockIndex const* pindexPrev) const;
 
-    /**
-     * @brief A new full mortgage block will be released, now add the information of the new block and calculate related
-     * data
-     *
-     * @param pindexPrev Last top block
-     * @param view Coins view
-     */
-    void AddNewFullMortgageBlock(CBlockIndex* pindexPrev, CCoinsViewCache const& view);
+    NODISCARD CAmount CalcDistributeAmount(CBlockIndex const* pindexFullMortgage, int nTargetHeight) const;
 
-    /**
-     * @brief Get the Actual Accumulated For Block Height object
-     *
-     * @param nHeight The height to calculate accumulated amount
-     *
-     * @return The calculated amount
-     */
-    NODISCARD CAmount GetActualAccumulatedForBlockHeight(int nHeight) const;
+    NODISCARD CAmount CalcAccumulatedAmount(int nTargetHeight) const;
 
-    /**
-     * @brief Return the full map
-     *
-     * @return The full map
-     */
-    NODISCARD FullMortgageBlockMap const& GetMap() const;
+    NODISCARD static bool IsFullMortgageBlock(CBlockIndex const* pindex, Consensus::Params const& params);
 
 private:
-    NODISCARD int GetNumOfBlocksToDistribute(CBlockIndex* pindexFullMortgage) const;
-
-    NODISCARD CAmount GetBlockTotalReward(CBlockIndex* pindex) const;
-
+    CBlockIndex const* m_pindexTip;
     Consensus::Params m_params;
-    FullMortgageBlockMap m_mapBlocks;
 };
 
 #endif

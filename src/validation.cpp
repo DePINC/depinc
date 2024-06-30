@@ -1288,22 +1288,22 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
 {
     std::string strGeneratorAddr = EncodeDestination(ScriptHash(generatorAccountID));
 
-    const int nHeight = pindexPrev ? (pindexPrev->nHeight + 1) : 0;
-    const CAmount nSubsidy = GetBlockSubsidy(nHeight, consensusParams);
+    const int nTargetHeight = pindexPrev ? (pindexPrev->nHeight + 1) : 0;
+    const CAmount nSubsidy = GetBlockSubsidy(nTargetHeight, consensusParams);
 
     // Calc miner reward and fund royalty
     BlockReward reward = { 0, 0, 0, 0, false, 0 };
-    if (nHeight <= consensusParams.BHDIP001PreMiningEndHeight)
+    if (nTargetHeight <= consensusParams.BHDIP001PreMiningEndHeight)
     {
         // Fund pre-mining
         reward.fund = nSubsidy + nFees;
     }
-    else if (nHeight <= consensusParams.BHDIP001FundZeroLastHeight)
+    else if (nTargetHeight <= consensusParams.BHDIP001FundZeroLastHeight)
     {
         // All to miner
         reward.miner = nSubsidy + nFees;
     }
-    else if (nHeight < consensusParams.BHDIP006Height)
+    else if (nTargetHeight < consensusParams.BHDIP006Height)
     {
         // BHDIP004
         // Y is 95% reward, N is 30% reward.
@@ -1316,12 +1316,12 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
         // See https://depinc.org/wiki/developer/BHD004-soft-fork-for-multimining
         //
         CAmount miningRequireBalanceAtOldConsensus;
-        CAmount miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nHeight, view, nullptr, &miningRequireBalanceAtOldConsensus, 0, consensusParams);
+        CAmount miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nTargetHeight, view, nullptr, &miningRequireBalanceAtOldConsensus, 0, consensusParams);
         CAmount accountBalance = view.GetAccountBalance(true, generatorAccountID);
         if (accountBalance >= miningRequireBalance) {
             // Full mortgage
             reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
-            if (nHeight < consensusParams.BHDIP004AbandonHeight && accountBalance < miningRequireBalanceAtOldConsensus) {
+            if (nTargetHeight < consensusParams.BHDIP004AbandonHeight && accountBalance < miningRequireBalanceAtOldConsensus) {
                 // Old consensus => fund
                 reward.miner0 = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForLowMortgage) / 1000;
             }
@@ -1331,12 +1331,12 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
             reward.fUnconditional = true;
         }
     }
-    else if (nHeight < consensusParams.BHDIP008Height)
+    else if (nTargetHeight < consensusParams.BHDIP008Height)
     {
         // BHDIP006
         CAmount balancePointSent = 0, balancePointReceived = 0;
         CAmount accountBalance = view.GetAccountBalance(true, generatorAccountID, nullptr, &balancePointSent, &balancePointReceived);
-        CAmount miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nHeight, view, nullptr, nullptr, 0, consensusParams);
+        CAmount miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nTargetHeight, view, nullptr, nullptr, 0, consensusParams);
         if (accountBalance - balancePointSent + balancePointReceived >= miningRequireBalance) {
             // Full mortgage
             reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
@@ -1353,48 +1353,54 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
         bool fFullMortgage;
 
         CAmount accountBalance;
-        if (nHeight >= consensusParams.BHDIP009Height) {
-            accountBalance = view.GetAccountBalance(nHeight < consensusParams.BHDIP009OldPledgesDisableOnHeight, generatorAccountID, nullptr, &balancePointSent, &balancePointReceived, &consensusParams.BHDIP009PledgeTerms, nHeight);
+        if (nTargetHeight >= consensusParams.BHDIP009Height) {
+            accountBalance = view.GetAccountBalance(nTargetHeight < consensusParams.BHDIP009OldPledgesDisableOnHeight, generatorAccountID, nullptr, &balancePointSent, &balancePointReceived, &consensusParams.BHDIP009PledgeTerms, nTargetHeight);
         } else {
             accountBalance = view.GetAccountBalance(true, generatorAccountID, nullptr, &balancePointSent, &balancePointReceived);
         }
         // Inherit BHDIP008
         CAmount nBurned{0};
         CAmount miningRequireBalance;
-        if (nHeight >= consensusParams.BHDIP009Height) {
-            int nHeightForCalculatingTotalSupply = GetHeightForCalculatingTotalSupply(nHeight, consensusParams);
+        if (nTargetHeight >= consensusParams.BHDIP009Height) {
+            int nHeightForCalculatingTotalSupply = GetHeightForCalculatingTotalSupply(nTargetHeight, consensusParams);
             nBurned = view.GetAccountBalance(false, GetBurnToAccountID(), nullptr, nullptr, nullptr, &consensusParams.BHDIP009PledgeTerms, nHeightForCalculatingTotalSupply);
-            miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nHeight, view, nullptr, nullptr, nBurned, consensusParams, nullptr, nullptr, nHeightForCalculatingTotalSupply); // Netspace fixed
+            miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nTargetHeight, view, nullptr, nullptr, nBurned, consensusParams, nullptr, nullptr, nHeightForCalculatingTotalSupply); // Netspace fixed
         } else {
-            miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nHeight, view, nullptr, nullptr, nBurned, consensusParams); // Netspace fixed
+            miningRequireBalance = poc::GetMiningRequireBalance(generatorAccountID, bindData, nTargetHeight, view, nullptr, nullptr, nBurned, consensusParams); // Netspace fixed
         }
         LogPrint(BCLog::POC, "%s: address %s, miningRequireBalance=%s DePC, accountBalance=%s DePC, balancePointSent=%s DePC, balancePointReceived=%s DePC\n", __func__, strGeneratorAddr,
                 chiapos::FormatNumberStr(std::to_string(miningRequireBalance / COIN)),
                 chiapos::FormatNumberStr(std::to_string(accountBalance / COIN)),
                 chiapos::FormatNumberStr(std::to_string(balancePointSent / COIN)),
                 chiapos::FormatNumberStr(std::to_string(balancePointReceived / COIN)));
-        fFullMortgage = (nHeight >= consensusParams.BHDIP009Height) ? (balancePointReceived >= miningRequireBalance) : (accountBalance - balancePointSent + balancePointReceived) >= miningRequireBalance;
+        fFullMortgage = (nTargetHeight >= consensusParams.BHDIP009Height) ? (balancePointReceived >= miningRequireBalance) : (accountBalance - balancePointSent + balancePointReceived) >= miningRequireBalance;
         if (fFullMortgage) {
             // Full mortgage
-            if (nHeight < consensusParams.BHDIP009Height) {
+            if (nTargetHeight < consensusParams.BHDIP009Height) {
                 reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
             } else {
                 reward.fund = 0;
             }
-            reward.accumulate = GetBlockAccumulateSubsidy(pindexPrev, consensusParams);
+            if (nTargetHeight >= consensusParams.BHDIP011Height) {
+                // the distribution for accumulate amount is changed
+                CMortgageCalculator calculator(pindexPrev, consensusParams);
+                reward.accumulate = calculator.CalcAccumulatedAmount(nTargetHeight);
+            } else {
+                reward.accumulate = GetBlockAccumulateSubsidy(pindexPrev, consensusParams);
+            }
             LogPrint(BCLog::POC, "%s: full mortgage for account %s, accumulate=%s\n", __func__, strGeneratorAddr, chiapos::MakeNumberStr(reward.accumulate / COIN));
         } else {
             reward.fUnconditional = true;
             // Low mortgage
-            if (nHeight < consensusParams.BHDIP009Height) {
-                int nPeriod = (nHeight - consensusParams.BHDIP008Height) / consensusParams.BHDIP008FundRoyaltyDecreasePeriodForLowMortgage;
+            if (nTargetHeight < consensusParams.BHDIP009Height) {
+                int nPeriod = (nTargetHeight - consensusParams.BHDIP008Height) / consensusParams.BHDIP008FundRoyaltyDecreasePeriodForLowMortgage;
                 int fundRatio = consensusParams.BHDIP008FundRoyaltyForLowMortgage - consensusParams.BHDIP008FundRoyaltyDecreaseForLowMortgage * nPeriod;
                 if (fundRatio < consensusParams.BHDIP001FundRoyaltyForFullMortgage)
                     fundRatio = consensusParams.BHDIP001FundRoyaltyForFullMortgage;
                 assert(fundRatio <= consensusParams.BHDIP001FundRoyaltyForLowMortgage);
                 reward.fund = (nSubsidy * fundRatio) / 1000;
                 reward.accumulate -= (nSubsidy * (consensusParams.BHDIP001FundRoyaltyForLowMortgage - fundRatio)) / 1000;
-            } else if (nHeight < consensusParams.BHDIP010Height) {
+            } else if (nTargetHeight < consensusParams.BHDIP010Height) {
                 reward.fund = 0;
                 reward.accumulate -= nSubsidy * (1000 - consensusParams.BHDIP009FundRoyaltyForLowMortgage) / 1000;
             } else {
@@ -1407,42 +1413,41 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
     }
 
     reward.miner = nSubsidy + nFees - reward.fund - reward.miner0;
-    if (nHeight == consensusParams.BHDIP009Height) {
+    if (nTargetHeight == consensusParams.BHDIP009Height) {
         // The 1-time distribution to foundation on hard-fork of upgrading to Chia's consensus
         reward.fund009 = GetTotalSupplyBeforeBHDIP009(consensusParams) * (consensusParams.BHDIP009TotalAmountUpgradeMultiply - 1);
     }
     assert(reward.miner + reward.accumulate >= 0);
-    LogPrint(BCLog::POC, "%s: subsidy=%ld (%s BHD) { miner=%ld, miner0=%ld, fund=%ld, accumulate=%ld, fund009=%ld, fUnconditional=%s }, height=%ld\n", __func__, nSubsidy, chiapos::FormatNumberStr(std::to_string(nSubsidy / COIN)), reward.miner / COIN, reward.miner0 / COIN, reward.fund / COIN, reward.accumulate / COIN, reward.fund009 / COIN, reward.fUnconditional ? "true" : "false", nHeight);
+    LogPrint(BCLog::POC, "%s: subsidy=%ld (%s BHD) { miner=%ld, miner0=%ld, fund=%ld, accumulate=%ld, fund009=%ld, fUnconditional=%s }, height=%ld\n", __func__, nSubsidy, chiapos::FormatNumberStr(std::to_string(nSubsidy / COIN)), reward.miner / COIN, reward.miner0 / COIN, reward.fund / COIN, reward.accumulate / COIN, reward.fund009 / COIN, reward.fUnconditional ? "true" : "false", nTargetHeight);
     return reward;
 }
 
-BlockReward GetFullMortgageBlockReward(CBlockIndex* pindex, const Consensus::Params& consensusParams)
+BlockReward GetFullMortgageBlockReward(CBlockIndex* pindexPrev, const Consensus::Params& consensusParams)
 {
-    int nHeight = pindex->nHeight + 1;
-    const CAmount nSubsidy = GetBlockSubsidy(nHeight, consensusParams);
+    int nTargetHeight = pindexPrev->nHeight + 1;
+    const CAmount nSubsidy = GetBlockSubsidy(nTargetHeight, consensusParams);
 
     BlockReward reward = { 0, 0, 0, 0, false, 0 };
-    if (nHeight <= consensusParams.BHDIP001PreMiningEndHeight) {
+    if (nTargetHeight <= consensusParams.BHDIP001PreMiningEndHeight) {
         // Fund pre-mining
         reward.fund = nSubsidy;
-    } else if (nHeight <= consensusParams.BHDIP001FundZeroLastHeight) {
+    } else if (nTargetHeight <= consensusParams.BHDIP001FundZeroLastHeight) {
         // All to miner
         reward.miner = nSubsidy;
-    } else if (nHeight < consensusParams.BHDIP006Height) {
+    } else if (nTargetHeight < consensusParams.BHDIP006Height) {
         reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
-    } else if (nHeight < consensusParams.BHDIP008Height) {
+    } else if (nTargetHeight < consensusParams.BHDIP008Height) {
         reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
-    } else if (nHeight < consensusParams.BHDIP009Height) {
+    } else if (nTargetHeight < consensusParams.BHDIP009Height) {
         reward.fund = (nSubsidy * consensusParams.BHDIP001FundRoyaltyForFullMortgage) / 1000;
         reward.accumulate = GetBlockAccumulateSubsidy(::ChainActive().Tip(), consensusParams);
-    } else if (nHeight < consensusParams.BHDIP011Height) {
+    } else if (nTargetHeight < consensusParams.BHDIP011Height) {
         reward.fund = 0;
         reward.accumulate = GetBlockAccumulateSubsidy(::ChainActive().Tip(), consensusParams);
     } else {
         reward.fund = 0;
-        CMortgageCalculator calculator(consensusParams);
-        calculator.Build(pindex);
-        reward.accumulate = calculator.GetActualAccumulatedForBlockHeight(nHeight);
+        CMortgageCalculator calculator(pindexPrev, consensusParams);
+        reward.accumulate = calculator.CalcAccumulatedAmount(nTargetHeight);
     }
 
     reward.miner = nSubsidy - reward.fund - reward.miner0;

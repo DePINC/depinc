@@ -1935,15 +1935,46 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
             RPCExamples("./cli queryfullmortgageinfo")).Check(request);
 
     LOCK(cs_main);
-    auto pindex = ::ChainActive().Tip();
-
-    CMortgageCalculator calculator(Params().GetConsensus());
-    calculator.Build(pindex);
+    auto pindexTip = ::ChainActive().Tip();
 
     UniValue resVal(UniValue::VARR);
-    for (auto const& entry : calculator.GetMap()) {
-        resVal.push_back(entry.second.ToUniValue(calculator.GetMap()));
+
+    auto params = Params().GetConsensus();
+    // CMortgageCalculator calculator(pindexTip, params);
+    for (auto pcurr = pindexTip; pcurr->nHeight > params.BHDIP009Height; pcurr = pcurr->pprev) {
+        if (CMortgageCalculator::IsFullMortgageBlock(pcurr, params)) {
+            UniValue fullMortgageVal(UniValue::VOBJ);
+            CMortgageCalculator calculator(pcurr->pprev, params);
+            fullMortgageVal.pushKV("height", pcurr->nHeight);
+            fullMortgageVal.pushKV("numOfDistributions", calculator.CalcNumOfDistributions(pcurr));
+            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr, pindexTip));
+
+            CAmount nOriginalAccumulated = GetBlockAccumulateSubsidy(pcurr->pprev, params);
+            fullMortgageVal.pushKV("originalAccumulated", nOriginalAccumulated);
+            fullMortgageVal.pushKV("originalAccumulated(human)", FormatMoney(nOriginalAccumulated));
+
+            CAmount nActualAccumulated = calculator.CalcAccumulatedAmount(pcurr->nHeight);
+            fullMortgageVal.pushKV("actualAccumulated", nActualAccumulated);
+            fullMortgageVal.pushKV("actualAccumulated(human)", FormatMoney(nActualAccumulated));
+
+            // read the block
+            CBlock block;
+            if (!ReadBlockFromDisk(block, pcurr, params)) {
+                throw std::runtime_error(tinyformat::format("cannot read block from disk (height=%d)", pcurr->nHeight));
+            }
+            // find coinbase
+            for (auto const& tx : block.vtx) {
+                if (tx->IsCoinBase()) {
+                    auto destination = ExtractDestination(tx->vout[0].scriptPubKey);
+                    fullMortgageVal.pushKV("miner", EncodeDestination(destination));
+                    fullMortgageVal.pushKV("reward", tx->vout[0].nValue);
+                    fullMortgageVal.pushKV("reward(human)", FormatMoney(tx->vout[0].nValue));
+                    break;
+                }
+            }
+        }
     }
+
     return resVal;
 }
 
