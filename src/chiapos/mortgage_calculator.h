@@ -16,7 +16,7 @@ public:
 
     NODISCARD int CalcNumOfDistributions(int nHeight) const;
 
-    NODISCARD int CalcNumOfDistributed(int nHeight, CBlockIndex const* pindexPrev) const;
+    NODISCARD int CalcNumOfDistributed(int nDistributeFromHeight, int nTargetHeight) const;
 
     NODISCARD CAmount CalcDistributeAmount(int nHeight, int nTargetHeight) const;
 

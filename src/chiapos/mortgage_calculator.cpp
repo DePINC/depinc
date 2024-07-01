@@ -32,9 +32,10 @@ int CMortgageCalculator::CalcNumOfDistributions(int nHeight) const {
     return std::max(m_params.BHDIP011MinFullMortgageBlocksToDistribute, nNumOfFullMortgageBlocks);
 }
 
-int CMortgageCalculator::CalcNumOfDistributed(int nHeight, CBlockIndex const* pindexPrev) const {
-    int nNumOfDistributed{1};
-    for (auto pindex = pindexPrev; pindex->nHeight >= nHeight; pindex = pindex->pprev) {
+int CMortgageCalculator::CalcNumOfDistributed(int nDistributeFromHeight, int nTargetHeight) const {
+    int nNumOfDistributed{0};
+    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= nDistributeFromHeight;
+         pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             ++nNumOfDistributed;
         }
@@ -42,21 +43,23 @@ int CMortgageCalculator::CalcNumOfDistributed(int nHeight, CBlockIndex const* pi
     return nNumOfDistributed;
 }
 
-CAmount CMortgageCalculator::CalcDistributeAmount(int nHeight, int nTargetHeight) const {
-    int nDistributions = CalcNumOfDistributions(nHeight);
-    int nDistributed = CalcNumOfDistributed(nHeight, m_pindexTip);
+CAmount CMortgageCalculator::CalcDistributeAmount(int nDistributeFromHeight, int nTargetHeight) const {
+    int nDistributions = CalcNumOfDistributions(nDistributeFromHeight);
+    int nDistributed = CalcNumOfDistributed(nDistributeFromHeight, nTargetHeight);
 
     if (nDistributed >= nDistributions) {
         return 0;
     }
 
-    CAmount nOriginalAccumulatedAmount = GetBlockAccumulateSubsidy(FindPrevIndex(nHeight, m_pindexTip), m_params);
+    CAmount nOriginalAccumulatedAmount =
+            GetBlockAccumulateSubsidy(FindPrevIndex(nDistributeFromHeight, m_pindexTip), m_params);
     return nOriginalAccumulatedAmount / nDistributions;
 }
 
 CAmount CMortgageCalculator::CalcAccumulatedAmount(int nTargetHeight) const {
     CAmount nTotalAmount{0};
-    for (auto pindex = m_pindexTip; pindex->nHeight >= m_params.BHDIP009Height; pindex = pindex->pprev) {
+    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= m_params.BHDIP009Height;
+         pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             nTotalAmount += CalcDistributeAmount(pindex->nHeight, nTargetHeight);
         }

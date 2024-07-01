@@ -1936,18 +1936,18 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
 
     LOCK(cs_main);
     auto pindexTip = ::ChainActive().Tip();
+    int nTargetHeight = pindexTip->nHeight + 1;
 
     UniValue resVal(UniValue::VARR);
 
     auto params = Params().GetConsensus();
-    // CMortgageCalculator calculator(pindexTip, params);
     for (auto pcurr = pindexTip; pcurr->nHeight >= params.BHDIP009Height; pcurr = pcurr->pprev) {
         if (CMortgageCalculator::IsFullMortgageBlock(pcurr, params)) {
             UniValue fullMortgageVal(UniValue::VOBJ);
-            CMortgageCalculator calculator(pcurr->pprev, params);
+            CMortgageCalculator calculator(pindexTip, params);
             fullMortgageVal.pushKV("height", pcurr->nHeight);
             fullMortgageVal.pushKV("numOfDistributions", calculator.CalcNumOfDistributions(pcurr->nHeight));
-            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr->nHeight, pindexTip));
+            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr->nHeight, nTargetHeight));
 
             CAmount nSubsidy = GetBlockSubsidy(pcurr->nHeight, params);
             fullMortgageVal.pushKV("subsidy", nSubsidy);
