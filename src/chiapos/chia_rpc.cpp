@@ -703,7 +703,7 @@ static UniValue queryUpdateTipHistory(JSONRPCRequest const& request) {
                         minerVal.pushKV("address", EncodeDestination(CTxDestination((ScriptHash)generatorAccountID)));
                         minerVal.pushKV("reward", ValueFromAmount(tx->vout[0].nValue));
                         // accumulate
-                        CAmount nAccumulate = GetBlockAccumulateSubsidy(pindex, params);
+                        CAmount nAccumulate = GetBlockAccumulateSubsidy(pindex->pprev, params);
                         minerVal.pushKV("accumulate", ValueFromAmount(nAccumulate));
                         // save to entry
                         txVal.push_back(minerVal);
