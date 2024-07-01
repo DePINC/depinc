@@ -3816,24 +3816,24 @@ UniValue rescanblockchain(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-            RPCHelpMan{"rescanblockchain",
-                "\nRescan the local blockchain for wallet related transactions.\n"
-                "Note: Use \"getwalletinfo\" to query the scanning progress.\n",
-                {
-                    {"start_height", RPCArg::Type::NUM, /* default */ "0", "block height where the rescan should start"},
-                    {"stop_height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED_NAMED_ARG, "the last block height that should be scanned. If none is provided it will rescan up to the tip at return time of this call."},
-                },
-                RPCResult{
+    RPCHelpMan{"rescanblockchain",
+        "\nRescan the local blockchain for wallet related transactions.\n"
+        "Note: Use \"getwalletinfo\" to query the scanning progress.\n",
+        {
+            {"start_height", RPCArg::Type::NUM, /* default */ "0", "block height where the rescan should start"},
+            {"stop_height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED_NAMED_ARG, "the last block height that should be scanned. If none is provided it will rescan up to the tip at return time of this call."},
+        },
+        RPCResult{
             "{\n"
             "  \"start_height\"     (numeric) The block height where the rescan started (the requested height or 0)\n"
             "  \"stop_height\"      (numeric) The height of the last rescanned block. May be null in rare cases if there was a reorg and the call didn't scan any blocks because they were already scanned in the background.\n"
             "}\n"
-                },
-                RPCExamples{
-                    HelpExampleCli("rescanblockchain", "100000 120000")
+        },
+        RPCExamples{
+            HelpExampleCli("rescanblockchain", "100000 120000")
             + HelpExampleRpc("rescanblockchain", "100000, 120000")
-                },
-            }.Check(request);
+        },
+    }.Check(request);
 
     WalletRescanReserver reserver(pwallet);
     if (!reserver.reserve()) {
