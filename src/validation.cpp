@@ -1384,7 +1384,7 @@ BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, 
             if (nTargetHeight >= consensusParams.BHDIP011Height) {
                 // the distribution for accumulate amount is changed
                 CMortgageCalculator calculator(pindexPrev, consensusParams);
-                reward.accumulate = calculator.CalcAccumulatedAmount(nTargetHeight);
+                std::tie(reward.accumulate, std::ignore) = calculator.CalcAccumulatedAmount(nTargetHeight);
             } else {
                 reward.accumulate = GetBlockAccumulateSubsidy(pindexPrev, consensusParams);
             }
@@ -1447,7 +1447,7 @@ BlockReward GetFullMortgageBlockReward(CBlockIndex* pindexPrev, const Consensus:
     } else {
         reward.fund = 0;
         CMortgageCalculator calculator(pindexPrev, consensusParams);
-        reward.accumulate = calculator.CalcAccumulatedAmount(nTargetHeight);
+        std::tie(reward.accumulate, std::ignore) = calculator.CalcAccumulatedAmount(nTargetHeight);
     }
 
     reward.miner = nSubsidy - reward.fund - reward.miner0;

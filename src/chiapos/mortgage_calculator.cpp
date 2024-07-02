@@ -56,18 +56,25 @@ CAmount CMortgageCalculator::CalcDistributeAmount(int nDistributeFromHeight, int
     return nOriginalAccumulatedAmount / nDistributions;
 }
 
-CAmount CMortgageCalculator::CalcAccumulatedAmount(int nTargetHeight) const {
+std::tuple<CAmount, CMortgageCalculator::FullMortgageAccumulatedInfoMap> CMortgageCalculator::CalcAccumulatedAmount(
+        int nTargetHeight) const {
     CAmount nTotalAmount{0};
+    FullMortgageAccumulatedInfoMap mapFullMortgageAccumulatedInfo;
     for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= m_params.BHDIP009Height;
          pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
-            nTotalAmount += CalcDistributeAmount(pindex->nHeight, nTargetHeight);
+            CAmount nAccumulatedAmount = CalcDistributeAmount(pindex->nHeight, nTargetHeight);
+            nTotalAmount += nAccumulatedAmount;
+            FullMortgageAccumulatedInfo entry;
+            entry.nHeight = pindex->nHeight;
+            entry.nAccumulatedAmount = nAccumulatedAmount;
+            mapFullMortgageAccumulatedInfo.insert_or_assign(pindex->nHeight, std::move(entry));
         }
     }
     // don't forget to calculate the accumulate amount from current block
     CAmount nOriginalAccumulated = GetBlockAccumulateSubsidy(FindPrevIndex(nTargetHeight, m_pindexTip), m_params);
     CAmount nDistributions = CalcNumOfDistributions(nTargetHeight);
-    return nTotalAmount + nOriginalAccumulated / nDistributions;
+    return std::make_tuple(nTotalAmount + nOriginalAccumulated / nDistributions, mapFullMortgageAccumulatedInfo);
 }
 
 bool CMortgageCalculator::IsFullMortgageBlock(CBlockIndex const* pindex, Consensus::Params const& params) {

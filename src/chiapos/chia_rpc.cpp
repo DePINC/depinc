@@ -1946,18 +1946,23 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
             UniValue fullMortgageVal(UniValue::VOBJ);
             CMortgageCalculator calculator(pindexTip, params);
             fullMortgageVal.pushKV("height", pcurr->nHeight);
-            fullMortgageVal.pushKV("numOfDistributions", calculator.CalcNumOfDistributions(pcurr->nHeight));
-            fullMortgageVal.pushKV("numOfDistributed", calculator.CalcNumOfDistributed(pcurr->nHeight, nTargetHeight));
 
-            CAmount nSubsidy = GetBlockSubsidy(pcurr->nHeight, params);
-            fullMortgageVal.pushKV("subsidy", nSubsidy);
-            fullMortgageVal.pushKV("subsidy(human)", FormatMoney(nSubsidy));
+            int numOfDistributions = calculator.CalcNumOfDistributions(pcurr->nHeight);
+            int numOfDistributed = calculator.CalcNumOfDistributed(pcurr->nHeight, nTargetHeight);
+
+            fullMortgageVal.pushKV("numOfDistributions", numOfDistributions);
+            fullMortgageVal.pushKV("numOfDistributed", std::min(numOfDistributions, numOfDistributed));
+            fullMortgageVal.pushKV("noMoreDistribution", numOfDistributions <= numOfDistributed);
+
+            CAmount nBlockSubsidy = GetBlockSubsidy(pcurr->nHeight, params);
+            fullMortgageVal.pushKV("subsidy", nBlockSubsidy);
+            fullMortgageVal.pushKV("subsidy(human)", FormatMoney(nBlockSubsidy));
 
             CAmount nOriginalAccumulated = GetBlockAccumulateSubsidy(pcurr->pprev, params);
             fullMortgageVal.pushKV("originalAccumulated", nOriginalAccumulated);
             fullMortgageVal.pushKV("originalAccumulated(human)", FormatMoney(nOriginalAccumulated));
 
-            CAmount nActualAccumulated = calculator.CalcAccumulatedAmount(pcurr->nHeight);
+            auto [nActualAccumulated, mapAccumulatedAmounts] = calculator.CalcAccumulatedAmount(pcurr->nHeight);
             fullMortgageVal.pushKV("actualAccumulated", nActualAccumulated);
             fullMortgageVal.pushKV("actualAccumulated(human)", FormatMoney(nActualAccumulated));
 
@@ -1967,15 +1972,41 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
                 throw std::runtime_error(tinyformat::format("cannot read block from disk (height=%d)", pcurr->nHeight));
             }
             // find coinbase
+            CAmount nReward{0};
             for (auto const& tx : block.vtx) {
                 if (tx->IsCoinBase()) {
                     auto destination = ExtractDestination(tx->vout[0].scriptPubKey);
+                    nReward = tx->vout[0].nValue;
                     fullMortgageVal.pushKV("miner", EncodeDestination(destination));
-                    fullMortgageVal.pushKV("reward", tx->vout[0].nValue);
+                    fullMortgageVal.pushKV("reward", nReward);
                     fullMortgageVal.pushKV("reward(human)", FormatMoney(tx->vout[0].nValue));
                     break;
                 }
             }
+            // need to verify the reward
+            CAmount nCalcReward{0};
+
+            // block subsidy
+            nCalcReward += nBlockSubsidy;
+
+            // current block accumulated subsidy
+            nCalcReward += (nOriginalAccumulated / numOfDistributions);
+
+            // find accumulated amounts from previous full mortgage blocks
+            UniValue constributedFromHeightsVal(UniValue::VARR);
+            for (auto const& amountEntry : mapAccumulatedAmounts) {
+                nCalcReward += amountEntry.second.nAccumulatedAmount;
+                UniValue val(UniValue::VOBJ);
+                val.pushKV("height", amountEntry.first);
+                val.pushKV("amount", amountEntry.second.nAccumulatedAmount);
+                val.pushKV("amount(human)", FormatMoney(amountEntry.second.nAccumulatedAmount));
+                constributedFromHeightsVal.push_back(val);
+            }
+
+            fullMortgageVal.pushKV("calculatedReward", nCalcReward);
+            fullMortgageVal.pushKV("calculatedReward(human)", FormatMoney(nCalcReward));
+            fullMortgageVal.pushKV("contributedFromBlocks", constributedFromHeightsVal);
+
             resVal.push_back(fullMortgageVal);
         }
     }
