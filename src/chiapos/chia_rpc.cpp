@@ -1927,12 +1927,33 @@ static UniValue querypledgeamount(JSONRPCRequest const& request)
     return res;
 }
 
-UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
+UniValue queryFullMortgageInfo(JSONRPCRequest const& request)
 {
     RPCHelpMan("queryfullmortgageinfo", "query full mortgage reward and related info. from current chain",
-            {},
+            {
+                RPCArg("skip", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "the number of full-mortgage blocks will be skipped"),
+                RPCArg("count", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "the number of full-mortgage blocks can be shown to the result"),
+            },
             RPCResults({ RPCResult("(json array)", "the json string contains the mortgage info.")}),
             RPCExamples("./cli queryfullmortgageinfo")).Check(request);
+
+    // retrieve the arguments
+    int nSkip{0};
+    int nCount{0};
+    bool fShowAll{true};
+
+    if (request.params.size() >= 1) {
+        if (!ParseInt32(request.params[0].get_str(), &nSkip)) {
+            throw std::runtime_error("cannot convert `skip` to number");
+        }
+    }
+
+    if (request.params.size() == 2) {
+        if (!ParseInt32(request.params[1].get_str(), &nCount)) {
+            throw std::runtime_error("cannot convert `count` to number");
+        }
+        fShowAll = false;
+    }
 
     LOCK(cs_main);
     auto pindexTip = ::ChainActive().Tip();
@@ -1943,6 +1964,14 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
     auto params = Params().GetConsensus();
     for (auto pcurr = pindexTip; pcurr->nHeight >= params.BHDIP009Height; pcurr = pcurr->pprev) {
         if (CMortgageCalculator::IsFullMortgageBlock(pcurr, params)) {
+            if (nSkip > 0) {
+                --nSkip;
+                continue;
+            }
+            if (!fShowAll && nCount == 0) {
+                break;
+            }
+            --nCount;
             UniValue fullMortgageVal(UniValue::VOBJ);
             CMortgageCalculator calculator(pindexTip, params);
             fullMortgageVal.pushKV("height", pcurr->nHeight);
@@ -2014,6 +2043,22 @@ UniValue queryfullmortgageinfo(JSONRPCRequest const& request)
     return resVal;
 }
 
+UniValue queryNumOfFullMortgageBlocks(JSONRPCRequest const& request)
+{
+    LOCK(cs_main);
+    auto pindex = ::ChainActive().Tip();
+    auto params = Params().GetConsensus();
+
+    int nCount{0};
+    for (; pindex->nHeight >= params.BHDIP009Height; pindex = pindex->pprev) {
+        if (CMortgageCalculator::IsFullMortgageBlock(pindex, params)) {
+            ++nCount;
+        }
+    }
+
+    return nCount;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -2038,7 +2083,8 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryownblocks", &queryownblocks, {"address", "height"}},
         {"chia", "querypledgeamount", &querypledgeamount, {"address"}},
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
-        {"chia", "queryfullmortgageinfo", &queryfullmortgageinfo, {}},
+        {"chia", "queryfullmortgageinfo", &queryFullMortgageInfo, {}},
+        {"chia", "querynumoffullmortgageblocks", &queryNumOfFullMortgageBlocks, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
