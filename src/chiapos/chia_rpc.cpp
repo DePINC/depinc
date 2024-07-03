@@ -1952,7 +1952,9 @@ UniValue queryFullMortgageInfo(JSONRPCRequest const& request)
         if (!ParseInt32(request.params[1].get_str(), &nCount)) {
             throw std::runtime_error("cannot convert `count` to number");
         }
-        fShowAll = false;
+        if (nCount > 0) {
+            fShowAll = false;
+        }
     }
 
     LOCK(cs_main);
