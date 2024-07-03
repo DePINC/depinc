@@ -64,11 +64,13 @@ std::tuple<CAmount, CMortgageCalculator::FullMortgageAccumulatedInfoMap> CMortga
          pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             CAmount nAccumulatedAmount = CalcDistributeAmount(pindex->nHeight, nTargetHeight);
-            nTotalAmount += nAccumulatedAmount;
-            FullMortgageAccumulatedInfo entry;
-            entry.nHeight = pindex->nHeight;
-            entry.nAccumulatedAmount = nAccumulatedAmount;
-            mapFullMortgageAccumulatedInfo.insert_or_assign(pindex->nHeight, std::move(entry));
+            if (nAccumulatedAmount > 0) {
+                nTotalAmount += nAccumulatedAmount;
+                FullMortgageAccumulatedInfo entry;
+                entry.nHeight = pindex->nHeight;
+                entry.nAccumulatedAmount = nAccumulatedAmount;
+                mapFullMortgageAccumulatedInfo.insert_or_assign(pindex->nHeight, std::move(entry));
+            }
         }
     }
     // don't forget to calculate the accumulate amount from current block
