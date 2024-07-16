@@ -40,7 +40,7 @@ Makefile: $(OUTPUTDIR) $(OUTPUT_FILES) configure
 	./configure LDFLAGS="-L$(INSTALL_PREFIX)/lib" CPPFLAGS="-I$(INSTALL_PREFIX)/include" CXXFLAGS="-I$(INSTALL_PREFIX)/include" BDB_LIBS="-L$(BDB_PREFIX)/lib -ldb_cxx-4.8" BDB_CFLAGS="-I$(BDB_PREFIX)/include" $(ADD_FLAGS)
 
 $(OUTPUT_GMP_LIB): $(PKG_GMP)
-	cd $(INSTALL_PREFIX) && tar xf $(PKG_GMP) && cd gmp-$(GMP_VERSION) && ./configure --prefix=$(INSTALL_PREFIX) && make -$(BJ) && make install
+	cd $(INSTALL_PREFIX) && tar xf $(PKG_GMP) && cd gmp-$(GMP_VERSION) && ./configure --prefix=$(INSTALL_PREFIX) --enable-cxx && make -$(BJ) && make install
 
 $(PKG_GMP):
 	cd $(INSTALL_PREFIX) && wget https://gmplib.org/download/gmp/gmp-$(GMP_VERSION).tar.xz
@@ -60,7 +60,7 @@ $(OUTPUT_LOG_H): $(PKG_PLOG)
 $(PKG_PLOG):
 	cd $(INSTALL_PREFIX) && wget https://github.com/SergiusTheBest/plog/archive/refs/tags/$(PLOG_VERSION).tar.gz
 
-$(OUTPUT_TIMEVDF_LIB): $(PKG_VDF)
+$(OUTPUT_TIMEVDF_LIB): $(PKG_VDF) $(OUTPUT_GMP_LIB)
 	cd $(INSTALL_PREFIX) && tar xf v$(VDF_VERSION).tar.gz && cd vdf-$(VDF_VERSION) && mkdir -p build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX) && cmake --build . -$(BJ) && cmake --install .
 
 $(PKG_VDF):
