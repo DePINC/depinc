@@ -34,7 +34,7 @@ const int DYNAMIC_BASE_ITERS_CONSUME_SECONDS = 60;
 const int ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX = 40;
 const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX = 118;
 
-const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2 = 114;
+const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2 = 110;
 
 const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
 
@@ -205,16 +205,19 @@ public:
         consensus.BHDIP010AdjustDifficultyConsumeSecondsFix = ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX;
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
 
-        consensus.BHDIP010AdjustDifficultyFix2AtHeight = 99999999;
-        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
-        // BHDIP011
         consensus.NetProtocolMinVersion = 80028;
 
-        consensus.BHDIP011Height = INFINITE_HEIGHT;
-        consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
-        consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
+        // BHDIP011: 7/29/2024
+        constexpr int BHDIP011_HEIGHT = 1003800;
+        consensus.BHDIP010AdjustDifficultyFix2AtHeight = BHDIP011_HEIGHT;
+        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
 
+        consensus.BHDIP011Height = BHDIP011_HEIGHT;
+        consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
+        consensus.BHDIP011MinFullMortgageBlocksToDistribute = 100;
+
+        // Misc.
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = Consensus::BIP9Deployment::NO_TIMEOUT;
