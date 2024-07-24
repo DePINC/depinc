@@ -20,7 +20,7 @@ std::tuple<CAmount, CMortgageCalculator::FullMortgageAccumulatedInfoMap> CMortga
         int nTargetHeight) const {
     CAmount nTotalAmount{0};
     FullMortgageAccumulatedInfoMap mapFullMortgageAccumulatedInfo;
-    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= m_params.BHDIP009Height;
+    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= m_params.BHDIP011Height;
          pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             CAmount nAccumulatedAmount = CalcDistributeAmountToTargetHeight(pindex->nHeight, nTargetHeight);
