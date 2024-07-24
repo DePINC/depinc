@@ -24,7 +24,6 @@ public:
 
     NODISCARD std::tuple<CAmount, FullMortgageAccumulatedInfoMap> CalcAccumulatedAmount(int nTargetHeight) const;
 
-private:
     NODISCARD int CalcNumOfDistributions(int nHeight) const;
 
     NODISCARD int CalcNumOfDistributedForTargetHeight(int nDistributeFromHeight, int nTargetHeight) const;
