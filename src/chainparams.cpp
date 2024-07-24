@@ -35,6 +35,8 @@ const int ADJUST_DIFFICULTY_CONSUME_SECONDS_FIX = 40;
 const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX = 118;
 
 const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2 = 110;
+const int ADJUST_DIFFICULTY_TARGET_SPACING_FIX2__TESTNET3 = 114;
+
 
 const double RESET_TARGET_SPACING_MUL_FACTOR = 0.68333;
 
@@ -817,7 +819,7 @@ public:
         consensus.BHDIP010AdjustDifficultyTargetSpacingFix = ADJUST_DIFFICULTY_TARGET_SPACING_FIX;
 
         consensus.BHDIP010AdjustDifficultyFix2AtHeight = consensus.BHDIP010Height + 3;
-        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2;
+        consensus.BHDIP010AdjustDifficultyTargetSpacingFix2 = ADJUST_DIFFICULTY_TARGET_SPACING_FIX2__TESTNET3;
 
         // BHDIP011
         consensus.NetProtocolMinVersion = 80031;
