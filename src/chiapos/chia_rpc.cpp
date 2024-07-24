@@ -1979,7 +1979,7 @@ UniValue queryFullMortgageInfo(JSONRPCRequest const& request)
             fullMortgageVal.pushKV("height", pcurr->nHeight);
 
             int numOfDistributions = calculator.CalcNumOfDistributions(pcurr->nHeight);
-            int numOfDistributed = calculator.CalcNumOfDistributed(pcurr->nHeight, nTargetHeight);
+            int numOfDistributed = calculator.CalcNumOfDistributedForTargetHeight(pcurr->nHeight, nTargetHeight);
 
             fullMortgageVal.pushKV("numOfDistributions", numOfDistributions);
             fullMortgageVal.pushKV("numOfDistributed", std::min(numOfDistributions, numOfDistributed));

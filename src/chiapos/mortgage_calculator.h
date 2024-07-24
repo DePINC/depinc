@@ -22,13 +22,14 @@ public:
 
     CMortgageCalculator(CBlockIndex const* pindexTip, Consensus::Params params);
 
+    NODISCARD std::tuple<CAmount, FullMortgageAccumulatedInfoMap> CalcAccumulatedAmount(int nTargetHeight) const;
+
+private:
     NODISCARD int CalcNumOfDistributions(int nHeight) const;
 
-    NODISCARD int CalcNumOfDistributed(int nDistributeFromHeight, int nTargetHeight) const;
+    NODISCARD int CalcNumOfDistributedForTargetHeight(int nDistributeFromHeight, int nTargetHeight) const;
 
-    NODISCARD CAmount CalcDistributeAmount(int nHeight, int nTargetHeight) const;
-
-    NODISCARD std::tuple<CAmount, FullMortgageAccumulatedInfoMap> CalcAccumulatedAmount(int nTargetHeight) const;
+    NODISCARD CAmount CalcDistributeAmountToTargetHeight(int nDistributeFromHeight, int nTargetHeight) const;
 
     NODISCARD static bool IsFullMortgageBlock(CBlockIndex const* pindex, Consensus::Params const& params);
 
