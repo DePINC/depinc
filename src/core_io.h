@@ -58,6 +58,7 @@ struct PledgeAmountsPack {
     CAmount nTxAmount;
     int nTxHeight{0};
     int nCurrHeight{0};
+    std::string strTermName;
 };
 void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex = true, int serialize_flags = 0, PledgeAmountsPack const& pack = {}, CoinAmountQuerier querier = {});
 void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOut& txOut, PledgeAmountsPack const& heights, UniValue& out);

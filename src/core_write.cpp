@@ -279,6 +279,7 @@ void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOu
     out.pushKV("subtype", DatacarrierTypeToString(payload->type));
     out.pushKV("txAmount", ValueFromAmount(txOut.nValue));
     out.pushKV("txAmount64", txOut.nValue);
+    out.pushKV("term", pledgeAmounts.strTermName);
     if (payload->type == DATACARRIER_TYPE_BINDPLOTTER || payload->type == DATACARRIER_TYPE_BINDCHIAFARMER) {
         out.pushKV("type", "bindplotter");
         out.pushKV("amount", ValueFromAmount(txOut.nValue));

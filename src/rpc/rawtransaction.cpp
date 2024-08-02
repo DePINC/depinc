@@ -64,6 +64,19 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, 
     pack.nActualAmount = pack.nTxAmount;
 
     if (tx.IsUniform()) {
+        auto term_to_str = [](DatacarrierType type) -> std::string_view {
+            if (!DatacarrierTypeIsChiaPoint(type)) {
+                return "none";
+            }
+            constexpr std::string_view TYPE_STRS[] = {
+                "noterm",
+                "term1",
+                "term2",
+                "term3",
+            };
+            int nTermIndex = static_cast<int>(type - DATACARRIER_TYPE_CHIA_POINT);
+            return TYPE_STRS[nTermIndex];
+        };
         auto const& params = Params().GetConsensus();
         auto payload = ExtractTransactionDatacarrier(tx, nTxHeight, {DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
         if (payload != nullptr) {
@@ -76,6 +89,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, 
                 auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
                 auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
                 pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
+                pack.strTermName = term_to_str(payload->type);
             } else if (payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
                 // Chia Retarget point
                 auto ppayloadRetarget = PointRetargetPayload::As(payload);
@@ -85,6 +99,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, 
                 auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
                 auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
                 pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
+                pack.strTermName = term_to_str(pointType);
             }
         } else {
             // TODO It's a normal tx
