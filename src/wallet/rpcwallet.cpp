@@ -3321,7 +3321,7 @@ static UniValue listunspent(const JSONRPCRequest& request)
             const Coin &coin = pwallet->chain().accessCoin(COutPoint(out.tx->GetHash(), out.i)); // lock cs_main
             if (coin.extraData) {
                 UniValue extra(UniValue::VOBJ);
-                DatacarrierPayloadToUniv(coin.extraData, out.tx->tx->vout[out.i], extra);
+                DatacarrierPayloadToUniv(coin.extraData, out.tx->tx->vout[out.i], PledgeAmountsPack{static_cast<int>(coin.nHeight), locked_chain->getHeight().get_value_or(0)}, extra);
                 entry.pushKV("extra", extra);
             }
         }

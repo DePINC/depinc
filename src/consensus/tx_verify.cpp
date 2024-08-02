@@ -22,8 +22,6 @@
 #include <univalue.h>
 #include "script/standard.h"
 
-void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
-
 bool IsFinalTx(CTransaction const& tx, int nBlockHeight, int64_t nBlockTime) {
     if (tx.nLockTime == 0)
         return true;

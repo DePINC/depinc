@@ -32,7 +32,7 @@
 #include <util/strencodings.h>
 #include <validation.h>
 #include <validationinterface.h>
-
+#include <wallet/txpledge.h>
 
 #include <numeric>
 #include <stdint.h>
@@ -47,12 +47,55 @@ static const CFeeRate DEFAULT_MAX_RAW_TX_FEE_RATE{COIN / 10};
 
 void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, CoinAmountQuerier querier = {})
 {
+    // we need to get the height of the block which contains the tx in order to calculate the pledge: actual amount
+    auto queryBlockHeight = [](uint256 const& hash) -> int {
+        for (auto pindex = ::ChainActive().Tip(); pindex != nullptr; pindex = pindex->pprev) {
+            if (pindex->GetBlockHash() == hash) {
+                return pindex->nHeight;
+            }
+        }
+        return 0;
+    };
+    int nTxHeight = queryBlockHeight(hashBlock);
+    PledgeAmountsPack pack;
+    pack.nTxHeight = nTxHeight;
+    pack.nCurrHeight = ::ChainActive().Height(); // locked_chain->getHeight().get_value_or(0);
+    pack.nTxAmount = tx.vout[0].nValue;
+    pack.nActualAmount = pack.nTxAmount;
+
+    if (tx.IsUniform()) {
+        auto const& params = Params().GetConsensus();
+        auto payload = ExtractTransactionDatacarrier(tx, nTxHeight, {DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
+        if (payload != nullptr) {
+            if (payload->type == DATACARRIER_TYPE_POINT) {
+                // BHD point
+                pack.nActualAmount = pack.nTxAmount;
+            } else if (DatacarrierTypeIsChiaPoint(payload->type)) {
+                // Chia Point
+                int nTermIndex = static_cast<int>(payload->type - DATACARRIER_TYPE_CHIA_POINT);
+                auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
+                auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
+                pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
+            } else if (payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
+                // Chia Retarget point
+                auto ppayloadRetarget = PointRetargetPayload::As(payload);
+                auto pointType = ppayloadRetarget->GetPointType();
+                int nPointHeight = ppayloadRetarget->GetPointHeight();
+                int nTermIndex = static_cast<int>(pointType - DATACARRIER_TYPE_CHIA_POINT);
+                auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
+                auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
+                pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
+            }
+        } else {
+            // TODO It's a normal tx
+        }
+    }
     // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
     //
     // Blockchain contextual information (confirmations and blocktime) is not
     // available to code in bitcoin-common, so we query them here and push the
     // data into the returned UniValue.
-    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags(), 0, querier);
+    TxToUniv(tx, uint256(), entry, true, RPCSerializationFlags(), pack, querier);
 
     if (!hashBlock.IsNull()) {
         LOCK(cs_main);

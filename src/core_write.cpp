@@ -187,7 +187,7 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     out.pushKV("addresses", a);
 }
 
-void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags, int nHeight, CoinAmountQuerier querier)
+void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags, PledgeAmountsPack const& pledgeAmounts, CoinAmountQuerier querier)
 {
     entry.pushKV("txid", tx.GetHash().GetHex());
     entry.pushKV("hash", tx.GetWitnessHash().GetHex());
@@ -253,10 +253,10 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
     entry.pushKV("vout", vout);
 
     if (tx.IsUniform()) {
-        CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(tx, nHeight, DatacarrierTypes{DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER, DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
+        CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(tx, pledgeAmounts.nCurrHeight, DatacarrierTypes{DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER, DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
         if (payload) {
             UniValue extra(UniValue::VOBJ);;
-            DatacarrierPayloadToUniv(payload, tx.vout[0], extra);
+            DatacarrierPayloadToUniv(payload, tx.vout[0], pledgeAmounts, extra);
             entry.pushKV("extra", extra);
         }
     }
@@ -273,10 +273,12 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
     }
 }
 
-void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOut& txOut, UniValue& out)
+void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOut& txOut, PledgeAmountsPack const& pledgeAmounts, UniValue& out)
 {
     assert(payload != nullptr);
     out.pushKV("subtype", DatacarrierTypeToString(payload->type));
+    out.pushKV("txAmount", ValueFromAmount(txOut.nValue));
+    out.pushKV("txAmount64", txOut.nValue);
     if (payload->type == DATACARRIER_TYPE_BINDPLOTTER || payload->type == DATACARRIER_TYPE_BINDCHIAFARMER) {
         out.pushKV("type", "bindplotter");
         out.pushKV("amount", ValueFromAmount(txOut.nValue));
@@ -284,9 +286,14 @@ void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOu
         out.pushKV("address", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
         out.pushKV("id", BindPlotterPayload::As(payload)->GetId().ToString());
     } else if (payload->type == DATACARRIER_TYPE_POINT || DatacarrierTypeIsChiaPoint(payload->type)) {
+        if (payload->type == DATACARRIER_TYPE_POINT) {
+            out.pushKV("amount", ValueFromAmount(txOut.nValue));
+            out.pushKV("amount64", txOut.nValue);
+        } else {
+            out.pushKV("amount", ValueFromAmount(pledgeAmounts.nActualAmount));
+            out.pushKV("amount64", pledgeAmounts.nActualAmount);
+        }
         out.pushKV("type", "pledge");
-        out.pushKV("amount", ValueFromAmount(txOut.nValue));
-        out.pushKV("amount64", txOut.nValue);
         out.pushKV("from", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
         auto ppayloadPoint = PointPayload::As(payload);
         out.pushKV("to", EncodeDestination((ScriptHash)ppayloadPoint->GetReceiverID()));
@@ -294,8 +301,8 @@ void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOu
         auto retargetPayload = PointRetargetPayload::As(payload);
         out.pushKV("type", "pledge");
         out.pushKV("from", EncodeDestination(ExtractDestination(txOut.scriptPubKey)));
-        out.pushKV("amount", ValueFromAmount(txOut.nValue));
-        out.pushKV("amount64", txOut.nValue);
+        out.pushKV("amount", ValueFromAmount(pledgeAmounts.nActualAmount));
+        out.pushKV("amount64", pledgeAmounts.nActualAmount);
         out.pushKV("point_type", DatacarrierTypeToString(retargetPayload->GetPointType()));
         out.pushKV("point_height", retargetPayload->GetPointHeight());
         out.pushKV("to", EncodeDestination(ScriptHash(retargetPayload->GetReceiverID())));

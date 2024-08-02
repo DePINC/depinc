@@ -182,7 +182,9 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* tip, const CBlockIn
         if(txDetails)
         {
             UniValue objTx(UniValue::VOBJ);
-            TxToUniv(*tx, uint256(), objTx, true, RPCSerializationFlags(), blockindex->nHeight);
+            PledgeAmountsPack pack;
+            pack.nTxHeight = blockindex->nHeight;
+            TxToUniv(*tx, uint256(), objTx, true, RPCSerializationFlags(), pack);
             txs.push_back(objTx);
         }
         else
