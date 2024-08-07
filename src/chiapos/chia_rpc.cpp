@@ -1073,10 +1073,10 @@ struct Amounts {
 };
 
 static UniValue queryChainPledgeInfo(JSONRPCRequest const& request) {
-    RPCHelpMan("querychiapledgeinfo", "Get the chain pledge information",
+    RPCHelpMan("querychainpledgeinfo", "Get the chain pledge information",
         { },
         RPCResult("info"),
-        RPCExamples("depinc-cli querychiapledgeinfo")).Check(request);
+        RPCExamples("depinc-cli querychainpledgeinfo")).Check(request);
 
     auto params = ::Params().GetConsensus();
     LOCK(cs_main);
