@@ -2061,6 +2061,56 @@ UniValue queryNumOfFullMortgageBlocks(JSONRPCRequest const& request)
     return nCount;
 }
 
+UniValue querysubsidy(JSONRPCRequest const& request)
+{
+    RPCHelpMan("querysubsidy", "get subsidy summary",
+        {
+            RPCArg{"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "calculate the subsidy for the number of height"},
+            RPCArg{"days", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "the profit of 1PB netspace for the number of days"},
+        },
+        RPCResults{RPCResult{"(subsidy in json object)", "{...}"}},
+        RPCExamples{"querysubsidy 999999 7"}
+        ).Check(request);
+
+    LOCK(cs_main);
+    int height = ::ChainActive().Height();
+
+    if (request.params.size() >= 1) {
+        if (!ParseInt32(request.params[0].get_str(), &height)) {
+            throw std::runtime_error("cannot parse `height`");
+        }
+    }
+
+    int days = 7;
+    if (request.params.size() >= 2) {
+        if (!ParseInt32(request.params[1].get_str(), &days)) {
+            throw std::runtime_error("cannot parse `days`");
+        }
+    }
+
+    // query subsidy info. for last block
+    auto const& params = Params().GetConsensus();
+
+    CAmount subsidy = GetBlockSubsidy(height, params);
+
+    auto querier = ChainInfoQuerier::CreateQuerier();
+    auto netspace_avg = querier.GetAverageNetSpace();
+    auto netspace_pb = static_cast<CAmount>(MakeNumberTB(netspace_avg).GetLow64() / 1000);
+    auto total_profit = subsidy * days * 480;
+    auto profit_1pb = total_profit / netspace_pb;
+
+    UniValue res(UniValue::VOBJ);
+    res.pushKV("height", height);
+    res.pushKV("subsidy", subsidy);
+    res.pushKV("subsidyHuman", FormatMoney(subsidy));
+    res.pushKV("netspacePB", FormatNumberStr(std::to_string(netspace_pb)));
+    res.pushKV("profitPerPB", profit_1pb);
+    res.pushKV("profitPerPBHuman", FormatMoney(profit_1pb));
+    res.pushKV("days", days);
+
+    return res;
+}
+
 static std::vector<CRPCCommand> commands = {
         {"chia", "checkchiapos", &checkChiapos, {}},
         {"chia", "querychallenge", &queryChallenge, {}},
@@ -2087,6 +2137,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
         {"chia", "queryfullmortgageinfo", &queryFullMortgageInfo, {}},
         {"chia", "querynumoffullmortgageblocks", &queryNumOfFullMortgageBlocks, {}},
+        {"chia", "querysubsidy", &querysubsidy, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
