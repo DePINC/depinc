@@ -2061,51 +2061,167 @@ UniValue queryNumOfFullMortgageBlocks(JSONRPCRequest const& request)
     return nCount;
 }
 
-UniValue querysubsidy(JSONRPCRequest const& request)
+UniValue queryprofit(JSONRPCRequest const& request)
 {
-    RPCHelpMan("querysubsidy", "get subsidy summary",
+    RPCHelpMan("queryprofit", "get profit summary",
         {
-            RPCArg{"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "calculate the subsidy for the number of height"},
-            RPCArg{"days", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "the profit of 1PB netspace for the number of days"},
+            RPCArg{"days", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "the profit of 1PB netspace for the number of days, default=7"},
+            RPCArg{"height", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "summary from the number of height, default=0 (current best height)"},
+            RPCArg{"calcNetspaceForEachMiner", RPCArg::Type::BOOL, RPCArg::Optional::OMITTED, "calculate netspace for each miner, default=false"},
         },
         RPCResults{RPCResult{"(subsidy in json object)", "{...}"}},
-        RPCExamples{"querysubsidy 999999 7"}
+        RPCExamples{"queryprofit 7 1000000"}
         ).Check(request);
 
     LOCK(cs_main);
-    int height = ::ChainActive().Height();
-
+    int days{7};
     if (request.params.size() >= 1) {
-        if (!ParseInt32(request.params[0].get_str(), &height)) {
+        if (!ParseInt32(request.params[0].get_str(), &days)) {
+            throw std::runtime_error("cannot parse `days`");
+        }
+    }
+
+    int height{0};
+    if (request.params.size() >= 2) {
+        if (!ParseInt32(request.params[1].get_str(), &height)) {
             throw std::runtime_error("cannot parse `height`");
         }
     }
 
-    int days = 7;
-    if (request.params.size() >= 2) {
-        if (!ParseInt32(request.params[1].get_str(), &days)) {
-            throw std::runtime_error("cannot parse `days`");
-        }
+    bool calc_miner_netspace{false};
+    if (request.params.size() == 3) {
+        calc_miner_netspace = request.params[2].get_bool();
     }
 
     // query subsidy info. for last block
     auto const& params = Params().GetConsensus();
 
+    if (height == 0) {
+        height = ::ChainActive().Height();
+    }
     CAmount subsidy = GetBlockSubsidy(height, params);
 
     auto querier = ChainInfoQuerier::CreateQuerier();
     auto netspace_avg = querier.GetAverageNetSpace();
-    auto netspace_pb = static_cast<CAmount>(MakeNumberTB(netspace_avg).GetLow64() / 1000);
-    auto total_profit = subsidy * days * 480;
-    auto profit_1pb = total_profit / netspace_pb;
+    auto netspace_tb = static_cast<CAmount>(MakeNumberTB(netspace_avg).GetLow64());
+    auto total_rewards = subsidy * days * 480;
+    auto profit_1tb = total_rewards / netspace_tb;
+
+    // query actual profit for days
+    constexpr int SECS_DAY = 24 * 60 *60;
+    int BLOCKS_DAY = SECS_DAY / params.BHDIP008TargetSpacing;
+
+    auto const& view = ::ChainstateActive().CoinsDB();
+
+    std::map<CAccountID, std::set<CPlotterBindData>> account_bind_farmer_pks;
+    auto query_bind_farmer_pks = [&view, &account_bind_farmer_pks](CAccountID const& account_id) -> std::set<CPlotterBindData> {
+        auto it = account_bind_farmer_pks.find(account_id);
+        if (it == std::cend(account_bind_farmer_pks)) {
+            std::set<CPlotterBindData> bindDataSet;
+            // query from view
+            auto map = view.GetAccountBindPlotterEntries(account_id);
+            for (auto const& entry : map) {
+                bindDataSet.insert(entry.second.bindData);
+            }
+            account_bind_farmer_pks.insert(std::make_pair(account_id, bindDataSet));
+            return bindDataSet;
+        }
+        return it->second;
+    };
+
+    // the functor query the number of mined blocks within the capacity eval window in order to find the netspace
+    auto calc_netspace_blks = [&params, &query_bind_farmer_pks](CBlockIndex* pindex_from, CAccountID const& account_id) -> int {
+        auto farmer_pks = query_bind_farmer_pks(account_id);
+        int num_blocks{0};
+        int target_height = pindex_from->nHeight - params.nCapacityEvalWindow + 1;
+        for (auto pindex = pindex_from; pindex->nHeight >= target_height; pindex = pindex->pprev) {
+            // find by farmer-pk
+            CChiaFarmerPk block_farmer_pk(pindex->chiaposFields.posProof.vchFarmerPk);
+            if (find_if(std::cbegin(farmer_pks), std::cend(farmer_pks), [&block_farmer_pk](CPlotterBindData const& bind_data) -> bool {
+                return bind_data.GetType() == CPlotterBindData::Type::CHIA && bind_data.GetChiaFarmerPk() == block_farmer_pk;
+            }) != std::cend(farmer_pks)) {
+                ++num_blocks;
+            }
+        }
+        return num_blocks;
+    };
+
+    // loop until meet the required height
+    auto pindex = ::ChainActive().Tip();
+    while (pindex->nHeight > height) {
+        pindex = pindex->pprev;
+    }
+
+    struct FMInfo {
+        int blocks;
+        int latest_height;
+    };
+    CAmount total_fullmortgage_profit{0};
+    int num_fullmortgage_blocks{0};
+    int num_checked_blocks{BLOCKS_DAY * days};
+    std::map<CAccountID, FMInfo> fullmortgage_prod_blks;
+    int low_height = height - num_checked_blocks;
+    for (; pindex->nHeight >= low_height; pindex = pindex->pprev) {
+        if ((pindex->nStatus & BLOCK_UNCONDITIONAL) == 0) {
+            ++num_fullmortgage_blocks;
+            // this is a full mortgage block, find the profit
+            CBlock block;
+            if (!ReadBlockFromDisk(block, pindex, params)) {
+                throw std::runtime_error(tinyformat::format("cannot read block %d from disk", pindex->nHeight));
+            }
+            // find coin base
+            for (auto const& tx : block.vtx) {
+                if (tx->IsCoinBase()) {
+                    total_fullmortgage_profit += tx->GetValueOut();
+                    CAccountID account_id = ExtractAccountID(tx->vout[0].scriptPubKey);
+                    int blks{0};
+                    if (calc_miner_netspace) {
+                        calc_netspace_blks(::ChainActive().Tip(), account_id);
+                    }
+                    if (fullmortgage_prod_blks.find(account_id) == std::cend(fullmortgage_prod_blks)) {
+                        fullmortgage_prod_blks[account_id] = { 0, pindex->nHeight };
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    std::uint64_t fullmortgage_netspace_tb = num_fullmortgage_blocks * netspace_tb / num_checked_blocks;
+
+    UniValue fullmortgage_details(UniValue::VARR);
+    std::uint64_t total_full_mortgage_netspace{0};
+    for (auto const& entry : fullmortgage_prod_blks) {
+        UniValue entry_val(UniValue::VOBJ);
+        CTxDestination dest(static_cast<ScriptHash>(entry.first));
+        int blocks = entry.second.blocks;
+        int latest_height = entry.second.latest_height;
+        std::uint64_t entry_netspace_tb = static_cast<std::uint64_t>(netspace_tb * blocks / params.nCapacityEvalWindow);
+        entry_val.pushKV("address", EncodeDestination(dest));
+        entry_val.pushKV("latestHeight", FormatNumberStr(std::to_string(latest_height)));
+        if (calc_miner_netspace) {
+            entry_val.pushKV("netspaceTB", FormatNumberStr(std::to_string(entry_netspace_tb)));
+            entry_val.pushKV("producedBlocks", blocks);
+        }
+        fullmortgage_details.push_back(std::move(entry_val));
+        total_full_mortgage_netspace += entry_netspace_tb;
+    }
+
+    CAmount fullmortgage_profit_tb = fullmortgage_netspace_tb != 0 ? total_fullmortgage_profit / static_cast<CAmount>(fullmortgage_netspace_tb) : 0;
+    CAmount fullmortgage_profit_pb = fullmortgage_profit_tb * 1000;
 
     UniValue res(UniValue::VOBJ);
     res.pushKV("height", height);
     res.pushKV("subsidy", subsidy);
     res.pushKV("subsidyHuman", FormatMoney(subsidy));
-    res.pushKV("netspacePB", FormatNumberStr(std::to_string(netspace_pb)));
-    res.pushKV("profitPerPB", profit_1pb);
-    res.pushKV("profitPerPBHuman", FormatMoney(profit_1pb));
+    res.pushKV("netspaceTB", FormatNumberStr(std::to_string(netspace_tb)));
+    res.pushKV("profitPerTB", profit_1tb);
+    res.pushKV("profitPerTBHuman", FormatMoney(profit_1tb));
+    res.pushKV("profitFullmortgage", fullmortgage_details);
+    res.pushKV("profitFullmortgagePerTB", fullmortgage_profit_tb);
+    res.pushKV("profitFullmortgagePerTBHuman", FormatMoney(fullmortgage_profit_tb));
+    res.pushKV("profitFullmortgagePerPB", fullmortgage_profit_pb);
+    res.pushKV("profitFullmortgagePerPBHuman", FormatMoney(fullmortgage_profit_pb));
     res.pushKV("days", days);
 
     return res;
@@ -2137,7 +2253,7 @@ static std::vector<CRPCCommand> commands = {
         {"chia", "queryallpointcoins", &queryAllPointCoins, {}},
         {"chia", "queryfullmortgageinfo", &queryFullMortgageInfo, {}},
         {"chia", "querynumoffullmortgageblocks", &queryNumOfFullMortgageBlocks, {}},
-        {"chia", "querysubsidy", &querysubsidy, {}},
+        {"chia", "queryprofit", &queryprofit, {}},
 };
 
 void RegisterChiaRPCCommands(CRPCTable& t) {
