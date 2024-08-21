@@ -1325,8 +1325,13 @@ else
   fi
 fi
 
-AC_CHECK_HEADER([mpir.h],,AC_MSG_ERROR(gmp(mpir) headers missing),)
-AC_CHECK_LIB([mpir],[main],GMP_LIBS=-lmpir,AC_MSG_ERROR(libgmp missing))
+if [test x$BUILD_OS = xdarwin]; then
+    AC_CHECK_HEADER([gmp.h],,AC_MSG_ERROR(gmp(gmp) headers missing),)
+    AC_CHECK_LIB([gmp],[main],GMP_LIBS=-lgmp,AC_MSG_ERROR(libgmp missing))
+else
+    AC_CHECK_HEADER([mpir.h],,AC_MSG_ERROR(mpir(mpir) headers missing),)
+    AC_CHECK_LIB([mpir],[main],GMP_LIBS=-lmpir,AC_MSG_ERROR(libmpir missing))
+fi
 
 save_CXXFLAGS="${CXXFLAGS}"
 CXXFLAGS="${CXXFLAGS} ${CRYPTO_CFLAGS} ${SSL_CFLAGS}"
