@@ -5654,6 +5654,68 @@ static UniValue listpledges(const JSONRPCRequest& request)
     return ret;
 }
 
+static UniValue sendamountwithtext(JSONRPCRequest const& request)
+{
+    std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
+    CWallet* const pwallet = wallet.get();
+
+    if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
+        return NullUniValue;
+    }
+
+    RPCHelpMan("sendamountwithtext", "send amount to address with text", {
+        {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "Target address"},
+        {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::NO, "The amount to be sent"},
+        {"text", RPCArg::Type::STR, RPCArg::Optional::NO, "The text attached with this transaction"},
+    }, RPCResult {
+        "\"txid\" (string) The transaction id.",
+    }, RPCExamples {
+        HelpExampleRpc("sendamountwithtext", "xxxxx  10000 \"hello world\"")
+    }).Check(request);
+
+    if (request.params.size() != 3) {
+        throw std::runtime_error("invalid number of parameters");
+    }
+    std::string address = request.params[0].get_str();
+    auto to_address = DecodeDestination(address);
+    CAmount amount;
+    if (!ParseInt64(request.params[1].get_str(), &amount)) {
+        throw std::runtime_error("invalid parameter: amount");
+    }
+    amount *= COIN;
+    std::string text = request.params[2].get_str();
+    auto from_address = pwallet->GetPrimaryDestination();
+
+    CMutableTransaction mtx;
+    std::vector<std::string> errors;
+    CAmount fee = 0.01 * COIN;
+    CCoinControl coin_control;
+    coin_control.m_signal_bip125_rbf = false;
+    coin_control.m_coin_pick_policy = CoinPickPolicy::IncludeIfSet;
+    coin_control.m_pick_dest = from_address;
+    coin_control.fAllowOtherInputs = true;
+    auto result = uniformer::CreateTextTransaction(pwallet, to_address, from_address, amount, text, coin_control, errors, fee, mtx);
+
+    if (result != uniformer::Result::OK) {
+        throw JSONRPCError(RPC_WALLET_ERROR, strprintf("Create transaction error(%d): %s", (uint32_t)result, errors.empty() ? "Unknown" : errors[0]));
+    }
+
+    // Sign transaction
+    if (!uniformer::SignTransaction(pwallet, mtx)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, strprintf("Sign transaction error(%d): %s", (uint32_t)result, errors.empty() ? "Unknown" : errors[0]));
+    }
+    uint256 txid = mtx.GetHash();
+
+    // Commit transaction
+    errors.clear();
+    result = uniformer::CommitTransaction(pwallet, std::move(mtx), {}, errors);
+    if (result != uniformer::Result::OK) {
+        throw JSONRPCError(RPC_WALLET_ERROR, strprintf("Commit transaction error(%d): %s", (uint32_t)result, errors.empty() ? "Unknown" : errors[0]));
+    }
+
+    return txid.GetHex();
+}
+
 UniValue abortrescan(const JSONRPCRequest& request); // in rpcdump.cpp
 UniValue dumpprivkey(const JSONRPCRequest& request); // in rpcdump.cpp
 UniValue importprivkey(const JSONRPCRequest& request);
@@ -5740,6 +5802,7 @@ static const CRPCCommand commands[] =
     {"wallet",              "retargetpledge",                   &retargetpledge, {"txid", "address"} },
     { "wallet",             "withdrawpledge",                   &withdrawpledge,                {"txid","comment","comment_to","replaceable","conf_target","estimate_mode"} },
     { "wallet",             "listpledges",                      &listpledges,                   {"count","skip","include_watchonly","include_invalid"} },
+    { "wallet",             "sendamountwithtext",               &sendamountwithtext,            {"address","amount","text"} },
 };
 // clang-format on
 

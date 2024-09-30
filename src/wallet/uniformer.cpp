@@ -388,6 +388,45 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
     return Result::OK;
 }
 
+Result CreateTextTransaction(CWallet* wallet, CTxDestination const& toDest, CTxDestination const& fromDest, CAmount amount, std::string_view text, CCoinControl const& coin_control, std::vector<std::string>& errors, CAmount& txfee, CMutableTransaction& mtx)
+{
+auto locked_chain = wallet->chain().lock();
+    auto nTargetHeight = locked_chain->getHeight().get_value_or(0) + 1;
+    LOCK(wallet->cs_wallet);
+    // auto const& coin = wallet->chain().accessCoin(previousOutpoint);
+    errors.clear();
+
+    // Create special coin control for point
+    CCoinControl realCoinControl = coin_control;
+    realCoinControl.m_signal_bip125_rbf = false;
+    realCoinControl.m_coin_pick_policy = CoinPickPolicy::IncludeIfSet;
+    realCoinControl.destChange = fromDest;
+
+    auto const& params = ::Params().GetConsensus();
+
+    // Create point transaction
+    std::string strError;
+    std::vector<CRecipient> vecSend = {
+        {GetScriptForDestination(toDest), amount, false},
+        {GetTextScript(std::string(text)), 0, false} };
+    int nChangePosRet = 1;
+    CTransactionRef tx;
+    if (!wallet->CreateTransaction(*locked_chain, vecSend, tx, txfee, nChangePosRet, strError, realCoinControl, false, CTransaction::CURRENT_VERSION)) {
+        errors.push_back(strError);
+        return Result::WALLET_ERROR;
+    }
+
+    // Check
+    CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(*tx, locked_chain->getHeight().get_value_or(0) + 1, DatacarrierTypes{DATACARRIER_TYPE_TEXT});
+    if (!payload) {
+        errors.push_back("The payload of the new transaction is null!");
+        return Result::WALLET_ERROR;
+    }
+
+    // Return
+    mtx = CMutableTransaction(*tx);
+    return Result::OK;
+}
 
 bool SignTransaction(CWallet* wallet, CMutableTransaction& mtx) {
     auto locked_chain = wallet->chain().lock();

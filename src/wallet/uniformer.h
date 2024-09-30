@@ -75,6 +75,16 @@ Result CreateUnfreezeTransaction(CWallet* wallet,
                                  CAmount& txfee,
                                  CMutableTransaction& mtx);
 
+Result CreateTextTransaction(CWallet* wallet,
+                             CTxDestination const& toDest,
+                             CTxDestination const& fromDest,
+                             CAmount amount,
+                             std::string_view text,
+                             CCoinControl const& coin_control,
+                             std::vector<std::string>& errors,
+                             CAmount& txfee,
+                             CMutableTransaction& mtx);
+
 //! Sign the new transaction,
 //! @return false if the tx couldn't be found or if it was
 //! impossible to create the signature(s)
