@@ -1830,8 +1830,8 @@ static UniValue queryownblocks(JSONRPCRequest const& request)
     res.pushKV("last_height", last_height);
     res.pushKV("total", total_rewards);
     res.pushKV("total_human", FormatMoney(total_rewards));
-    res.pushKV("rewards_block", total_rewards / count);
-    res.pushKV("rewards_block_human", FormatMoney(total_rewards / count));
+    res.pushKV("rewards_block", (count > 0 ? total_rewards / count : 0));
+    res.pushKV("rewards_block_human", FormatMoney(count > 0 ? total_rewards / count : 0));
 
     return res;
 }
