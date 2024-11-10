@@ -393,21 +393,48 @@ static CTransactionRef SendMoney(interfaces::Chain::Lock& locked_chain, CWallet 
  */
 static UniValue sendcointoaddress(JSONRPCRequest const& request)
 {
-    if (request.params.size() != 3) {
-        throw std::runtime_error("invalid parameters! Should be (tx hash, n, address) or (txouts json file, pack number of txins to 1 tx max, address)");
-    }
-
-    // retrieve the output address
-    CTxDestination transfer_to_destination = DecodeDestination(request.params[2].getValStr());
-    if (transfer_to_destination.empty()) {
-        throw std::runtime_error("invalid target address");
-    }
-
     std::shared_ptr<CWallet> const wallet = GetWalletForJSONRPCRequest(request);
     CWallet* const pwallet = wallet.get();
 
     if (!EnsureWalletIsAvailable(pwallet, request.fHelp)) {
         return NullUniValue;
+    }
+
+    RPCHelpMan("sendcointoaddress", "send special coin to an address",
+        {
+            RPCArg(
+                "hash_or_jsonfile",
+                RPCArg::Type::STR,
+                RPCArg::Optional::NO,
+                "represents 'hash' from the special coin or the json file contains coins"
+            ),
+            RPCArg(
+                "n_or_count",
+                RPCArg::Type::NUM,
+                RPCArg::Optional::NO,
+                "represents 'n' from the special coin or max number of coins should be sent from the file"
+            ),
+            RPCArg(
+                "target",
+                RPCArg::Type::STR,
+                RPCArg::Optional::NO,
+                "the address will receive the coins"
+            ),
+        },
+        RPCResults {
+            RPCResult("")
+        },
+        RPCExamples {
+            "cli sendcointoaddress /path/to/file.json"
+        }
+    ).Check(request);
+
+    LOCK(pwallet->cs_wallet);
+
+    // retrieve the output address
+    CTxDestination transfer_to_destination = DecodeDestination(request.params[2].getValStr());
+    if (transfer_to_destination.empty()) {
+        throw std::runtime_error("invalid target address");
     }
 
     // Make sure the results are valid at least up to the most recent block
@@ -5821,7 +5848,7 @@ static const CRPCCommand commands[] =
     {"wallet",              "retargetpledge",                   &retargetpledge, {"txid", "address"} },
     { "wallet",             "withdrawpledge",                   &withdrawpledge,                {"txid","comment","comment_to","replaceable","conf_target","estimate_mode"} },
     { "wallet",             "listpledges",                      &listpledges,                   {"count","skip","include_watchonly","include_invalid"} },
-    { "wallet",             "sendamountwithtext",               &sendamountwithtext,            {"address","amount","text"} },
+    { "wallet",             "sendamountwithtext",               &sendamountwithtext,            {"address","amount","text", "txid", "n"} },
 };
 // clang-format on
 
