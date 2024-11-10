@@ -315,18 +315,18 @@ static UniValue setlabel(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-            RPCHelpMan{"setlabel",
-                "\nSets the label associated with the given address.\n",
-                {
-                    {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The bitcoin address to be associated with a label."},
-                    {"label", RPCArg::Type::STR, RPCArg::Optional::NO, "The label to assign to the address."},
-                },
-                RPCResults{},
-                RPCExamples{
-                    HelpExampleCli("setlabel", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\" \"tabby\"")
-            + HelpExampleRpc("setlabel", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\", \"tabby\"")
-                },
-            }.Check(request);
+    RPCHelpMan{"setlabel",
+        "\nSets the label associated with the given address.\n",
+        {
+            {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "The bitcoin address to be associated with a label."},
+            {"label", RPCArg::Type::STR, RPCArg::Optional::NO, "The label to assign to the address."},
+        },
+        RPCResults{},
+        RPCExamples{
+            HelpExampleCli("setlabel", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\" \"tabby\"")
+    + HelpExampleRpc("setlabel", "\"1D1ZrZNe3JUo7ZycKEYQQiQAWd9y54F4XX\", \"tabby\"")
+        },
+    }.Check(request);
 
     LOCK(pwallet->cs_wallet);
 
