@@ -5663,17 +5663,19 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
         return NullUniValue;
     }
 
-    RPCHelpMan("sendamountwithtext", "send amount to address with text", {
+    RPCHelpMan("sendamountwithtext", "send amount to address with text and spend a special coin, the coin can be included as an optional parameter.", {
         {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "Target address"},
         {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::NO, "The amount to be sent"},
         {"text", RPCArg::Type::STR, RPCArg::Optional::NO, "The text attached with this transaction"},
+        {"txid", RPCArg::Type::STR_HEX, RPCArg::Optional::OMITTED, "The 'txid' of the optional coin"},
+        {"n", RPCArg::Type::NUM, RPCArg::Optional::OMITTED, "The 'n' of the optional coin"},
     }, RPCResult {
         "\"txid\" (string) The transaction id.",
     }, RPCExamples {
         HelpExampleRpc("sendamountwithtext", "xxxxx  10000 \"hello world\"")
     }).Check(request);
 
-    if (request.params.size() != 3) {
+    if (request.params.size() != 3 && request.params.size() != 5) {
         throw std::runtime_error("invalid number of parameters");
     }
     std::string address = request.params[0].get_str();
@@ -5686,6 +5688,20 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
     std::string text = request.params[2].get_str();
     auto from_address = pwallet->GetPrimaryDestination();
 
+    // special coin
+    std::optional<COutPoint> coin;
+    if (request.params.size() == 5) {
+        uint256 txid;
+        int n;
+        if (!ParseHashStr(request.params[3].get_str(), txid)) {
+            throw std::runtime_error("cannot parse hex string of the special coin");
+        }
+        if (!ParseInt32(request.params[4].get_str(), &n)) {
+            throw std::runtime_error("the 'n' of the special coin cannot be parsed");
+        }
+        coin = COutPoint(std::move(txid), n);
+    }
+
     CMutableTransaction mtx;
     std::vector<std::string> errors;
     CAmount fee = 0.01 * COIN;
@@ -5694,6 +5710,9 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
     coin_control.m_coin_pick_policy = CoinPickPolicy::IncludeIfSet;
     coin_control.m_pick_dest = from_address;
     coin_control.fAllowOtherInputs = true;
+    if (coin.has_value()) {
+        coin_control.Select(*coin);
+    }
     auto result = uniformer::CreateTextTransaction(pwallet, to_address, from_address, amount, text, coin_control, errors, fee, mtx);
 
     if (result != uniformer::Result::OK) {
