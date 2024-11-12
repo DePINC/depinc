@@ -390,7 +390,7 @@ Result CreateUnfreezeTransaction(CWallet* wallet, COutPoint const& outpoint, CCo
 
 Result CreateTextTransaction(CWallet* wallet, CTxDestination const& toDest, CTxDestination const& fromDest, CAmount amount, std::string_view text, CCoinControl const& coin_control, std::vector<std::string>& errors, CAmount& txfee, CMutableTransaction& mtx)
 {
-auto locked_chain = wallet->chain().lock();
+    auto locked_chain = wallet->chain().lock();
     auto nTargetHeight = locked_chain->getHeight().get_value_or(0) + 1;
     LOCK(wallet->cs_wallet);
     errors.clear();
