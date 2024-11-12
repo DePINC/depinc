@@ -422,7 +422,7 @@ static UniValue sendcointoaddress(JSONRPCRequest const& request)
             ),
         },
         RPCResults {
-            RPCResult("")
+            RPCResult("the txid")
         },
         RPCExamples {
             "cli sendcointoaddress /path/to/file.json"
