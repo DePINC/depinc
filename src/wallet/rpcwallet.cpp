@@ -5690,6 +5690,9 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
         return NullUniValue;
     }
 
+    auto locked_chain = pwallet->chain().lock();
+    LOCK(pwallet->cs_wallet);
+
     RPCHelpMan("sendamountwithtext", "send amount to address with text and spend a special coin, the coin can be included as an optional parameter.", {
         {"address", RPCArg::Type::STR, RPCArg::Optional::NO, "Target address"},
         {"amount", RPCArg::Type::AMOUNT, RPCArg::Optional::NO, "The amount to be sent"},
@@ -5716,7 +5719,7 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
     auto from_address = pwallet->GetPrimaryDestination();
 
     // special coin
-    std::optional<COutPoint> coin;
+    std::optional<COutPoint> the_coin;
     if (request.params.size() == 5) {
         uint256 txid;
         int n;
@@ -5726,21 +5729,30 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
         if (!ParseInt32(request.params[4].get_str(), &n)) {
             throw std::runtime_error("the 'n' of the special coin cannot be parsed");
         }
-        coin = COutPoint(std::move(txid), n);
+        the_coin = COutPoint(std::move(txid), n);
+        // we need to ensure that the coin is valid
+        std::vector<COutput> vCoins;
+        pwallet->AvailableCoins(*locked_chain, vCoins);
+        auto it = find_if(std::cbegin(vCoins), std::cend(vCoins), [&the_coin](COutput const& coin) {
+            return coin.tx->GetHash() == the_coin->hash && coin.i == the_coin->n;
+        });
+        if (it == std::cend(vCoins)) {
+            throw std::runtime_error(tinyformat::format("The coin cannot be found from wallet, it's unspentable (txid=%s, n=%d)", the_coin->hash.ToString(), the_coin->n));
+        }
     }
 
     CMutableTransaction mtx;
     std::vector<std::string> errors;
-    CAmount fee = 0.01 * COIN;
+    CAmount nFeeRet;
     CCoinControl coin_control;
     coin_control.m_signal_bip125_rbf = false;
     coin_control.m_coin_pick_policy = CoinPickPolicy::IncludeIfSet;
     coin_control.m_pick_dest = from_address;
     coin_control.fAllowOtherInputs = true;
-    if (coin.has_value()) {
-        coin_control.Select(*coin);
+    if (the_coin.has_value()) {
+        coin_control.Select(*the_coin);
     }
-    auto result = uniformer::CreateTextTransaction(pwallet, to_address, from_address, amount, text, coin_control, errors, fee, mtx);
+    auto result = uniformer::CreateTextTransaction(pwallet, to_address, from_address, amount, text, coin_control, errors, nFeeRet, mtx);
 
     if (result != uniformer::Result::OK) {
         throw JSONRPCError(RPC_WALLET_ERROR, strprintf("Create transaction error(%d): %s", (uint32_t)result, errors.empty() ? "Unknown" : errors[0]));
