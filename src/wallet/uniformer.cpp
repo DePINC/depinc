@@ -399,6 +399,7 @@ Result CreateTextTransaction(CWallet* wallet, CTxDestination const& toDest, CTxD
     CCoinControl realCoinControl = coin_control;
     realCoinControl.m_signal_bip125_rbf = false;
     realCoinControl.m_coin_pick_policy = CoinPickPolicy::IncludeIfSet;
+    realCoinControl.fAllowOtherInputs = true;
     realCoinControl.destChange = fromDest;
 
     auto const& params = ::Params().GetConsensus();
