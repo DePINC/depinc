@@ -393,7 +393,6 @@ Result CreateTextTransaction(CWallet* wallet, CTxDestination const& toDest, CTxD
 auto locked_chain = wallet->chain().lock();
     auto nTargetHeight = locked_chain->getHeight().get_value_or(0) + 1;
     LOCK(wallet->cs_wallet);
-    // auto const& coin = wallet->chain().accessCoin(previousOutpoint);
     errors.clear();
 
     // Create special coin control for point
