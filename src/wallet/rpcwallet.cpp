@@ -5714,7 +5714,6 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
     if (!ParseInt64(request.params[1].get_str(), &amount)) {
         throw std::runtime_error("invalid parameter: amount");
     }
-    amount *= COIN;
     std::string text = request.params[2].get_str();
     auto from_address = pwallet->GetPrimaryDestination();
 
