@@ -5706,13 +5706,13 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
     }).Check(request);
 
     if (request.params.size() != 3 && request.params.size() != 5) {
-        throw std::runtime_error("invalid number of parameters");
+        throw JSONRPCError(RPC_WALLET_ERROR, "invalid number of parameters");
     }
     std::string address = request.params[0].get_str();
     auto to_address = DecodeDestination(address);
     CAmount amount;
     if (!ParseInt64(request.params[1].get_str(), &amount)) {
-        throw std::runtime_error("invalid parameter: amount");
+        throw JSONRPCError(RPC_WALLET_ERROR, "invalid parameter: amount");
     }
     std::string text = request.params[2].get_str();
     auto from_address = pwallet->GetPrimaryDestination();
@@ -5723,10 +5723,10 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
         uint256 txid;
         int n;
         if (!ParseHashStr(request.params[3].get_str(), txid)) {
-            throw std::runtime_error("cannot parse hex string of the special coin");
+            throw JSONRPCError(RPC_WALLET_ERROR, "cannot parse hex string of the special coin");
         }
         if (!ParseInt32(request.params[4].get_str(), &n)) {
-            throw std::runtime_error("the 'n' of the special coin cannot be parsed");
+            throw JSONRPCError(RPC_WALLET_ERROR, "the 'n' of the special coin cannot be parsed");
         }
         the_coin = COutPoint(std::move(txid), n);
         // we need to ensure that the coin is valid
@@ -5736,7 +5736,7 @@ static UniValue sendamountwithtext(JSONRPCRequest const& request)
             return coin.tx->GetHash() == the_coin->hash && coin.i == the_coin->n;
         });
         if (it == std::cend(vCoins)) {
-            throw std::runtime_error(tinyformat::format("The coin cannot be found from wallet, it's unspentable (txid=%s, n=%d)", the_coin->hash.ToString(), the_coin->n));
+            throw JSONRPCError(RPC_WALLET_ERROR, tinyformat::format("The coin cannot be found from wallet, it's unspentable (txid=%s, n=%d)", the_coin->hash.ToString(), the_coin->n));
         }
     }
 
