@@ -15,6 +15,7 @@
 #include <iterator>
 #include <stdexcept>
 #include <utility>
+#include <chrono>
 
 #include <amount.h>
 
@@ -454,6 +455,41 @@ static UniValue queryNetspace(JSONRPCRequest const& request) {
     return res;
 }
 
+class TimeElapsed {
+private:
+    std::chrono::time_point<std::chrono::steady_clock> start_time;
+    std::string m_name;
+    mutable double m_elapsed_time {0.0};
+
+public:
+    explicit TimeElapsed(std::string_view name)
+        : start_time(std::chrono::steady_clock::now())
+        , m_name(name) {}
+
+    void Reset() {
+        start_time = std::chrono::steady_clock::now();
+    }
+
+    double Elapsed() const {
+        auto end_time = std::chrono::steady_clock::now();
+        return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / 1000.0;
+    }
+
+    std::string GetName() const {
+        return m_name;
+    }
+
+    double GetElapsedTime() const {
+        return m_elapsed_time;
+    }
+
+    double PrintAndRecordElapsedTime() const {
+        m_elapsed_time = Elapsed();
+        LogPrintf("%s: elapsed time: %.2f seconds\n", m_name, m_elapsed_time);
+        return m_elapsed_time;
+    }
+};
+
 static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     RPCHelpMan("queryminingrequirement", "Query the pledge requirement for the miner",
                {
@@ -464,6 +500,11 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
                RPCExamples(HelpExampleCli("queryminerpledgeinfo", "xxxxxx")))
             .Check(request);
 
+    // elapsed time entries will be recorded to `Debug` json object
+    UniValue debug(UniValue::VOBJ);
+
+    TimeElapsed te_init("initialize");
+
     LOCK(cs_main);
     CBlockIndex* pindex = ::ChainActive().Tip();
     auto params = Params().GetConsensus();
@@ -473,17 +514,30 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
 
     CCoinsViewCache const& view = ::ChainstateActive().CoinsTip();
 
+    debug.pushKV("te_init", te_init.PrintAndRecordElapsedTime());
+
     UniValue res(UniValue::VOBJ);
     UniValue summary(UniValue::VOBJ);
 
     int nTargetHeight = pindex->nHeight + 1;
-    int nHeightForCalculatingTotalSupply = GetHeightForCalculatingTotalSupply(nTargetHeight, params);
 
+    TimeElapsed te_get_height_for_calculating_total_supply("get_height_for_calculating_total_supply");
+    int nHeightForCalculatingTotalSupply = GetHeightForCalculatingTotalSupply(nTargetHeight, params);
+    debug.pushKV("te_get_height_for_calculating_total_supply", te_get_height_for_calculating_total_supply.PrintAndRecordElapsedTime());
+
+    TimeElapsed te_get_accumulate("get_accumulate");
     CAmount nAccumulate = GetBlockAccumulateSubsidy(pindex, params);
+    debug.pushKV("te_get_accumulate", te_get_accumulate.PrintAndRecordElapsedTime());
+
+    TimeElapsed te_get_total_supply("get_total_supply");
     CAmount nTotalSupplied = GetTotalSupplyBeforeHeight(nHeightForCalculatingTotalSupply, params) +
                              GetTotalSupplyBeforeBHDIP009(params) * (params.BHDIP009TotalAmountUpgradeMultiply - 1);
+    debug.pushKV("te_get_total_supply", te_get_total_supply.PrintAndRecordElapsedTime());
+
+    TimeElapsed te_get_burned("get_burned");
     CAmount nBurned = view.GetAccountBalance(false, GetBurnToAccountID(), nullptr, nullptr, nullptr,
                                              &params.BHDIP009PledgeTerms, nHeightForCalculatingTotalSupply);
+    debug.pushKV("te_get_burned", te_get_burned.PrintAndRecordElapsedTime());
 
     bool summaryForAddress { false };
 
@@ -506,21 +560,26 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
 
         summaryForAddress = true; // TODO maybe we need to make this to an optional parameter
 
+        TimeElapsed te_get_mining_require("get_mining_require");
         int nMinedCount, nTotalCount;
         CAmount nReq = poc::GetMiningRequireBalance(accountID, bindData, nTargetHeight, view, nullptr, nullptr, nBurned,
                                                     params, &nMinedCount, &nTotalCount, nHeightForCalculatingTotalSupply);
         summary.pushKV("address", address);
         summary.pushKV("require", nReq);
         summary.pushKV("require-human", FormatMoney(nReq));
+        debug.pushKV("te_get_mining_require", te_get_mining_require.PrintAndRecordElapsedTime());
 
         // Retrieve all public-key which are binding with this account
+        TimeElapsed te_get_fpks("get_fpks");
         UniValue pklist(UniValue::VARR);
         auto fpks = view.GetAccountBindPlotters(accountID, CPlotterBindData::Type::CHIA);
         for (auto const& fpk : fpks) {
             pklist.push_back(fpk.GetChiaFarmerPk().ToString());
         }
+        debug.pushKV("te_get_fpks", te_get_fpks.PrintAndRecordElapsedTime());
 
         // List mined blocks which are related to this account
+        TimeElapsed te_get_blks("get_blks");
         UniValue blks(UniValue::VARR);
         auto pcurrIndex = pindex;
         int count{0}, mined{0};
@@ -544,6 +603,7 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
             pcurrIndex = pcurrIndex->pprev;
             ++count;
         }
+        debug.pushKV("te_get_blks", te_get_blks.PrintAndRecordElapsedTime());
 
         res.pushKV("mined", blks);
         res.pushKV("fpks", pklist);
@@ -556,6 +616,7 @@ static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     summary.pushKV("supplied", nTotalSupplied);
     summary.pushKV("height", nTargetHeight);
     summary.pushKV("calc-height", nHeightForCalculatingTotalSupply);
+    summary.pushKV("debug", debug);
 
     if (summaryForAddress) {
         res.pushKV("summary", summary);
