@@ -42,6 +42,7 @@
 #include "kernel/utils.h"
 
 #include "chain_info_querier.h"
+#include "chiapos/elapsed_time.hpp"
 
 extern std::unique_ptr<CConnman> g_connman;
 
@@ -454,41 +455,6 @@ static UniValue queryNetspace(JSONRPCRequest const& request) {
 
     return res;
 }
-
-class TimeElapsed {
-private:
-    std::chrono::time_point<std::chrono::steady_clock> start_time;
-    std::string m_name;
-    mutable double m_elapsed_time {0.0};
-
-public:
-    explicit TimeElapsed(std::string_view name)
-        : start_time(std::chrono::steady_clock::now())
-        , m_name(name) {}
-
-    void Reset() {
-        start_time = std::chrono::steady_clock::now();
-    }
-
-    double Elapsed() const {
-        auto end_time = std::chrono::steady_clock::now();
-        return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count()) / 1000.0;
-    }
-
-    std::string GetName() const {
-        return m_name;
-    }
-
-    double GetElapsedTime() const {
-        return m_elapsed_time;
-    }
-
-    double PrintAndRecordElapsedTime() const {
-        m_elapsed_time = Elapsed();
-        LogPrintf("%s: elapsed time: %.2f seconds\n", m_name, m_elapsed_time);
-        return m_elapsed_time;
-    }
-};
 
 static UniValue queryMiningRequirement(JSONRPCRequest const& request) {
     RPCHelpMan("queryminingrequirement", "Query the pledge requirement for the miner",
