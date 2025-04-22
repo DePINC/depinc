@@ -54,6 +54,7 @@
 
 #include <chiapos/kernel/bls_key.h>
 #include <chiapos/mortgage_calculator.h>
+#include <chiapos/elapsed_time.hpp>
 
 #ifdef ENABLE_OMNICORE
 #include <omnicore_api.h>
@@ -1286,6 +1287,11 @@ CAmount GetTotalReward(BlockReward const& reward) {
 
 BlockReward GetBlockReward(const CBlockIndex* pindexPrev, const CAmount& nFees, const CAccountID& generatorAccountID, const CPlotterBindData& bindData, const CCoinsViewCache& view, const Consensus::Params& consensusParams)
 {
+    LogPrintf("%s: start\n", __func__);
+    TimeElapsed te(__func__);
+    te.BindExitCallback([&te](std::string_view name) {
+        LogPrintf("%s: elapsed %1.5f exit\n", name, te.PrintAndRecordElapsedTime());
+    });
     std::string strGeneratorAddr = EncodeDestination(ScriptHash(generatorAccountID));
 
     const int nTargetHeight = pindexPrev ? (pindexPrev->nHeight + 1) : 0;

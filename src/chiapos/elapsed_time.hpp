@@ -6,14 +6,27 @@
 #include <string>
 #include <string_view>
 
+using TimeElapsed_Callback = std::function<void(std::string_view)>;
+
 class TimeElapsed {
 private:
     std::chrono::time_point<std::chrono::steady_clock> start_time;
     std::string m_name;
     mutable double m_elapsed_time{0.0};
+    TimeElapsed_Callback m_exit_callback;
 
 public:
     explicit TimeElapsed(std::string_view name) : start_time(std::chrono::steady_clock::now()), m_name(name) {}
+
+    ~TimeElapsed() {
+        if (m_exit_callback) {
+            m_exit_callback(m_name);
+        }
+    }
+
+    void BindExitCallback(TimeElapsed_Callback&& callback) {
+        m_exit_callback = std::move(callback);
+    }
 
     void Reset() { start_time = std::chrono::steady_clock::now(); }
 
