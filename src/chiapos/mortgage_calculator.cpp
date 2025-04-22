@@ -6,6 +6,31 @@
 
 #include <util/moneystr.h>
 
+class IndexRangeControl {
+public:
+    static IndexRangeControl& GetInstance() {
+        static IndexRangeControl instance;
+        return instance;
+    }
+
+    int GetLowestHeight() const {
+        if (m_mortgage_heights.empty()) {
+            LogPrint(BCLog::BENCH, "%s: cached 0 heights\n", __func__);
+            return 0;
+        }
+        int nLowestHeight = *m_mortgage_heights.begin();
+        LogPrint(BCLog::BENCH, "%s: cached %d heights, lowest height %d\n", __func__, m_mortgage_heights.size(), nLowestHeight);
+        return nLowestHeight;
+    }
+
+    void InsertHeight(int nHeight) { m_mortgage_heights.insert(nHeight); }
+
+    void RemoveHeight(int nHeight) { m_mortgage_heights.erase(nHeight); }
+
+private:
+    std::set<int> m_mortgage_heights;
+};
+
 CBlockIndex const* FindPrevIndex(int nHeight, CBlockIndex const* pindex) {
     while (pindex->nHeight >= nHeight) {
         pindex = pindex->pprev;
@@ -19,17 +44,21 @@ CMortgageCalculator::CMortgageCalculator(CBlockIndex const* pindexTip, Consensus
 std::tuple<CAmount, CMortgageCalculator::FullMortgageAccumulatedInfoMap> CMortgageCalculator::CalcAccumulatedAmount(
         int nTargetHeight) const {
     CAmount nTotalAmount{0};
+    int nLowestHeight = std::max(m_params.BHDIP011Height, IndexRangeControl::GetInstance().GetLowestHeight());
     FullMortgageAccumulatedInfoMap mapFullMortgageAccumulatedInfo;
-    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= m_params.BHDIP011Height;
+    for (auto pindex = FindPrevIndex(nTargetHeight, m_pindexTip); pindex->nHeight >= nLowestHeight;
          pindex = pindex->pprev) {
         if (IsFullMortgageBlock(pindex, m_params)) {
             CAmount nAccumulatedAmount = CalcDistributeAmountToTargetHeight(pindex->nHeight, nTargetHeight);
             if (nAccumulatedAmount > 0) {
+                IndexRangeControl::GetInstance().InsertHeight(pindex->nHeight);
                 nTotalAmount += nAccumulatedAmount;
                 FullMortgageAccumulatedInfo entry;
                 entry.nHeight = pindex->nHeight;
                 entry.nAccumulatedAmount = nAccumulatedAmount;
                 mapFullMortgageAccumulatedInfo.insert_or_assign(pindex->nHeight, std::move(entry));
+            } else {
+                IndexRangeControl::GetInstance().RemoveHeight(pindex->nHeight);
             }
         }
     }
@@ -66,10 +95,14 @@ int CMortgageCalculator::CalcNumOfDistributedForTargetHeight(int nDistributeFrom
     return nNumOfDistributed;
 }
 
-CAmount CMortgageCalculator::CalcDistributeAmountToTargetHeight(int nDistributeFromHeight, int nTargetHeight) const {
+std::tuple<CAmount, CAmount> CMortgageCalculator::GetDistrInfo(int nDistributeFromHeight, int nTargetHeight) const {
     int nDistributions = CalcNumOfDistributions(nDistributeFromHeight);
     int nDistributed = CalcNumOfDistributedForTargetHeight(nDistributeFromHeight, nTargetHeight);
+    return std::make_tuple(nDistributions, nDistributed);
+}
 
+CAmount CMortgageCalculator::CalcDistributeAmountToTargetHeight(int nDistributeFromHeight, int nTargetHeight) const {
+    auto [nDistributions, nDistributed] = GetDistrInfo(nDistributeFromHeight, nTargetHeight);
     if (nDistributed >= nDistributions) {
         // The distribution is completed for the nDistributeFromHeight
         return 0;

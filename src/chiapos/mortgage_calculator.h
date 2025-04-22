@@ -2,6 +2,7 @@
 #define BITCOIN_MORTGAGE_CALCULATOR_H
 
 #include <map>
+#include <unordered_map>
 
 #include <attributes.h>
 
@@ -28,6 +29,8 @@ public:
 
     NODISCARD int CalcNumOfDistributedForTargetHeight(int nDistributeFromHeight, int nTargetHeight) const;
 
+    NODISCARD std::tuple<CAmount, CAmount> GetDistrInfo(int nDistributeFromHeight, int nTargetHeight) const;
+
     NODISCARD CAmount CalcDistributeAmountToTargetHeight(int nDistributeFromHeight, int nTargetHeight) const;
 
     NODISCARD static bool IsFullMortgageBlock(CBlockIndex const* pindex, Consensus::Params const& params);
@@ -35,6 +38,7 @@ public:
 private:
     CBlockIndex const* m_pindexTip;
     Consensus::Params m_params;
+    mutable std::unordered_map<int, int> m_cached_n_distr;
 };
 
 #endif
