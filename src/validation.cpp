@@ -1817,6 +1817,21 @@ bool CheckInputs(const CTransaction& tx, CValidationState &state, const CCoinsVi
             continue;
         }
 
+        if (nSpendHeight >= params.BHDIP012Height) {
+            for (auto const& burnTxoutRelatedToAddress : params.BHDIP012BurnTxoutsRelatedToAddresses) {
+                // convert string into account id and compare with the account id from the txin
+                CTxDestination burnAccountDestination = DecodeDestination(burnTxoutRelatedToAddress);
+                CAccountID burnAccountID = ExtractAccountID(burnAccountDestination);
+                if (ExtractAccountID(coin.out.scriptPubKey) == burnAccountID) {
+                    fBurnTx = true;
+                    break;
+                }
+            }
+            if (fBurnTx) {
+                continue;
+            }
+        }
+
         // We very carefully only pass in things to CScriptCheck which
         // are clearly committed to by tx' witness hash. This provides
         // a sanity check that our caching is not introducing consensus

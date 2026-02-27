@@ -219,6 +219,11 @@ public:
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 100;
 
+        // BHDIP012
+        // TODO the BHDIP012 parameters are waiting to be filled
+        consensus.BHDIP012Height = INFINITE_HEIGHT;
+        consensus.BHDIP012BurnTxoutsRelatedToAddresses = {};
+
         // Misc.
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;
@@ -827,6 +832,10 @@ public:
         consensus.BHDIP011Height = consensus.BHDIP010Height + 10;
         consensus.BHDIP011NumHeightsToCalcDistributionPercentageOfFullMortgage = 3360;
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 10;
+
+        // BHDIP012
+        consensus.BHDIP012Height = consensus.BHDIP011Height + 20;
+        consensus.BHDIP012BurnTxoutsRelatedToAddresses = {"2NAfqQ8ChefHYx448WX2243fZ9MoTtViFon"};
 
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = Consensus::BIP9Deployment::ALWAYS_ACTIVE;

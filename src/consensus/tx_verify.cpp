@@ -180,6 +180,19 @@ bool Consensus::CheckTxInputs(CTransaction const& tx, CValidationState& state, C
             }
         }
 
+        if (nSpendHeight >= params.BHDIP012Height) {
+            for (auto const& burnTxoutRelatedToAddress : params.BHDIP012BurnTxoutsRelatedToAddresses) {
+                // convert string into account id and compare with the account id from the txin
+                CTxDestination burnAccountDestination = DecodeDestination(burnTxoutRelatedToAddress);
+                CAccountID burnAccountID = ExtractAccountID(burnAccountDestination);
+                if (ExtractAccountID(previous_coin.out.scriptPubKey) == burnAccountID) {
+                    fLimitTxOutToBurn = true;
+                    outpointCauseBurning = prevout;
+                    break;
+                }
+            }
+        }
+
         if (previous_coin.refOutAccountID == burnAccountID) {
             return state.Invalid(ValidationInvalidReason::CONSENSUS, false, REJECT_INVALID, "tx-spend-burn-address", "spend from burn address is not allowed");
         }

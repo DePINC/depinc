@@ -2936,6 +2936,22 @@ void CWallet::AvailableCoins(interfaces::Chain::Lock& locked_chain, std::vector<
                     LogPrintf("%s: cannot select coin (%s, %n) to spend cause the coin is older than BHDIP009 and the related chain consensus is activated\n", __func__, wtxid.GetHex(), i);
                     continue;
                 }
+                if (nSpendHeight >= params.BHDIP012Height) {
+                    bool skip = false;
+                    for (auto const& burnTxoutRelatedToAddress : params.BHDIP012BurnTxoutsRelatedToAddresses) {
+                        // convert string into account id and compare with the account id from the txin
+                        CTxDestination burnAccountDestination = DecodeDestination(burnTxoutRelatedToAddress);
+                        CAccountID burnAccountID = ExtractAccountID(burnAccountDestination);
+                        if (ExtractAccountID(wtx.tx->vout[i].scriptPubKey) == burnAccountID) {
+                            skip = true;
+                            break;
+                        }
+                    }
+                    if (skip) {
+                        LogPrintf("%s: cannot select coin (%s, %n) to spend cause the coin is related to BHDIP012 burn address and the related chain consensus is activated\n", __func__, wtxid.GetHex(), i);
+                        continue;
+                    }
+                }
             }
 
             bool solvable = IsSolvable(*this, wtx.tx->vout[i].scriptPubKey);
