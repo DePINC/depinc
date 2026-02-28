@@ -220,9 +220,8 @@ public:
         consensus.BHDIP011MinFullMortgageBlocksToDistribute = 100;
 
         // BHDIP012
-        // TODO the BHDIP012 parameters are waiting to be filled
-        consensus.BHDIP012Height = INFINITE_HEIGHT;
-        consensus.BHDIP012BurnTxoutsRelatedToAddresses = {};
+        consensus.BHDIP012Height = 1293000;
+        consensus.BHDIP012BurnTxoutsRelatedToAddresses = { "3NaM54CkXjcJqiU4osHkUbVeKJYKA4h7ji" };
 
         // Misc.
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
