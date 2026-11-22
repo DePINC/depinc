@@ -84,15 +84,3 @@ TxPledgeMap RetrievePledgeMap(CWallet* pwallet, bool fIncludeInvalid, isminefilt
 
     return mapTxPledge;
 }
-
-CAmount CalcActualAmount(CAmount pledgeAmount, int pledgeOnHeight, PledgeTerm const& term, PledgeTerm const& fallbackTerm, int chainHeight) noexcept {
-    if (chainHeight == 0) {
-        return 0;
-    }
-    int pledgedHeights = std::max(chainHeight - pledgeOnHeight, 0);
-    if (pledgedHeights > term.nLockHeight) {
-        // should use the fallback term
-        return fallbackTerm.nWeightPercent * pledgeAmount / 100;
-    }
-    return term.nWeightPercent * pledgeAmount / 100;
-}

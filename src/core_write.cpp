@@ -4,7 +4,9 @@
 
 #include <core_io.h>
 
+#include <chainparams.h>
 #include <consensus/consensus.h>
+#include <consensus/pledge_term.h>
 #include <consensus/validation.h>
 #include <key_io.h>
 #include <script/script.h>
@@ -17,6 +19,8 @@
 #include <util/strencodings.h>
 
 #include <coins.h>
+
+#include <string_view>
 
 UniValue ValueFromAmount(const CAmount& amount)
 {
@@ -187,6 +191,68 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey,
     out.pushKV("addresses", a);
 }
 
+PledgeAmountsPack BuildPledgeAmountsPack(const CTransaction& tx, int nTxHeight, int nCalcHeight)
+{
+    PledgeAmountsPack pack;
+    pack.nTxHeight = nTxHeight;
+    if (tx.vout.empty()) {
+        return pack;
+    }
+    pack.nTxAmount = tx.vout[0].nValue;
+    pack.nActualAmount = pack.nTxAmount;
+
+    if (!tx.IsUniform()) {
+        return pack;
+    }
+
+    auto payload = ExtractTransactionDatacarrier(tx, nTxHeight, DatacarrierTypes{DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
+    if (payload == nullptr) {
+        return pack;
+    }
+
+    auto term_to_str = [](DatacarrierType type) -> std::string {
+        if (!DatacarrierTypeIsChiaPoint(type)) {
+            return "none";
+        }
+        constexpr std::string_view TYPE_STRS[] = {
+            "noterm",
+            "term1",
+            "term2",
+            "term3",
+        };
+        int nTermIndex = static_cast<int>(type - DATACARRIER_TYPE_CHIA_POINT);
+        return std::string(TYPE_STRS[nTermIndex]);
+    };
+
+    auto const& params = Params().GetConsensus();
+    if (payload->type == DATACARRIER_TYPE_POINT) {
+        // BHD point
+        pack.nActualAmount = pack.nTxAmount;
+    } else if (DatacarrierTypeIsChiaPoint(payload->type)) {
+        // Chia point
+        int nTermIndex = static_cast<int>(payload->type - DATACARRIER_TYPE_CHIA_POINT);
+        auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
+        auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
+        pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, nCalcHeight);
+        pack.strTermName = term_to_str(payload->type);
+    } else if (payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
+        // Chia retarget point: the term and the pledge height come from the
+        // original point carried by the payload.
+        auto ppayloadRetarget = PointRetargetPayload::As(payload);
+        auto pointType = ppayloadRetarget->GetPointType();
+        int nPointHeight = ppayloadRetarget->GetPointHeight();
+        int nTermIndex = static_cast<int>(pointType - DATACARRIER_TYPE_CHIA_POINT);
+        if (nTermIndex < 0 || nTermIndex >= static_cast<int>(params.BHDIP009PledgeTerms.size())) {
+            return pack;
+        }
+        auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
+        auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
+        pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nPointHeight, term, fallbackTerm, nCalcHeight);
+        pack.strTermName = term_to_str(pointType);
+    }
+    return pack;
+}
+
 void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex, int serialize_flags, PledgeAmountsPack const& pledgeAmounts, CoinAmountQuerier querier)
 {
     entry.pushKV("txid", tx.GetHash().GetHex());
@@ -253,7 +319,7 @@ void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry,
     entry.pushKV("vout", vout);
 
     if (tx.IsUniform()) {
-        CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(tx, pledgeAmounts.nCurrHeight, DatacarrierTypes{DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER, DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
+        CDatacarrierPayloadRef payload = ExtractTransactionDatacarrier(tx, pledgeAmounts.nTxHeight, DatacarrierTypes{DATACARRIER_TYPE_BINDPLOTTER, DATACARRIER_TYPE_BINDCHIAFARMER, DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
         if (payload) {
             UniValue extra(UniValue::VOBJ);;
             DatacarrierPayloadToUniv(payload, tx.vout[0], pledgeAmounts, extra);

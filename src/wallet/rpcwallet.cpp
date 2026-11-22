@@ -2008,7 +2008,14 @@ static UniValue gettransaction(const JSONRPCRequest& request)
 
     if (verbose) {
         UniValue decoded(UniValue::VOBJ);
-        TxToUniv(*wtx.tx, uint256(), decoded, false);
+        // Mirror getrawtransaction: use the height of the containing block so the
+        // decoded pledge amount is immutable. Unconfirmed txs use the next height.
+        int nTxHeight = locked_chain->getBlockHeight(wtx.GetBlockHash()).get_value_or(0);
+        if (nTxHeight == 0) {
+            nTxHeight = locked_chain->getHeight().get_value_or(0) + 1;
+        }
+        PledgeAmountsPack pack = BuildPledgeAmountsPack(*wtx.tx, nTxHeight, nTxHeight);
+        TxToUniv(*wtx.tx, uint256(), decoded, false, 0, pack);
         entry.pushKV("decoded", decoded);
     }
 
@@ -3348,7 +3355,9 @@ static UniValue listunspent(const JSONRPCRequest& request)
             const Coin &coin = pwallet->chain().accessCoin(COutPoint(out.tx->GetHash(), out.i)); // lock cs_main
             if (coin.extraData) {
                 UniValue extra(UniValue::VOBJ);
-                DatacarrierPayloadToUniv(coin.extraData, out.tx->tx->vout[out.i], PledgeAmountsPack{static_cast<int>(coin.nHeight), locked_chain->getHeight().get_value_or(0)}, extra);
+                // listunspent reports the currently effective amount, so evaluate at the chain tip.
+                PledgeAmountsPack pack = BuildPledgeAmountsPack(*out.tx->tx, static_cast<int>(coin.nHeight), locked_chain->getHeight().get_value_or(0));
+                DatacarrierPayloadToUniv(coin.extraData, out.tx->tx->vout[out.i], pack, extra);
                 entry.pushKV("extra", extra);
             }
         }
