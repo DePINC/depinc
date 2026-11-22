@@ -4,6 +4,11 @@ $(package)_download_path=https://github.com/depinc/vdf/archive/refs/tags/
 $(package)_download_file=$($(package)_version).tar.gz
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=32241c794324071673f1ed66e3332819ea31dadab00d958155590e5435c23e85
+$(package)_patches=001-mpir-c89.patch
+
+define $(package)_preprocess_cmds
+  patch -p1 < $($(package)_patch_dir)/001-mpir-c89.patch
+endef
 
 define $(package)_fetch_cmds
 $(call fetch_file,$(package),$($(package)_download_path),$($(package)_download_file),$($(package)_file_name),$($(package)_sha256_hash))

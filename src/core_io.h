@@ -54,12 +54,23 @@ void ScriptPubKeyToUniv(const CScript& scriptPubKey, UniValue& out, bool fInclud
 void ScriptToUniv(const CScript& script, UniValue& out, bool include_address);
 
 struct PledgeAmountsPack {
-    CAmount nActualAmount;
-    CAmount nTxAmount;
+    CAmount nActualAmount{0};
+    CAmount nTxAmount{0};
     int nTxHeight{0};
-    int nCurrHeight{0};
     std::string strTermName;
 };
+
+/**
+ * Build the pledge amount context for a transaction.
+ *
+ * @param[in] tx         the transaction to decode
+ * @param[in] nTxHeight  height of the block containing tx (0 when unknown)
+ * @param[in] nCalcHeight height at which the actual amount is evaluated
+ *
+ * The datacarrier is extracted at nTxHeight so that bind transactions are
+ * validated against the height they were mined at instead of the chain tip.
+ */
+PledgeAmountsPack BuildPledgeAmountsPack(const CTransaction& tx, int nTxHeight, int nCalcHeight);
 void TxToUniv(const CTransaction& tx, const uint256& hashBlock, UniValue& entry, bool include_hex = true, int serialize_flags = 0, PledgeAmountsPack const& pack = {}, CoinAmountQuerier querier = {});
 void DatacarrierPayloadToUniv(const CDatacarrierPayloadRef& payload, const CTxOut& txOut, PledgeAmountsPack const& heights, UniValue& out);
 

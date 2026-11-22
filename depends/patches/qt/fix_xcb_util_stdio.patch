@@ -1,0 +1,18 @@
+Move the stdio.h include out of the HAVE_VASPRINTF block.
+
+atoms.c uses vsnprintf() and asprintf() regardless of whether the configure
+test found vasprintf(), but it only included <stdio.h> in the vasprintf
+branch.  GCC 15+ (C23) treats the resulting implicit declaration as an error.
+
+--- a/qtbase/src/3rdparty/xcb/xcb-util/atoms.c
++++ b/qtbase/src/3rdparty/xcb/xcb-util/atoms.c
+@@ -2,8 +2,8 @@
+    possible... */
+ #ifdef HAVE_VASPRINTF
+ #define _GNU_SOURCE
+-#include <stdio.h>
+ #endif
++#include <stdio.h>
+
+ #include <xcb/xcb.h>
+ #include <stdlib.h>

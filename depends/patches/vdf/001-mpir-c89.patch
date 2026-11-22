@@ -1,0 +1,21 @@
+Build the bundled MPIR with -std=gnu89.
+
+GCC 15 and newer default to C23, where implicit function declarations are
+errors.  MPIR 3.0.0's configure probes (and K&R sources) rely on the old
+permissive behaviour, so force C89 for both the target compiler and the
+CC_FOR_BUILD probe used by configure.
+
+Note that CC_FOR_BUILD is quoted so CMake's ExternalProject keeps it as a
+single shell word when generating the configure command.
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -192,7 +192,7 @@
+         URL https://github.com/wbhart/mpir/archive/refs/tags/mpir-3.0.0.tar.gz
+         URL_HASH SHA256=86a5039badc3e6738219a262873a1db5513405e15ece9527b718fcd0fac09bb2
+         SOURCE_DIR "${GMP_SOURCE_DIR}"
+-        CONFIGURE_COMMAND ./autogen.sh && ./configure --enable-cxx --enable-static --disable-shared --prefix=${GMP_PREFIX_DIR} --host=${TOOLCHAIN_PREFIX} CC_FOR_BUILD=gcc CXXFLAGS=${STATIC_CXXFLAGS}
++        CONFIGURE_COMMAND ./autogen.sh && ./configure --enable-cxx --enable-static --disable-shared --prefix=${GMP_PREFIX_DIR} --host=${TOOLCHAIN_PREFIX} "CC_FOR_BUILD=gcc -std=gnu89" CFLAGS=-std=gnu89 CXXFLAGS=${STATIC_CXXFLAGS}
+         TEST_COMMAND ""
+         BUILD_IN_SOURCE 1
+         INSTALL_COMMAND make install && ln -f -s ${GMP_PREFIX_DIR}/include/mpir.h ${GMP_PREFIX_DIR}/include/gmp.h && ln -f -s ${GMP_PREFIX_DIR}/include/mpirxx.h ${GMP_PREFIX_DIR}/include/gmpxx.h

@@ -32,7 +32,6 @@
 #include <util/strencodings.h>
 #include <validation.h>
 #include <validationinterface.h>
-#include <wallet/txpledge.h>
 
 #include <numeric>
 #include <stdint.h>
@@ -47,64 +46,20 @@ static const CFeeRate DEFAULT_MAX_RAW_TX_FEE_RATE{COIN / 10};
 
 void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry, CoinAmountQuerier querier = {})
 {
-    // we need to get the height of the block which contains the tx in order to calculate the pledge: actual amount
-    auto queryBlockHeight = [](uint256 const& hash) -> int {
-        for (auto pindex = ::ChainActive().Tip(); pindex != nullptr; pindex = pindex->pprev) {
-            if (pindex->GetBlockHash() == hash) {
-                return pindex->nHeight;
-            }
-        }
-        return 0;
-    };
-    int nTxHeight = queryBlockHeight(hashBlock);
-    PledgeAmountsPack pack;
-    pack.nTxHeight = nTxHeight;
-    pack.nCurrHeight = ::ChainActive().Height(); // locked_chain->getHeight().get_value_or(0);
-    pack.nTxAmount = tx.vout[0].nValue;
-    pack.nActualAmount = pack.nTxAmount;
-
-    if (tx.IsUniform()) {
-        auto term_to_str = [](DatacarrierType type) -> std::string_view {
-            if (!DatacarrierTypeIsChiaPoint(type)) {
-                return "none";
-            }
-            constexpr std::string_view TYPE_STRS[] = {
-                "noterm",
-                "term1",
-                "term2",
-                "term3",
-            };
-            int nTermIndex = static_cast<int>(type - DATACARRIER_TYPE_CHIA_POINT);
-            return TYPE_STRS[nTermIndex];
-        };
-        auto const& params = Params().GetConsensus();
-        auto payload = ExtractTransactionDatacarrier(tx, nTxHeight, {DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
-        if (payload != nullptr) {
-            if (payload->type == DATACARRIER_TYPE_POINT) {
-                // BHD point
-                pack.nActualAmount = pack.nTxAmount;
-            } else if (DatacarrierTypeIsChiaPoint(payload->type)) {
-                // Chia Point
-                int nTermIndex = static_cast<int>(payload->type - DATACARRIER_TYPE_CHIA_POINT);
-                auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
-                auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
-                pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
-                pack.strTermName = term_to_str(payload->type);
-            } else if (payload->type == DATACARRIER_TYPE_CHIA_POINT_RETARGET) {
-                // Chia Retarget point
-                auto ppayloadRetarget = PointRetargetPayload::As(payload);
-                auto pointType = ppayloadRetarget->GetPointType();
-                int nPointHeight = ppayloadRetarget->GetPointHeight();
-                int nTermIndex = static_cast<int>(pointType - DATACARRIER_TYPE_CHIA_POINT);
-                auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
-                auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
-                pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, pack.nCurrHeight);
-                pack.strTermName = term_to_str(pointType);
-            }
-        } else {
-            // TODO It's a normal tx
+    // Pledge amounts are evaluated at the height of the block containing the
+    // transaction, so the result stays immutable over time. Mempool transactions
+    // are evaluated as if they were mined in the next block.
+    int nTxHeight = 0;
+    {
+        LOCK(cs_main);
+        if (hashBlock.IsNull()) {
+            nTxHeight = ::ChainActive().Height() + 1;
+        } else if (CBlockIndex const* pindex = LookupBlockIndex(hashBlock)) {
+            nTxHeight = pindex->nHeight;
         }
     }
+    PledgeAmountsPack pack = BuildPledgeAmountsPack(tx, nTxHeight, nTxHeight);
+
     // Call into TxToUniv() in bitcoin-common to decode the transaction hex.
     //
     // Blockchain contextual information (confirmations and blocktime) is not

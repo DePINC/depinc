@@ -378,8 +378,20 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
     }
 
     case RetFormat::JSON: {
+        // Evaluate pledge amounts at the height of the containing block so the
+        // result is immutable over time; mempool txs use the next height.
+        int nTxHeight = 0;
+        {
+            LOCK(cs_main);
+            if (hashBlock.IsNull()) {
+                nTxHeight = ::ChainActive().Height() + 1;
+            } else if (CBlockIndex const* pindex = LookupBlockIndex(hashBlock)) {
+                nTxHeight = pindex->nHeight;
+            }
+        }
         UniValue objTx(UniValue::VOBJ);
-        TxToUniv(*tx, hashBlock, objTx);
+        PledgeAmountsPack pack = BuildPledgeAmountsPack(*tx, nTxHeight, nTxHeight);
+        TxToUniv(*tx, hashBlock, objTx, true, 0, pack);
         std::string strJSON = objTx.write() + "\n";
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strJSON);
