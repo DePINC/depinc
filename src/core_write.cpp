@@ -205,6 +205,12 @@ PledgeAmountsPack BuildPledgeAmountsPack(const CTransaction& tx, int nTxHeight, 
         return pack;
     }
 
+    // Without a resolvable height the term cannot be evaluated (chainHeight 0
+    // makes CalcActualAmount return 0); report the raw amount instead.
+    if (nCalcHeight <= 0) {
+        return pack;
+    }
+
     auto payload = ExtractTransactionDatacarrier(tx, nTxHeight, DatacarrierTypes{DATACARRIER_TYPE_POINT, DATACARRIER_TYPE_CHIA_POINT, DATACARRIER_TYPE_CHIA_POINT_TERM_1, DATACARRIER_TYPE_CHIA_POINT_TERM_2, DATACARRIER_TYPE_CHIA_POINT_TERM_3, DATACARRIER_TYPE_CHIA_POINT_RETARGET});
     if (payload == nullptr) {
         return pack;
@@ -231,6 +237,9 @@ PledgeAmountsPack BuildPledgeAmountsPack(const CTransaction& tx, int nTxHeight, 
     } else if (DatacarrierTypeIsChiaPoint(payload->type)) {
         // Chia point
         int nTermIndex = static_cast<int>(payload->type - DATACARRIER_TYPE_CHIA_POINT);
+        if (nTermIndex < 0 || nTermIndex >= static_cast<int>(params.BHDIP009PledgeTerms.size())) {
+            return pack;
+        }
         auto const& term = params.BHDIP009PledgeTerms[nTermIndex];
         auto const& fallbackTerm = params.BHDIP009PledgeTerms[0];
         pack.nActualAmount = CalcActualAmount(pack.nTxAmount, nTxHeight, term, fallbackTerm, nCalcHeight);
