@@ -18,7 +18,10 @@ CAmount CalcActualAmount(CAmount pledgeAmount, int pledgeOnHeight, PledgeTerm co
         return 0;
     }
     int pledgedHeights = std::max(chainHeight - pledgeOnHeight, 0);
-    if (pledgedHeights > term.nLockHeight) {
+    // Match the consensus/DB rule: the term expires once the point has been
+    // locked for nLockHeight blocks (CCoinsViewDB::CalculateTermAmount and
+    // ChainInfoQuerier::GetPledgeActualAmount both use >=).
+    if (pledgedHeights >= term.nLockHeight) {
         // should use the fallback term
         return fallbackTerm.nWeightPercent * pledgeAmount / 100;
     }
