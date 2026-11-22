@@ -4,6 +4,9 @@ The py-compile script shipped with xcb-proto 1.10 imports the `imp` module,
 which was removed in Python 3.12, so installing the xcbgen Python module
 fails under a modern system Python.
 
+Keep the original fallback (compile next to the source) for interpreters
+without importlib.util.cache_from_source.
+
 --- a/py-compile
 +++ b/py-compile
 @@ -116,7 +116,11 @@
@@ -15,19 +18,20 @@ fails under a modern system Python.
 +try:
 +    from importlib.util import cache_from_source
 +except ImportError:
-+    from imp import cache_from_source
++    cache_from_source = None
 
  files = '''$files'''
 
-@@ -129,15 +133,16 @@
+@@ -129,15 +133,19 @@
  	    continue
      sys.stdout.write(file)
      sys.stdout.flush()
 -    if hasattr(imp, 'get_tag'):
 -        py_compile.compile(filepath, imp.cache_from_source(filepath), path)
--    else:
--        py_compile.compile(filepath, filepath + 'c', path)
-+    py_compile.compile(filepath, cache_from_source(filepath), path)
++    if cache_from_source is not None:
++        py_compile.compile(filepath, cache_from_source(filepath), path)
+     else:
+         py_compile.compile(filepath, filepath + 'c', path)
  sys.stdout.write('\n')" || exit $?
 
  # this will fail for python < 1.5, but that doesn't matter ...
@@ -37,19 +41,18 @@ fails under a modern system Python.
 +try:
 +    from importlib.util import cache_from_source
 +except ImportError:
-+    from imp import cache_from_source
++    cache_from_source = None
 
  # pypy does not use .pyo optimization
  if hasattr(sys, 'pypy_translation_info'):
-@@ -153,10 +158,7 @@
+@@ -153,8 +161,8 @@
  	    continue
      sys.stdout.write(file)
      sys.stdout.flush()
 -    if hasattr(imp, 'get_tag'):
 -        py_compile.compile(filepath, imp.cache_from_source(filepath, False), path)
--    else:
--        py_compile.compile(filepath, filepath + 'o', path)
-+    py_compile.compile(filepath, cache_from_source(filepath, False), path)
++    if cache_from_source is not None:
++        py_compile.compile(filepath, cache_from_source(filepath, False), path)
+     else:
+         py_compile.compile(filepath, filepath + 'o', path)
  sys.stdout.write('\n')" 2>/dev/null || :
-
- # Local Variables:
