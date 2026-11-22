@@ -2010,9 +2010,11 @@ static UniValue gettransaction(const JSONRPCRequest& request)
         UniValue decoded(UniValue::VOBJ);
         // Mirror getrawtransaction: use the height of the containing block so the
         // decoded pledge amount is immutable. Unconfirmed txs use the next height.
-        int nTxHeight = locked_chain->getBlockHeight(wtx.GetBlockHash()).get_value_or(0);
-        if (nTxHeight == 0) {
+        int nTxHeight = 0;
+        if (wtx.GetBlockHash().IsNull()) {
             nTxHeight = locked_chain->getHeight().get_value_or(0) + 1;
+        } else {
+            nTxHeight = locked_chain->getBlockHeight(wtx.GetBlockHash()).get_value_or(0);
         }
         PledgeAmountsPack pack = BuildPledgeAmountsPack(*wtx.tx, nTxHeight, nTxHeight);
         TxToUniv(*wtx.tx, uint256(), decoded, false, 0, pack);
