@@ -4,7 +4,7 @@ $(package)_download_path=https://github.com/Chia-Network/bls-signatures/archive/
 $(package)_download_file=$($(package)_version).tar.gz
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=eb3815dc4b7fe0630d53a6b60e58c3a6a3acc415531bcb076507271f35a674c5
-$(package)_patches=001-build-as-static-library.patch
+$(package)_patches=001-build-as-static-library.patch 002-cmake-policy-version-minimum.patch
 
 $(package)_sodium=libsodium
 $(package)_sodium_version=4f5e89fa84ce1d178a6765b8b46f2b6f91216677
@@ -35,7 +35,8 @@ $(call fetch_file,$(package),$($(package)_relic_download_path),$($(package)_reli
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 < $($(package)_patch_dir)/001-build-as-static-library.patch
+  patch -p1 < $($(package)_patch_dir)/001-build-as-static-library.patch && \
+  patch -p1 < $($(package)_patch_dir)/002-cmake-policy-version-minimum.patch
 endef
 
 define $(package)_config_cmds
