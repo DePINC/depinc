@@ -13,7 +13,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-  mkdir -p build && cd build && cmake -DBUILD_SHARED_LIBS=0 -DCMAKE_TOOLCHAIN_FILE=$(BASEDIR)/hosts/cmake/$(host).cmake -DCMAKE_INSTALL_PREFIX=$(host_prefix) ..
+  mkdir -p build && cd build && cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_SHARED_LIBS=0 -DCMAKE_TOOLCHAIN_FILE=$(BASEDIR)/hosts/cmake/$(host).cmake -DCMAKE_INSTALL_PREFIX=$(host_prefix) ..
 endef
 
 define $(package)_build_cmds

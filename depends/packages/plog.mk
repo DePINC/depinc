@@ -13,7 +13,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-  cmake -DPLOG_BUILD_SAMPLES=0 -DCMAKE_TOOLCHAIN_FILE=$(BASEDIR)/hosts/cmake/$(host).cmake -DCMAKE_INSTALL_PREFIX=$(host_prefix) .
+  cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DPLOG_BUILD_SAMPLES=0 -DCMAKE_TOOLCHAIN_FILE=$(BASEDIR)/hosts/cmake/$(host).cmake -DCMAKE_INSTALL_PREFIX=$(host_prefix) .
 endef
 
 define $(package)_build_cmds
